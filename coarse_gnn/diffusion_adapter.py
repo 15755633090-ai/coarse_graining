@@ -13,6 +13,39 @@ from diffusion.bond_diffusion.trainer import load_encoder
 
 from .config import CoarseningConfig, NetworkConfig
 from .model import CoarseGraphPredictor, GraphOutput
+from .cache import TopologyCache
+from .topology import CoarseTopology
+
+
+def molecular_graph_inputs(batch: MoleculeBatch):
+    """Validate clean molecular graphs and extract unpadded sparse inputs."""
+    if batch.node_features.ndim != 3 or batch.node_features.size(-1) != 5:
+        raise ValueError("Expected padded molecular node_features [B, N, 5]")
+    b, n = batch.node_features.shape[:2]
+    if b < 1 or batch.node_mask.shape != (b, n) or batch.node_mask.dtype != torch.bool:
+        raise ValueError("Expected nonempty batch with boolean node_mask [B, N]")
+    if batch.bonds.dtype != torch.long or batch.bonds.shape != (b, n, n):
+        raise ValueError("Expected long bonds [B, N, N]")
+    if not batch.node_mask.any(dim=1).all():
+        raise ValueError("Empty graphs are not supported")
+    inputs = []
+    for i in range(b):
+        valid = torch.where(batch.node_mask[i])[0]
+        bonds = batch.bonds[i][valid][:, valid]
+        if (bonds < 0).any() or (bonds >= MASK_BOND).any():
+            raise ValueError("Coarsening requires clean bond labels 0..4")
+        if not torch.equal(bonds, bonds.T) or bonds.diagonal().any():
+            raise ValueError("Bonds must be symmetric with zero diagonal")
+        edges = torch.triu(bonds > 0, diagonal=1).nonzero().T.contiguous()
+        inputs.append((valid, edges, batch.node_features[i, valid], bonds[edges[0], edges[1]]))
+    return inputs
+
+
+def precompute_batch_topologies(batch: MoleculeBatch, cache: TopologyCache,
+                               config: CoarseningConfig | None = None) -> list[CoarseTopology]:
+    """Populate a cache without constructing/loading a neural encoder."""
+    return [cache.get_or_build(len(valid), edges, config, node_labels=nodes, edge_labels=labels)
+            for valid, edges, nodes, labels in molecular_graph_inputs(batch)]
 
 
 @dataclass
@@ -38,10 +71,11 @@ class DiffusionCoarseModel(nn.Module):
         cls, checkpoint: str | Path, *, network: NetworkConfig | None = None,
         coarsening: CoarseningConfig | None = None, freeze_encoder: bool = True,
         device: str | torch.device = "cpu",
+        topology_cache: TopologyCache | None = None,
     ) -> "DiffusionCoarseModel":
         encoder = load_encoder(checkpoint, device)
         network = network or NetworkConfig(input_dim=encoder.config.hidden_dim, edge_dim=4)
-        return cls(encoder, CoarseGraphPredictor(network, coarsening), freeze_encoder).to(device)
+        return cls(encoder, CoarseGraphPredictor(network, coarsening, topology_cache=topology_cache), freeze_encoder).to(device)
 
     def set_encoder_frozen(self, frozen: bool) -> None:
         self.freeze_encoder = frozen
@@ -59,40 +93,33 @@ class DiffusionCoarseModel(nn.Module):
             self.encoder.eval()  # Frozen features must not acquire dropout noise.
         return self
 
-    def forward(self, batch: MoleculeBatch, *, node_ids: list[Tensor] | None = None) -> BatchOutput:
-        if batch.node_features.ndim != 3 or batch.node_features.size(-1) != 5:
-            raise ValueError("Expected padded molecular node_features [B, N, 5]")
-        b, n = batch.node_features.shape[:2]
-        if b < 1 or batch.node_mask.shape != (b, n) or batch.node_mask.dtype != torch.bool:
-            raise ValueError("Expected nonempty batch with boolean node_mask [B, N]")
-        if batch.bonds.dtype != torch.long or batch.bonds.shape != (b, n, n):
-            raise ValueError("Expected long bonds [B, N, N]")
-        if not batch.node_mask.any(dim=1).all():
-            raise ValueError("Empty graphs are not supported")
-        if node_ids is not None and len(node_ids) != b:
+    def precompute_topologies(self, batch: MoleculeBatch, *, node_ids: list[Tensor] | None = None) -> list[CoarseTopology]:
+        inputs = molecular_graph_inputs(batch)
+        if node_ids is not None and len(node_ids) != len(inputs):
             raise ValueError("node_ids must contain one tensor per graph")
-        # Coarsening uses clean observed topology, never masked diffusion pairs.
-        for i in range(b):
-            valid = torch.where(batch.node_mask[i])[0]
-            bonds = batch.bonds[i][valid][:, valid]
-            if (bonds < 0).any() or (bonds >= MASK_BOND).any():
-                raise ValueError("Coarsening requires clean bond labels 0..4")
-            if not torch.equal(bonds, bonds.T) or bonds.diagonal().any():
-                raise ValueError("Bonds must be symmetric with zero diagonal")
+        return [self.predictor.prepare_topology(
+            len(valid), edges, node_labels=nodes, edge_labels=labels,
+            node_ids=None if node_ids is None else node_ids[i],
+        ) for i, (valid, edges, nodes, labels) in enumerate(inputs)]
+
+    def forward(self, batch: MoleculeBatch, *, node_ids: list[Tensor] | None = None,
+                topologies: list[CoarseTopology] | None = None) -> BatchOutput:
+        inputs = molecular_graph_inputs(batch)
+        if node_ids is not None and len(node_ids) != len(inputs):
+            raise ValueError("node_ids must contain one tensor per graph")
+        if topologies is not None and len(topologies) != len(inputs):
+            raise ValueError("topologies must contain one topology per graph in batch order")
         context = torch.no_grad() if self.freeze_encoder else nullcontext()
         with context:
             nodes = self.encoder.encode_nodes(batch.node_features, batch.bonds, batch.node_mask)
         outputs = []
-        for i in range(b):
-            valid = torch.where(batch.node_mask[i])[0]
-            bonds = batch.bonds[i][valid][:, valid]
-            edges = torch.triu(bonds > 0, diagonal=1).nonzero().T.contiguous()
-            labels = bonds[edges[0], edges[1]]
+        for i, (valid, edges, raw_nodes, labels) in enumerate(inputs):
             attributes = nn.functional.one_hot(labels - 1, num_classes=4).to(nodes.dtype) if self.predictor.config.edge_dim else None
             outputs.append(self.predictor(
                 nodes[i, valid], edges, attributes,
                 node_ids=None if node_ids is None else node_ids[i],
-                node_labels=batch.node_features[i, valid], edge_labels=labels,
+                node_labels=raw_nodes, edge_labels=labels,
+                topology=None if topologies is None else topologies[i],
             ))
         return BatchOutput(
             torch.stack([out.prediction for out in outputs]),

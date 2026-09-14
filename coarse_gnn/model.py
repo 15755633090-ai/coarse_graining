@@ -7,8 +7,9 @@ import torch
 from torch import Tensor, nn
 
 from .config import CoarseningConfig, NetworkConfig
+from .cache import TopologyCache
 from .layers import EdgeGIN
-from .topology import CoarseTopology, build_topology
+from .topology import CoarseTopology, build_topology, topology_fingerprint
 
 
 @dataclass
@@ -22,10 +23,12 @@ class GraphOutput:
 
 
 class CoarseGraphPredictor(nn.Module):
-    def __init__(self, config: NetworkConfig | None = None, coarsening: CoarseningConfig | None = None):
+    def __init__(self, config: NetworkConfig | None = None, coarsening: CoarseningConfig | None = None,
+                 *, topology_cache: TopologyCache | None = None):
         super().__init__()
         self.config = config or NetworkConfig()
         self.coarsening = coarsening or CoarseningConfig()
+        self.topology_cache = topology_cache
         cfg = self.config
         self.input_projection = nn.Sequential(nn.Linear(cfg.input_dim, cfg.hidden_dim), nn.SiLU())
         self.region_gnn = EdgeGIN(cfg.hidden_dim, cfg.edge_dim if cfg.use_region_edge_features else 0, cfg.region_layers, cfg.dropout)
@@ -33,10 +36,18 @@ class CoarseGraphPredictor(nn.Module):
         self.coarse_gnn = EdgeGIN(cfg.hidden_dim, cfg.coarse_edge_dim, cfg.coarse_layers, cfg.dropout)
         self.head = nn.Sequential(nn.Linear(cfg.hidden_dim, cfg.hidden_dim), nn.SiLU(), nn.Linear(cfg.hidden_dim, cfg.output_dim))
 
+    def prepare_topology(self, num_nodes, edge_index, *, node_ids=None,
+                         node_labels=None, edge_labels=None) -> CoarseTopology:
+        """Precompute without running the encoder or any trainable layer."""
+        builder = self.topology_cache.get_or_build if self.topology_cache is not None else build_topology
+        return builder(num_nodes, edge_index, self.coarsening, node_ids=node_ids,
+                       node_labels=node_labels, edge_labels=edge_labels)
+
     def forward(
         self, node_embeddings: Tensor, edge_index: Tensor, edge_attr: Tensor | None = None,
         *, node_ids: Tensor | None = None, node_labels: Tensor | None = None,
         edge_labels: Tensor | None = None,
+        topology: CoarseTopology | None = None,
     ) -> GraphOutput:
         cfg = self.config
         if node_embeddings.ndim != 2 or node_embeddings.size(1) != cfg.input_dim:
@@ -48,8 +59,14 @@ class CoarseGraphPredictor(nn.Module):
                 raise ValueError("Canonical prediction requires raw discrete node_labels, not learned embeddings")
             if cfg.edge_dim and edge_labels is None:
                 raise ValueError("Provide raw discrete edge_labels separately from message-passing edge_attr")
-        topology = build_topology(node_embeddings.size(0), edge_index, self.coarsening,
-                                  node_ids=node_ids, node_labels=node_labels, edge_labels=edge_labels)
+        if topology is None:
+            topology = self.prepare_topology(node_embeddings.size(0), edge_index,
+                                            node_ids=node_ids, node_labels=node_labels, edge_labels=edge_labels)
+        elif topology.input_fingerprint != topology_fingerprint(
+            node_embeddings.size(0), edge_index, self.coarsening,
+            node_ids=node_ids, node_labels=node_labels, edge_labels=edge_labels,
+        ):
+            raise ValueError("Precomputed topology does not match input layout, labels or coarsening config")
         device = node_embeddings.device
         if edge_attr is None:
             if cfg.edge_dim:
@@ -62,9 +79,7 @@ class CoarseGraphPredictor(nn.Module):
             raise ValueError("edge_attr must be finite")
         attributes = edge_attr[topology.edge_positions.to(device)]
         # Opposite directions are storage duplicates, not additional physical edges.
-        canonical_ids = {tuple(pair): i for i, pair in enumerate(topology.edges.T.tolist())}
-        input_pairs = topology.input_to_canonical[edge_index.detach().cpu()].T.tolist()
-        inverse = torch.tensor([canonical_ids[(min(u, v), max(u, v))] for u, v in input_pairs], device=device, dtype=torch.long)
+        inverse = topology.input_edge_ids.to(device)
         if not torch.allclose(edge_attr, attributes[inverse]):
             raise ValueError("Opposite directions of an undirected edge must have identical attributes")
 

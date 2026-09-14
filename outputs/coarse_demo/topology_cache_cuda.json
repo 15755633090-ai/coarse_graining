@@ -1,0 +1,266 @@
+{
+  "notice": "Framework smoke test only. Downstream weights are randomly initialized; predictions are not trained property estimates.",
+  "checkpoint": "C:\\Users\\12775\\Desktop\\GNN课题1\\coarse_graining\\diffusion\\outputs\\ogb_clean\\encoder.pt",
+  "device": "cuda",
+  "freeze_encoder": false,
+  "network": {
+    "input_dim": 128,
+    "hidden_dim": 128,
+    "edge_dim": 4,
+    "region_layers": 2,
+    "coarse_layers": 3,
+    "output_dim": 1,
+    "dropout": 0.1,
+    "region_pool": "mean",
+    "graph_pool": "mean",
+    "edge_reduce": "sum",
+    "use_size_feature": false,
+    "use_region_edge_features": false,
+    "use_coarse_edge_count": false,
+    "use_coarse_edge_features": false
+  },
+  "coarsening": {
+    "radius": 4,
+    "center_fraction": 0.1,
+    "max_residual_size": 4,
+    "canonicalize": true
+  },
+  "prediction_shape": [
+    4,
+    1
+  ],
+  "graph_embedding_shape": [
+    4,
+    128
+  ],
+  "training_check": {
+    "synthetic_loss": 0.0675407126545906,
+    "parameters_with_gradients": 99
+  },
+  "topology_cache": {
+    "hits": 8,
+    "disk_hits": 4,
+    "misses": 0,
+    "memory_entries": 4
+  },
+  "graphs": [
+    {
+      "input": "CCO",
+      "prediction": [
+        0.8493149280548096
+      ],
+      "stats": {
+        "num_nodes": 3,
+        "num_edges": 2,
+        "num_main_regions": 1,
+        "num_added_centers": 0,
+        "num_residual_regions": 0,
+        "num_residual_nodes": 0,
+        "num_coarse_nodes": 1,
+        "num_coarse_edges": 0,
+        "coarse_node_ratio": 0.3333333333333333,
+        "context_occurrence_ratio": 1.0,
+        "max_core_size": 3,
+        "canonicalized": true
+      },
+      "centers": [
+        1
+      ],
+      "owner": [
+        0,
+        0,
+        0
+      ],
+      "atom_order": [
+        0,
+        1,
+        2
+      ],
+      "owner_input": [
+        0,
+        0,
+        0
+      ],
+      "centers_input": [
+        1
+      ],
+      "canonical_signature": "7ef02286fdf449ed0e153ad6d281f7f9801fd5d200b97a113be513259789c5eb",
+      "contexts": [
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "coarse_edges": [],
+      "coarse_edge_attr": []
+    },
+    {
+      "input": "CC(=O)O",
+      "prediction": [
+        0.7523776888847351
+      ],
+      "stats": {
+        "num_nodes": 4,
+        "num_edges": 3,
+        "num_main_regions": 1,
+        "num_added_centers": 0,
+        "num_residual_regions": 0,
+        "num_residual_nodes": 0,
+        "num_coarse_nodes": 1,
+        "num_coarse_edges": 0,
+        "coarse_node_ratio": 0.25,
+        "context_occurrence_ratio": 1.0,
+        "max_core_size": 4,
+        "canonicalized": true
+      },
+      "centers": [
+        0
+      ],
+      "owner": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "atom_order": [
+        1,
+        0,
+        3,
+        2
+      ],
+      "owner_input": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "centers_input": [
+        1
+      ],
+      "canonical_signature": "896bbc4b3fe8eb0c0d82a41b106aca1271910fa1c93d28354986219af7e42b2e",
+      "contexts": [
+        [
+          0,
+          1,
+          2,
+          3
+        ]
+      ],
+      "coarse_edges": [],
+      "coarse_edge_attr": []
+    },
+    {
+      "input": "c1ccccc1",
+      "prediction": [
+        0.36108219623565674
+      ],
+      "stats": {
+        "num_nodes": 6,
+        "num_edges": 6,
+        "num_main_regions": 1,
+        "num_added_centers": 0,
+        "num_residual_regions": 0,
+        "num_residual_nodes": 0,
+        "num_coarse_nodes": 1,
+        "num_coarse_edges": 0,
+        "coarse_node_ratio": 0.16666666666666666,
+        "context_occurrence_ratio": 1.0,
+        "max_core_size": 6,
+        "canonicalized": true
+      },
+      "centers": [
+        0
+      ],
+      "owner": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "atom_order": [
+        4,
+        2,
+        3,
+        5,
+        1,
+        0
+      ],
+      "owner_input": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "centers_input": [
+        4
+      ],
+      "canonical_signature": "011a4fffb8a356cfc42364f478c9911519fda095ef759b43f4525e8a5f4e23ff",
+      "contexts": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      ],
+      "coarse_edges": [],
+      "coarse_edge_attr": []
+    },
+    {
+      "input": "[Na+].[Cl-]",
+      "prediction": [
+        0.5508182048797607
+      ],
+      "stats": {
+        "num_nodes": 2,
+        "num_edges": 0,
+        "num_main_regions": 1,
+        "num_added_centers": 0,
+        "num_residual_regions": 1,
+        "num_residual_nodes": 1,
+        "num_coarse_nodes": 2,
+        "num_coarse_edges": 0,
+        "coarse_node_ratio": 1.0,
+        "context_occurrence_ratio": 1.0,
+        "max_core_size": 1,
+        "canonicalized": true
+      },
+      "centers": [
+        0
+      ],
+      "owner": [
+        0,
+        1
+      ],
+      "atom_order": [
+        0,
+        1
+      ],
+      "owner_input": [
+        0,
+        1
+      ],
+      "centers_input": [
+        0
+      ],
+      "canonical_signature": "158ba51fd31a417e26d45bb9224d91ca8bcc793b988bace334091b65d960be36",
+      "contexts": [
+        [
+          0
+        ],
+        [
+          1
+        ]
+      ],
+      "coarse_edges": [],
+      "coarse_edge_attr": []
+    }
+  ]
+}

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import torch
 
-from coarse_gnn import CoarseningConfig, NetworkConfig
+from coarse_gnn import CoarseningConfig, NetworkConfig, TopologyCache
 from coarse_gnn.diffusion_adapter import DiffusionCoarseModel
 from diffusion.bond_diffusion.data import MoleculeGraph, collate_graphs, graph_from_smiles
 from diffusion.bond_diffusion.trainer import load_encoder
@@ -31,6 +31,7 @@ def main():
     parser.add_argument("--checkpoint", type=Path, default=Path(__file__).resolve().parent / "diffusion/outputs/ogb_clean/encoder.pt")
     parser.add_argument("--smiles", nargs="+", help="Optional molecular inputs; default: synthetic chains of 1, 24, 100 nodes")
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--topology-cache", type=Path, help="Reuse/prepopulate persistent topology files in this directory")
     parser.add_argument("--radius", type=int, default=4)
     parser.add_argument("--center-fraction", type=float, default=0.1)
     parser.add_argument("--max-residual-size", type=int, default=4)
@@ -63,9 +64,13 @@ def main():
     )
     coarsening = CoarseningConfig(args.radius, args.center_fraction, args.max_residual_size, canonicalize=not args.legacy_coarsening)
     from coarse_gnn import CoarseGraphPredictor
-    model = DiffusionCoarseModel(encoder, CoarseGraphPredictor(network, coarsening), not args.finetune_encoder).to(args.device)
+    cache = TopologyCache(args.topology_cache) if args.topology_cache is not None else None
+    model = DiffusionCoarseModel(encoder, CoarseGraphPredictor(network, coarsening, topology_cache=cache), not args.finetune_encoder).to(args.device)
     graphs = [graph_from_smiles(s) for s in args.smiles] if args.smiles else [chain_graph(n) for n in (1, 24, 100)]
-    batch = collate_graphs(graphs).to(args.device)
+    batch = collate_graphs(graphs)
+    if cache is not None:
+        model.precompute_topologies(batch)
+    batch = batch.to(args.device)
     training_check = None
     if args.backward:
         model.train()
@@ -93,6 +98,7 @@ def main():
         "prediction_shape": list(result.predictions.shape),
         "graph_embedding_shape": list(result.graph_embeddings.shape),
         "training_check": training_check,
+        "topology_cache": None if cache is None else cache.stats,
         "graphs": [
             {
                 "input": graph.smiles, "prediction": out.prediction.cpu().tolist(),

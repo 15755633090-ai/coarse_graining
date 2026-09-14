@@ -5,13 +5,45 @@ import math
 import hashlib
 import json
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from functools import lru_cache
+from importlib.metadata import version
 
 import torch
 from torch import Tensor
 
 from .config import CoarseningConfig
 from .canonical import canonical_atom_order, discrete_rows
+
+
+# Bump when topology construction, serialization or index semantics change.
+TOPOLOGY_VERSION = 1
+
+
+@lru_cache(maxsize=1)
+def _bliss_version() -> str:
+    return version("igraph")
+
+
+def topology_fingerprint(num_nodes, edge_index, config, *, node_ids=None,
+                         node_labels=None, edge_labels=None) -> str:
+    """Hash the exact input layout, NOT a canonical/isomorphism hash.
+
+    O(N+E) verification avoids canonicalization on hits. Reordered inputs get
+    their own entries because atom_order and edge_positions are input-specific.
+    Learned embeddings and continuous message attributes are deliberately absent.
+    """
+    header = dict(version=TOPOLOGY_VERSION, config=asdict(config), num_nodes=num_nodes,
+                  igraph=_bliss_version() if config.canonicalize else None)
+    digest = hashlib.sha256(json.dumps(header, sort_keys=True).encode())
+    for value in (edge_index, node_ids, node_labels, edge_labels):
+        if value is None:
+            digest.update(b"null;")
+        else:
+            value = value.detach().cpu().contiguous()
+            digest.update(json.dumps([str(value.dtype), list(value.shape)]).encode())
+            digest.update(value.reshape(-1).view(torch.uint8).numpy().tobytes())
+    return digest.hexdigest()
 
 
 @dataclass
@@ -37,6 +69,8 @@ class CoarseTopology:
     input_to_canonical: Tensor
     node_labels: Tensor  # Original discrete values in canonical order.
     edge_labels: Tensor  # Original discrete values aligned with edges.
+    input_edge_ids: Tensor  # Caller edge positions -> canonical physical edge IDs.
+    input_fingerprint: str  # Exact input layout + coarsening config + version.
 
     @property
     def owner_input(self) -> Tensor:
@@ -165,6 +199,11 @@ def build_topology(
         unique_labels = unique_labels[edge_order]
         keys = list(range(num_nodes))
     raw_nodes = raw_nodes[order]
+    canonical_ids = {tuple(pair): i for i, pair in enumerate(edges.T.tolist())}
+    input_edge_ids = torch.tensor([
+        canonical_ids[(min(u, v), max(u, v))]
+        for u, v in inverse[edge_index.detach().cpu()].T.tolist()
+    ], dtype=torch.long)
     adjacency: list[list[int]] = [[] for _ in range(num_nodes)]
     pairs = edges.T.tolist()
     for u, v in pairs:
@@ -250,5 +289,7 @@ def build_topology(
         torch.arange(num_coarse) >= num_main, edges, positions,
         context_edges, context_edge_ids, core_positions, _pairs_tensor(coarse_pairs),
         torch.tensor(boundary_ids, dtype=torch.long), groups, counts, stats,
-        order, inverse, raw_nodes, unique_labels,
+        order, inverse, raw_nodes, unique_labels, input_edge_ids,
+        topology_fingerprint(num_nodes, edge_index, config, node_ids=node_ids,
+                             node_labels=node_labels, edge_labels=edge_labels),
     )

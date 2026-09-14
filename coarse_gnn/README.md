@@ -81,6 +81,55 @@ assert output.predictions.shape == (2, 1)
 
 输出默认不施加 sigmoid/softmax：回归可用 MSE，二分类可用 `BCEWithLogitsLoss`，多分类设置 `output_dim=类别数` 并用 `CrossEntropyLoss`。本框架不定义尚未选定的数据划分、标签归一化或训练目标。
 
+## 拓扑缓存与预计算
+
+`TopologyCache` 保存 CPU 上的离散拓扑，包括 `atom_order`、反向编号映射、`centers`、`owner`、`cores`、`contexts`、`context_edges`、区域边与池化索引、`coarse_edges`，以及 `boundary_edge_ids` / `boundary_groups` 边界映射。`input_edge_ids` 同时保存原始边存储位置到规范物理边的映射，前向不再用字典重建它。
+
+```python
+from coarse_gnn import TopologyCache
+from coarse_gnn.diffusion_adapter import DiffusionCoarseModel, precompute_batch_topologies
+
+cache = TopologyCache("outputs/topology_cache", max_memory_entries=128)
+
+# 可在构造模型前遍历 CPU DataLoader；不读取性质标签、不运行编码器。
+# 如修改粗化参数，应将同一个 CoarseningConfig 传给预计算和模型。
+# for batch in loader:
+#     precompute_batch_topologies(batch, cache)
+
+model = DiffusionCoarseModel.from_checkpoint(
+    "diffusion/outputs/ogb_clean/encoder.pt", topology_cache=cache,
+    freeze_encoder=False,
+)
+# 每个 epoch 照常运行 model(batch)，自动命中已有拓扑。
+# output = model(batch)
+print(cache.stats)  # hits: 内存命中；disk_hits: 磁盘命中；misses: 新构建次数
+```
+
+也支持显式传入预计算对象，便于数据管线自己管理：
+
+```python
+# batch 是已有 MoleculeBatch；预计算不运行神经网络。
+topologies = model.precompute_topologies(batch)
+output = model(batch, topologies=topologies)
+```
+
+显式列表必须与当前 batch 的分子顺序对应。模型会核对输入指纹，误传其他分子、其他编号或其他配置的拓扑会报错。通用接口对应 `predictor.prepare_topology(N, edge_index, node_labels=..., edge_labels=...)` 和 `predictor(..., topology=topology)`；自动缓存通过 `CoarseGraphPredictor(..., topology_cache=cache)` 开启。
+
+缓存规则：
+
+- 指纹包含节点数、精确的输入边排列、原始离散原子/键属性、可选 legacy `node_ids`、全部 `CoarseningConfig` 参数、拓扑实现版本和 igraph 版本。它是原始输入的内容哈希，计算为 `O(N+E)`，不需要先做 canonicalization。
+- 节点重编号、边重排或图增强会生成独立条目，避免复用旧 `atom_order` / `edge_positions`。这不是跨同构图共享的缓存；固定数据集输入顺序可最大化命中率。模型的重编号不变性仍由原来的规范化保证。
+- 不保存扩散节点向量、训练标签、消息边特征、GNN 输出或计算图；更换网络权重、增强开关、读出方式和微调编码器均可复用同一拓扑。连续边属性在每次前向重新聚合并保留梯度。
+- 未传缓存时沿用即时构建。`TopologyCache()` 仅缓存内存；传目录后持久化为张量和基础类型组成的 `.pt` 文件，以 `weights_only=True` 读取。默认最多保留 128 张图的内存条目，超出后按最近使用顺序淘汰，磁盘文件保留；设为 0 可仅用磁盘。`clear_memory()` 不删除磁盘文件。
+- 文件采用临时文件加原子替换写入；不同进程可以共用目录，各自持有内存缓存。同时首次处理同一张图时可能重复计算，但不会读取到半写入文件。损坏文件明确报错并提示重建。
+- 返回的拓扑对象应视为只读。修改粗化算法、字段格式或索引语义时必须递增 `topology.py` 中的 `TOPOLOGY_VERSION`；旧条目仍保留，但不会命中。默认 `outputs/topology_cache/` 可重建，因此不纳入 Git。
+
+CLI：`python precompute_topology.py --input molecules.csv --cache-dir outputs/topology_cache`。可用 `--smiles-column` 指定 CSV 列；图 JSONL 沿用原始数据格式。`--radius`、`--center-fraction`、`--max-residual-size` 应与模型配置一致。再次运行同一命令会读取已有文件；输出报告中 `misses=0` 表示本次未重新构建。
+
+缓存不消除输入哈希、磁盘 I/O、CPU/GPU 索引传输、分子适配器的稠密边检查和 GNN 计算；实际训练加速幅度仍需在选定数据集上测量。
+
+缓存验收：22 项测试通过（原有 16 项、新增 6 项）。新增测试覆盖磁盘全字段还原、命中后禁止调用 Bliss/BFS、参数/属性/编号变化失效、缓存与即时构建的预测及梯度一致、batch 重排、重编号不变性和连续编码器微调。使用现有预训练权重完成 CPU 预计算后在 CUDA 上微调一步，记录为 4 次磁盘命中、8 次内存命中、0 次重建，见 [运行报告](../outputs/coarse_demo/topology_cache_cuda.json)。该报告使用合成目标验证梯度，不代表下游训练结果。
+
 ## 诊断与消融
 
 `output.topology.stats` 记录原节点/边数量、主区域和残余数量、补中心数、最终粗节点和粗边数、最大主区域大小，以及：
@@ -116,7 +165,7 @@ base_plus_counts = NetworkConfig.base(input_dim=128, edge_dim=0, use_coarse_edge
 - 当前分子适配器使用二维连接关系、已有离散原子属性和键类型。
 - 残余区域保证节点进入表示，但不保证大幅压缩或消除长程瓶颈；主区域的四跳半径也不限制高分支图的节点数。
 - 区域上下文不保证为每个边界主节点提供完整的多层外部邻域。共享全图扩散表示提供已有上下文，区域 GNN 使用其截取到的诱导子图。
-- 当前规范化与拓扑在 CPU 上构建，每次前向重新计算，区域逐个编码，批次内粗图逐图处理。Bliss 的最坏时间复杂度是指数级；在其后，中心 BFS 约为 `O(K(N+E))`，上下文边筛选约为 `O(K_final E)`，残余检查另有遍历开销。尚未实现缓存或区域并行批处理。
+- 当前规范化与拓扑在 CPU 上构建，启用缓存后只在未命中时计算，区域逐个编码，批次内粗图逐图处理。首次构建时 Bliss 的最坏时间复杂度是指数级；在其后，中心 BFS 约为 `O(K(N+E))`，上下文边筛选约为 `O(K_final E)`，残余检查另有遍历开销。尚未实现区域并行批处理。
 - 扩散适配器沿用原编码器的稠密分子边矩阵，因此整体仍有原图二次规模的内存开销。通用粗图预测器不要求稠密矩阵。
 - 当前只支持图级预测，不包含粗图向原节点回传或节点级预测头。通用粗图模块不限定材料种类，但现有预训练编码器及其适配器仍是分子图模型。
 - 尚未进行正式下游训练、长程性能验证或创新性验证。

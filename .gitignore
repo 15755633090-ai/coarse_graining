@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+# Rebuildable per-graph topology cache (not model checkpoints or audit reports).
+outputs/topology_cache/
 .venv/
 venv/
 
