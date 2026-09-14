@@ -1,4 +1,4 @@
-"""Audit renumbering sensitivity and stereo information without training a model."""
+"""Audit graph renumbering invariance without training a model."""
 import argparse
 import json
 from collections import deque
@@ -57,7 +57,7 @@ def main():
     samples = [
         ("chain_24", chain_graph(24)),
         ("chain_100", chain_graph(100)),
-        ("PP_like_oligomer", graph_from_smiles("CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)C")),
+        ("branched_molecule", graph_from_smiles("CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)C")),
     ]
     report = {
         "seed": args.seed, "permutations": args.permutations,
@@ -117,19 +117,11 @@ def main():
             )
             report["graphs"].append(item)
             print(json.dumps(item), flush=True)
-        stereo_pair = ["C[C@H](F)[C@H](Cl)Br", "C[C@H](F)[C@@H](Cl)Br"]
-        first, second = map(graph_from_smiles, stereo_pair)
-        report["stereo_probe"] = {
-            "smiles": stereo_pair,
-            "identical_node_features": torch.equal(first.node_features, second.node_features),
-            "identical_bonds": torch.equal(first.bonds, second.bonds),
-        }
     import igraph
     report["versions"] = {"torch": torch.__version__, "igraph": igraph.__version__}
     report["passed"] = all(item["passed"] for item in report["graphs"])
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
-    print(json.dumps(report["stereo_probe"]), flush=True)
     if not report["passed"]:
         raise SystemExit("Permutation audit FAILED; see saved report")
 

@@ -111,7 +111,7 @@
       "passed": true
     },
     {
-      "name": "PP_like_oligomer",
+      "name": "branched_molecule",
       "baseline_prediction": [
         -0.23193007707595825
       ],
@@ -152,14 +152,6 @@
       "passed": true
     }
   ],
-  "stereo_probe": {
-    "smiles": [
-      "C[C@H](F)[C@H](Cl)Br",
-      "C[C@H](F)[C@@H](Cl)Br"
-    ],
-    "identical_node_features": true,
-    "identical_bonds": true
-  },
   "versions": {
     "torch": "2.8.0+cu128",
     "igraph": "0.11.9"

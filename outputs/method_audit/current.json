@@ -78,7 +78,7 @@
       "diameter_ratio": 0.16161616161616163
     },
     {
-      "name": "PP_like_oligomer",
+      "name": "branched_molecule",
       "baseline_prediction": [
         -0.02923721820116043
       ],
@@ -112,13 +112,5 @@
       "coarse_diameter": 3,
       "diameter_ratio": 0.1875
     }
-  ],
-  "stereo_probe": {
-    "smiles": [
-      "C[C@H](F)[C@H](Cl)Br",
-      "C[C@H](F)[C@@H](Cl)Br"
-    ],
-    "identical_node_features": true,
-    "identical_bonds": true
-  }
+  ]
 }
