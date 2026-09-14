@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "checkpoint": {
+    "path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\\u6269\u6563\u6a21\u578b\\outputs\\ogb_clean\\best.pt",
+    "size": 15744867,
+    "sha256": "1358eb1baba19ccbb4463e46907e86e28085cf5b14cd39ccaef99a4fc6f6f1a9"
+  },
+  "input": {
+    "path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\\u6269\u6563\u6a21\u578b\\datasets\\ogb_latent_probe.csv",
+    "size": 205272,
+    "sha256": "aaff76e8894048d8b4d465a281f2d52929e49a584b2d991833fc9a916830e7b1"
+  },
+  "smiles_column": "smiles",
+  "seed": 42,
+  "methods": [
+    "pretrained",
+    "random",
+    "raw"
+  ],
+  "probe_epochs": 300,
+  "learning_rate": 0.01,
+  "weight_decay": 0.0001,
+  "batch_size": 64,
+  "num_workers": 0,
+  "max_samples_per_split": 100000,
+  "edge_mask_fraction": 0.3,
+  "device": "cuda"
+}

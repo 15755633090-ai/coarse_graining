@@ -1,0 +1,15 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Dataset files, model checkpoints and run outputs are intentionally tracked
+# for this complete project upload.
+
+# Upload copies and local credentials
+github_upload/
+.env
+.env.*
+!.env.example

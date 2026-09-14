@@ -1,0 +1,74 @@
+{
+  "input": "C:\\Users\\12775\\Desktop\\GNN课题1\\扩散模型\\datasets\\ogb_pretrain.csv",
+  "output": "C:\\Users\\12775\\Desktop\\GNN课题1\\扩散模型\\datasets\\ogb_pretrain_clean.csv",
+  "exclusion_output": "C:\\Users\\12775\\Desktop\\GNN课题1\\扩散模型\\datasets\\downstream_exclusion_smiles.csv",
+  "datasets": [
+    "esol",
+    "freesolv",
+    "lipo",
+    "bbbp",
+    "bace",
+    "hiv",
+    "tox21"
+  ],
+  "dataset_counts": {
+    "esol": {
+      "all": 1128,
+      "train": 902,
+      "valid": 113,
+      "test": 113,
+      "unique_canonical": 1117
+    },
+    "freesolv": {
+      "all": 642,
+      "train": 513,
+      "valid": 64,
+      "test": 65,
+      "unique_canonical": 642
+    },
+    "lipo": {
+      "all": 4200,
+      "train": 3360,
+      "valid": 420,
+      "test": 420,
+      "unique_canonical": 4200
+    },
+    "bbbp": {
+      "all": 2039,
+      "train": 1631,
+      "valid": 204,
+      "test": 204,
+      "unique_canonical": 1975
+    },
+    "bace": {
+      "all": 1513,
+      "train": 1210,
+      "valid": 151,
+      "test": 152,
+      "unique_canonical": 1513
+    },
+    "hiv": {
+      "all": 41127,
+      "train": 32901,
+      "valid": 4113,
+      "test": 4113,
+      "unique_canonical": 41127
+    },
+    "tox21": {
+      "all": 7831,
+      "train": 6264,
+      "valid": 783,
+      "test": 784,
+      "unique_canonical": 7831
+    }
+  },
+  "input_rows": 429686,
+  "input_unique_canonical": 429686,
+  "invalid_pretraining_smiles": 0,
+  "downstream_unique_canonical": 55755,
+  "invalid_downstream_smiles": 15,
+  "removed_overlap": 6572,
+  "clean_rows": 423114,
+  "output_sha256": "e3dd228fdb5551eef6d429cc781d70b9f3ae3760d67b7e4190918ca891db49f2",
+  "exclusion_sha256": "c9629167203b7c3cb125ab254f338aca164cb2dc97967ce9f0471aec203db5f4"
+}
