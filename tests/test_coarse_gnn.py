@@ -52,10 +52,10 @@ class CoarseFrameworkTests(unittest.TestCase):
                     self.assertLessEqual(len(topology.cores[i]), 4)
 
     def test_large_holes_add_centers_and_small_holes_survive(self):
-        topology = build_topology(60, chain_edges(60), CoarseningConfig(radius=1, center_fraction=0.01, max_residual_size=2))
+        topology = build_topology(60, chain_edges(60), CoarseningConfig(radius=1, center_fraction=0.01, max_residual_size=2, canonicalize=False))
         self.check_partition(topology, 60)
         self.assertGreater(topology.stats["num_added_centers"], 0)
-        small = build_topology(10, chain_edges(10), CoarseningConfig(radius=1, center_fraction=0.01, max_residual_size=10))
+        small = build_topology(10, chain_edges(10), CoarseningConfig(radius=1, center_fraction=0.01, max_residual_size=10, canonicalize=False))
         self.check_partition(small, 10)
         self.assertEqual(small.stats["num_residual_regions"], 1)
         self.assertEqual(small.stats["num_residual_nodes"], 7)
@@ -70,7 +70,7 @@ class CoarseFrameworkTests(unittest.TestCase):
         n = 6
         edges = chain_edges(n)
         attributes = torch.arange(1, n, dtype=torch.float32).unsqueeze(1)
-        model = CoarseGraphPredictor(NetworkConfig(input_dim=3, hidden_dim=8, edge_dim=1, dropout=0), CoarseningConfig(radius=1, center_fraction=0.4))
+        model = CoarseGraphPredictor(NetworkConfig(input_dim=3, hidden_dim=8, edge_dim=1, dropout=0), CoarseningConfig(radius=1, center_fraction=0.4, canonicalize=False))
         x = torch.randn(n, 3)
         once = model(x, edges, attributes)
         twice = model(x, torch.cat((edges, edges.flip(0)), 1), attributes.repeat(2, 1))
@@ -86,7 +86,7 @@ class CoarseFrameworkTests(unittest.TestCase):
     def test_pool_only_core_but_receive_context_messages(self):
         model = CoarseGraphPredictor(
             NetworkConfig(input_dim=3, hidden_dim=8, region_layers=1, coarse_layers=0, dropout=0, use_size_feature=False),
-            CoarseningConfig(radius=2, center_fraction=0.4),
+            CoarseningConfig(radius=2, center_fraction=0.4, canonicalize=False),
         )
         x = torch.randn(14, 3)
         output = model(x, chain_edges(14))
@@ -106,11 +106,11 @@ class CoarseFrameworkTests(unittest.TestCase):
         changed = model(perturbed, chain_edges(14))
         self.assertFalse(torch.allclose(output.region_embeddings[k], changed.region_embeddings[k]))
 
-    def test_permutation_with_persistent_ids(self):
+    def test_legacy_permutation_with_persistent_ids(self):
         n = 14
         x = torch.randn(n, 3)
         edges = chain_edges(n)
-        model = CoarseGraphPredictor(NetworkConfig(input_dim=3, hidden_dim=8, dropout=0), CoarseningConfig(radius=2))
+        model = CoarseGraphPredictor(NetworkConfig(input_dim=3, hidden_dim=8, dropout=0), CoarseningConfig(radius=2, canonicalize=False))
         ids = torch.arange(n) + 100
         first = model(x, edges, node_ids=ids)
         permutation = torch.randperm(n)
@@ -120,7 +120,7 @@ class CoarseFrameworkTests(unittest.TestCase):
         torch.testing.assert_close(first.prediction, second.prediction, atol=1e-6, rtol=1e-5)
 
     def test_edge_features_affect_predictions_and_receive_gradients(self):
-        model = CoarseGraphPredictor(NetworkConfig(input_dim=3, hidden_dim=8, edge_dim=1, dropout=0), CoarseningConfig(radius=1))
+        model = CoarseGraphPredictor(NetworkConfig(input_dim=3, hidden_dim=8, edge_dim=1, dropout=0), CoarseningConfig(radius=1, canonicalize=False))
         x = torch.randn(16, 3, requires_grad=True)
         attributes = torch.ones(15, 1, requires_grad=True)
         first = model(x, chain_edges(16), attributes)
@@ -167,7 +167,7 @@ class CoarseFrameworkTests(unittest.TestCase):
 
     def test_pooling_modes_zero_layers_and_invalid_inputs(self):
         for pool in ("mean", "sum", "size_weighted_mean"):
-            model = CoarseGraphPredictor(NetworkConfig(input_dim=3, hidden_dim=8, region_layers=0, coarse_layers=0, graph_pool=pool))
+            model = CoarseGraphPredictor(NetworkConfig(input_dim=3, hidden_dim=8, region_layers=0, coarse_layers=0, graph_pool=pool), CoarseningConfig(canonicalize=False))
             self.assertTrue(torch.isfinite(model(torch.randn(1, 3), chain_edges(1)).prediction).all())
         with self.assertRaisesRegex(ValueError, "Empty"):
             build_topology(0, chain_edges(1))

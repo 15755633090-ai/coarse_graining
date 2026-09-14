@@ -27,8 +27,8 @@ class DiffusionCoarseModel(nn.Module):
         super().__init__()
         if encoder.config.hidden_dim != predictor.config.input_dim:
             raise ValueError("Predictor input_dim must match encoder hidden_dim")
-        if predictor.config.edge_dim != MASK_BOND - 1:
-            raise ValueError("The molecular adapter requires edge_dim=4 (one-hot bond types)")
+        if predictor.config.edge_dim not in (0, MASK_BOND - 1):
+            raise ValueError("The molecular adapter accepts edge_dim=0 or 4 (one-hot bond types)")
         self.encoder = encoder
         self.predictor = predictor
         self.set_encoder_frozen(freeze_encoder)
@@ -88,10 +88,11 @@ class DiffusionCoarseModel(nn.Module):
             bonds = batch.bonds[i][valid][:, valid]
             edges = torch.triu(bonds > 0, diagonal=1).nonzero().T.contiguous()
             labels = bonds[edges[0], edges[1]]
-            attributes = nn.functional.one_hot(labels - 1, num_classes=4).to(nodes.dtype)
+            attributes = nn.functional.one_hot(labels - 1, num_classes=4).to(nodes.dtype) if self.predictor.config.edge_dim else None
             outputs.append(self.predictor(
                 nodes[i, valid], edges, attributes,
                 node_ids=None if node_ids is None else node_ids[i],
+                node_labels=batch.node_features[i, valid], edge_labels=labels,
             ))
         return BatchOutput(
             torch.stack([out.prediction for out in outputs]),

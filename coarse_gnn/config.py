@@ -7,6 +7,7 @@ class CoarseningConfig:
     radius: int = 4
     center_fraction: float = 0.1
     max_residual_size: int = 4
+    canonicalize: bool = True
 
     def __post_init__(self):
         if not isinstance(self.radius, int) or self.radius < 0:
@@ -15,6 +16,8 @@ class CoarseningConfig:
             raise ValueError("center_fraction must be in (0, 1]")
         if not isinstance(self.max_residual_size, int) or self.max_residual_size < 1:
             raise ValueError("max_residual_size must be a positive integer")
+        if not isinstance(self.canonicalize, bool):
+            raise ValueError("canonicalize must be boolean")
 
 
 @dataclass(frozen=True)
@@ -30,6 +33,21 @@ class NetworkConfig:
     graph_pool: str = "size_weighted_mean"
     edge_reduce: str = "sum"
     use_size_feature: bool = True
+    use_region_edge_features: bool = True
+    use_coarse_edge_count: bool = True
+    use_coarse_edge_features: bool = True
+
+    @classmethod
+    def base(cls, **overrides):
+        """Plain region/coarse GIN, no size statistics, mean graph readout."""
+        options = dict(use_region_edge_features=False, use_coarse_edge_count=False,
+                       use_coarse_edge_features=False, use_size_feature=False, graph_pool="mean")
+        options.update(overrides)
+        return cls(**options)
+
+    @property
+    def coarse_edge_dim(self) -> int:
+        return int(self.use_coarse_edge_count) + (self.edge_dim if self.use_coarse_edge_features else 0)
 
     def __post_init__(self):
         for name in ("input_dim", "hidden_dim", "output_dim"):
@@ -46,3 +64,6 @@ class NetworkConfig:
             raise ValueError("invalid graph_pool")
         if self.edge_reduce not in {"sum", "mean"}:
             raise ValueError("edge_reduce must be sum or mean")
+        for name in ("use_size_feature", "use_region_edge_features", "use_coarse_edge_count", "use_coarse_edge_features"):
+            if not isinstance(getattr(self, name), bool):
+                raise ValueError(f"{name} must be boolean")

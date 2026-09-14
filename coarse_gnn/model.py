@@ -17,7 +17,7 @@ class GraphOutput:
     graph_embedding: Tensor
     region_embeddings: Tensor  # Before coarse propagation.
     coarse_embeddings: Tensor  # After coarse propagation.
-    coarse_edge_attr: Tensor  # count followed by sum/mean of original attributes.
+    coarse_edge_attr: Tensor  # Only enabled features; [Ec, 0] for binary coarse graphs.
     topology: CoarseTopology
 
 
@@ -28,21 +28,28 @@ class CoarseGraphPredictor(nn.Module):
         self.coarsening = coarsening or CoarseningConfig()
         cfg = self.config
         self.input_projection = nn.Sequential(nn.Linear(cfg.input_dim, cfg.hidden_dim), nn.SiLU())
-        self.region_gnn = EdgeGIN(cfg.hidden_dim, cfg.edge_dim, cfg.region_layers, cfg.dropout)
+        self.region_gnn = EdgeGIN(cfg.hidden_dim, cfg.edge_dim if cfg.use_region_edge_features else 0, cfg.region_layers, cfg.dropout)
         self.size_projection = nn.Linear(1, cfg.hidden_dim, bias=False) if cfg.use_size_feature else None
-        self.coarse_gnn = EdgeGIN(cfg.hidden_dim, cfg.edge_dim + 1, cfg.coarse_layers, cfg.dropout)
+        self.coarse_gnn = EdgeGIN(cfg.hidden_dim, cfg.coarse_edge_dim, cfg.coarse_layers, cfg.dropout)
         self.head = nn.Sequential(nn.Linear(cfg.hidden_dim, cfg.hidden_dim), nn.SiLU(), nn.Linear(cfg.hidden_dim, cfg.output_dim))
 
     def forward(
         self, node_embeddings: Tensor, edge_index: Tensor, edge_attr: Tensor | None = None,
-        *, node_ids: Tensor | None = None,
+        *, node_ids: Tensor | None = None, node_labels: Tensor | None = None,
+        edge_labels: Tensor | None = None,
     ) -> GraphOutput:
         cfg = self.config
         if node_embeddings.ndim != 2 or node_embeddings.size(1) != cfg.input_dim:
             raise ValueError(f"node_embeddings must have shape [N, {cfg.input_dim}]")
         if not node_embeddings.is_floating_point() or not torch.isfinite(node_embeddings).all():
             raise ValueError("node_embeddings must be finite floating point values")
-        topology = build_topology(node_embeddings.size(0), edge_index, self.coarsening, node_ids=node_ids)
+        if self.coarsening.canonicalize:
+            if node_labels is None:
+                raise ValueError("Canonical prediction requires raw discrete node_labels, not learned embeddings")
+            if cfg.edge_dim and edge_labels is None:
+                raise ValueError("Provide raw discrete edge_labels separately from message-passing edge_attr")
+        topology = build_topology(node_embeddings.size(0), edge_index, self.coarsening,
+                                  node_ids=node_ids, node_labels=node_labels, edge_labels=edge_labels)
         device = node_embeddings.device
         if edge_attr is None:
             if cfg.edge_dim:
@@ -56,12 +63,12 @@ class CoarseGraphPredictor(nn.Module):
         attributes = edge_attr[topology.edge_positions.to(device)]
         # Opposite directions are storage duplicates, not additional physical edges.
         canonical_ids = {tuple(pair): i for i, pair in enumerate(topology.edges.T.tolist())}
-        input_pairs = edge_index.detach().cpu().T.tolist()
+        input_pairs = topology.input_to_canonical[edge_index.detach().cpu()].T.tolist()
         inverse = torch.tensor([canonical_ids[(min(u, v), max(u, v))] for u, v in input_pairs], device=device, dtype=torch.long)
         if not torch.allclose(edge_attr, attributes[inverse]):
             raise ValueError("Opposite directions of an undirected edge must have identical attributes")
 
-        projected = self.input_projection(node_embeddings)
+        projected = self.input_projection(node_embeddings[topology.atom_order.to(device)])
         regions = []
         for context, local_edges, edge_ids, core_positions in zip(
             topology.contexts, topology.context_edges, topology.context_edge_ids, topology.core_positions,
@@ -84,7 +91,12 @@ class CoarseGraphPredictor(nn.Module):
         )
         if cfg.edge_reduce == "mean":
             reduced = reduced / counts.clamp_min(1)
-        coarse_edge_attr = torch.cat((counts, reduced), dim=1)
+        enabled = []
+        if cfg.use_coarse_edge_count:
+            enabled.append(counts)
+        if cfg.use_coarse_edge_features:
+            enabled.append(reduced)
+        coarse_edge_attr = torch.cat(enabled, dim=1) if enabled else attributes.new_empty((counts.size(0), 0))
         coarse_embeddings = self.coarse_gnn(coarse_input, topology.coarse_edges.to(device), coarse_edge_attr)
         if cfg.graph_pool == "sum":
             graph_embedding = coarse_embeddings.sum(0)

@@ -37,19 +37,31 @@ def main():
     parser.add_argument("--hidden-dim", type=int, default=128)
     parser.add_argument("--region-layers", type=int, default=2)
     parser.add_argument("--coarse-layers", type=int, default=3)
-    parser.add_argument("--graph-pool", choices=["mean", "sum", "size_weighted_mean"], default="size_weighted_mean")
+    parser.add_argument("--variant", choices=["enhanced", "base"], default="enhanced")
+    parser.add_argument("--graph-pool", choices=["mean", "sum", "size_weighted_mean"], default=None)
+    parser.add_argument("--no-region-edge-features", action="store_true")
+    parser.add_argument("--no-coarse-edge-count", action="store_true")
+    parser.add_argument("--no-coarse-edge-features", action="store_true")
+    parser.add_argument("--no-size-feature", action="store_true")
+    parser.add_argument("--legacy-coarsening", action="store_true", help="Disable canonicalization only for diagnostic comparisons")
     parser.add_argument("--finetune-encoder", action="store_true")
     parser.add_argument("--backward", action="store_true", help="One optimizer step on synthetic targets to check gradients; not a scientific training run")
-    parser.add_argument("--output", type=Path, default=Path("outputs/coarse_demo/report.json"))
+    parser.add_argument("--output", type=Path, default=Path("outputs/coarse_demo/canonical_report.json"))
     args = parser.parse_args()
     torch.manual_seed(42)
     torch.set_num_threads(2)
     encoder = load_encoder(args.checkpoint, args.device)
+    base = args.variant == "base"
     network = NetworkConfig(
         input_dim=encoder.config.hidden_dim, hidden_dim=args.hidden_dim, edge_dim=4,
-        region_layers=args.region_layers, coarse_layers=args.coarse_layers, graph_pool=args.graph_pool,
+        region_layers=args.region_layers, coarse_layers=args.coarse_layers,
+        graph_pool=args.graph_pool or ("mean" if base else "size_weighted_mean"),
+        use_region_edge_features=not (base or args.no_region_edge_features),
+        use_coarse_edge_count=not (base or args.no_coarse_edge_count),
+        use_coarse_edge_features=not (base or args.no_coarse_edge_features),
+        use_size_feature=not (base or args.no_size_feature),
     )
-    coarsening = CoarseningConfig(args.radius, args.center_fraction, args.max_residual_size)
+    coarsening = CoarseningConfig(args.radius, args.center_fraction, args.max_residual_size, canonicalize=not args.legacy_coarsening)
     from coarse_gnn import CoarseGraphPredictor
     model = DiffusionCoarseModel(encoder, CoarseGraphPredictor(network, coarsening), not args.finetune_encoder).to(args.device)
     graphs = [graph_from_smiles(s) for s in args.smiles] if args.smiles else [chain_graph(n) for n in (1, 24, 100)]
@@ -86,6 +98,10 @@ def main():
                 "input": graph.smiles, "prediction": out.prediction.cpu().tolist(),
                 "stats": out.topology.stats, "centers": out.topology.centers.tolist(),
                 "owner": out.topology.owner.tolist(),
+                "atom_order": out.topology.atom_order.tolist(),
+                "owner_input": out.topology.owner_input.tolist(),
+                "centers_input": out.topology.centers_input.tolist(),
+                "canonical_signature": out.topology.canonical_signature(),
                 "contexts": [c.tolist() for c in out.topology.contexts],
                 "coarse_edges": out.topology.coarse_edges.T.tolist(),
                 "coarse_edge_attr": out.coarse_edge_attr.cpu().tolist(),

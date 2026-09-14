@@ -1,0 +1,168 @@
+{
+  "seed": 42,
+  "permutations": 100,
+  "device": "cuda",
+  "tolerance": 1e-06,
+  "variant": "enhanced",
+  "network": {
+    "input_dim": 128,
+    "hidden_dim": 128,
+    "edge_dim": 4,
+    "region_layers": 2,
+    "coarse_layers": 3,
+    "output_dim": 1,
+    "dropout": 0.1,
+    "region_pool": "mean",
+    "graph_pool": "size_weighted_mean",
+    "edge_reduce": "sum",
+    "use_size_feature": true,
+    "use_region_edge_features": true,
+    "use_coarse_edge_count": true,
+    "use_coarse_edge_features": true
+  },
+  "coarsening": {
+    "radius": 4,
+    "center_fraction": 0.1,
+    "max_residual_size": 4,
+    "canonicalize": true
+  },
+  "notice": "Pretrained encoder, untrained downstream weights, eval mode. Every permutation reruns the encoder, canonicalization and complete coarsening. No persistent IDs are passed. This is a symmetry test, not trained prediction accuracy.",
+  "graphs": [
+    {
+      "name": "chain_24",
+      "baseline_prediction": [
+        0.005206778645515442
+      ],
+      "prediction_std": [
+        0.0
+      ],
+      "prediction_range": [
+        0.0
+      ],
+      "max_abs_change": 0.0,
+      "coarse_node_counts_observed": [
+        5
+      ],
+      "coarse_edge_counts_observed": [
+        4
+      ],
+      "canonical_signature": "7de68c1a7ff2b32735a3bced8b63492bf521bfb6fd3ee43a14fbe11ceb24b6a8",
+      "canonical_coarsening_identical": true,
+      "coarse_edges_exactly_identical": true,
+      "encoder_max_permutation_error": 0.0,
+      "baseline_stats": {
+        "num_nodes": 24,
+        "num_edges": 23,
+        "num_main_regions": 3,
+        "num_added_centers": 0,
+        "num_residual_regions": 2,
+        "num_residual_nodes": 4,
+        "num_coarse_nodes": 5,
+        "num_coarse_edges": 4,
+        "coarse_node_ratio": 0.20833333333333334,
+        "context_occurrence_ratio": 1.0,
+        "max_core_size": 9,
+        "canonicalized": true
+      },
+      "original_diameter": 23,
+      "coarse_diameter": 4,
+      "diameter_ratio": 0.17391304347826086,
+      "passed": true
+    },
+    {
+      "name": "chain_100",
+      "baseline_prediction": [
+        0.03977879881858826
+      ],
+      "prediction_std": [
+        0.0
+      ],
+      "prediction_range": [
+        0.0
+      ],
+      "max_abs_change": 0.0,
+      "coarse_node_counts_observed": [
+        17
+      ],
+      "coarse_edge_counts_observed": [
+        16
+      ],
+      "canonical_signature": "2906d8948d78b851d4fa70c433164e15c88b2572286bb3793a73d7e5cf29c6b3",
+      "canonical_coarsening_identical": true,
+      "coarse_edges_exactly_identical": true,
+      "encoder_max_permutation_error": 0.0,
+      "baseline_stats": {
+        "num_nodes": 100,
+        "num_edges": 99,
+        "num_main_regions": 10,
+        "num_added_centers": 0,
+        "num_residual_regions": 7,
+        "num_residual_nodes": 23,
+        "num_coarse_nodes": 17,
+        "num_coarse_edges": 16,
+        "coarse_node_ratio": 0.17,
+        "context_occurrence_ratio": 1.06,
+        "max_core_size": 9,
+        "canonicalized": true
+      },
+      "original_diameter": 99,
+      "coarse_diameter": 16,
+      "diameter_ratio": 0.16161616161616163,
+      "passed": true
+    },
+    {
+      "name": "PP_like_oligomer",
+      "baseline_prediction": [
+        -0.029237322509288788
+      ],
+      "prediction_std": [
+        2.4793647122192924e-08
+      ],
+      "prediction_range": [
+        1.1920928955078125e-07
+      ],
+      "max_abs_change": 9.685754776000977e-08,
+      "coarse_node_counts_observed": [
+        4
+      ],
+      "coarse_edge_counts_observed": [
+        3
+      ],
+      "canonical_signature": "7df48dd34ab94fa91e07d81ee1cb856c28ce1a9737ba624141ab9a4abdfc166f",
+      "canonical_coarsening_identical": true,
+      "coarse_edges_exactly_identical": true,
+      "encoder_max_permutation_error": 7.152557373046875e-07,
+      "baseline_stats": {
+        "num_nodes": 25,
+        "num_edges": 24,
+        "num_main_regions": 3,
+        "num_added_centers": 0,
+        "num_residual_regions": 1,
+        "num_residual_nodes": 1,
+        "num_coarse_nodes": 4,
+        "num_coarse_edges": 3,
+        "coarse_node_ratio": 0.16,
+        "context_occurrence_ratio": 1.04,
+        "max_core_size": 9,
+        "canonicalized": true
+      },
+      "original_diameter": 16,
+      "coarse_diameter": 3,
+      "diameter_ratio": 0.1875,
+      "passed": true
+    }
+  ],
+  "stereo_probe": {
+    "smiles": [
+      "C[C@H](F)[C@H](Cl)Br",
+      "C[C@H](F)[C@@H](Cl)Br"
+    ],
+    "identical_node_features": true,
+    "identical_bonds": true
+  },
+  "versions": {
+    "torch": "2.8.0+cu128",
+    "igraph": "0.11.9"
+  },
+  "passed": true
+}

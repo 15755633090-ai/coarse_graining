@@ -21,7 +21,8 @@ class EdgeGINLayer(nn.Module):
         messages = x[source]
         if self.edge_projection is not None:
             messages = messages + self.edge_projection(torch.cat((edge_attr, edge_attr)))
-        messages = torch.relu(messages)
+            messages = torch.relu(messages)
+        # Without explicit edge features this is an ordinary GIN sum update.
         aggregated = torch.zeros_like(x).index_add(0, target, messages)
         return self.norm(x + self.mlp((1 + self.epsilon) * x + aggregated))
 

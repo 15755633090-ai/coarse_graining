@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import math
+import hashlib
+import json
 from collections import deque
 from dataclasses import dataclass
 
@@ -9,11 +11,13 @@ import torch
 from torch import Tensor
 
 from .config import CoarseningConfig
+from .canonical import canonical_atom_order, discrete_rows
 
 
 @dataclass
 class CoarseTopology:
-    # All structural tensors live on CPU; indices refer to unpadded input nodes.
+    # All structural tensors live on CPU. Node indices use canonical atom order
+    # by default; use atom_order/owner_input to map back to the original input.
     centers: Tensor  # Only main centers; residual coarse nodes have no center.
     owner: Tensor  # [N], includes both main and residual regions.
     cores: list[Tensor]
@@ -29,6 +33,34 @@ class CoarseTopology:
     boundary_groups: Tensor  # Coarse edge index for each boundary edge.
     edge_counts: Tensor  # Physical edges, not directed storage entries.
     stats: dict[str, float | int]
+    atom_order: Tensor  # canonical -> input
+    input_to_canonical: Tensor
+    node_labels: Tensor  # Original discrete values in canonical order.
+    edge_labels: Tensor  # Original discrete values aligned with edges.
+
+    @property
+    def owner_input(self) -> Tensor:
+        return self.owner[self.input_to_canonical]
+
+    @property
+    def centers_input(self) -> Tensor:
+        return self.atom_order[self.centers]
+
+    def canonical_signature(self) -> str:
+        """Fingerprint attributed input and its COMPLETE ordered coarsening.
+
+        Includes assignments, contexts, coarse edges, counts and residual flags,
+        so equal node/edge counts alone cannot pass the invariance audit.
+        No original IDs, edge storage order, or floating embeddings are hashed.
+        """
+        payload = {
+            "nodes": self.node_labels.tolist(), "edges": self.edges.T.tolist(),
+            "edge_labels": self.edge_labels.tolist(), "centers": self.centers.tolist(),
+            "owner": self.owner.tolist(), "contexts": [x.tolist() for x in self.contexts],
+            "is_residual": self.is_residual.tolist(),
+            "coarse_edges": self.coarse_edges.T.tolist(), "counts": self.edge_counts.tolist(),
+        }
+        return hashlib.sha256(json.dumps(payload, separators=(",", ":")).encode()).hexdigest()
 
 
 def _pairs_tensor(pairs: list[tuple[int, int]]) -> Tensor:
@@ -91,17 +123,22 @@ def build_topology(
     config: CoarseningConfig | None = None,
     *,
     node_ids: Tensor | None = None,
+    node_labels: Tensor | None = None,
+    edge_labels: Tensor | None = None,
 ) -> CoarseTopology:
     """Build all assignments before encoding.
 
     Farthest-point sampling maximizes distance to the nearest existing center.
-    Ties prefer higher degree, then smaller node ID. Default IDs are input row
-    indices, so arbitrary relabeling is NOT guaranteed invariant. Callers may
-    supply persistent unique IDs and carry them with node permutations.
+    Default: canonicalize the discrete attributed graph first, then break ties
+    using canonical indices. Auxiliary edge vertices never enter coarsening.
+    With canonicalize=False, the legacy input-ID-dependent behavior is retained
+    only for comparisons. Persistent node_ids are accepted only in that mode.
     """
     config = config or CoarseningConfig()
     if num_nodes < 1:
         raise ValueError("Empty graphs are not supported")
+    if config.canonicalize and node_ids is not None:
+        raise ValueError("node_ids cannot override canonical labeling; use canonicalize=False for legacy tests")
     if node_ids is None:
         keys = list(range(num_nodes))
     else:
@@ -111,6 +148,23 @@ def build_topology(
         if len(set(keys)) != num_nodes:
             raise ValueError("node_ids must be unique within a graph")
     edges, positions = _canonical_edges(num_nodes, edge_index)
+    raw_nodes = discrete_rows(node_labels, num_nodes, "node_labels")
+    raw_edges = discrete_rows(edge_labels, edge_index.size(1), "edge_labels")
+    unique_labels = raw_edges[positions]
+    physical_ids = {tuple(pair): i for i, pair in enumerate(edges.T.tolist())}
+    for i, (u, v) in enumerate(edge_index.detach().cpu().T.tolist()):
+        if not torch.equal(raw_edges[i], unique_labels[physical_ids[(min(u, v), max(u, v))]]):
+            raise ValueError("Opposite directions must have identical discrete edge_labels")
+    order = canonical_atom_order(num_nodes, edges, raw_nodes, unique_labels) if config.canonicalize else torch.arange(num_nodes)
+    inverse = torch.argsort(order)
+    if config.canonicalize:
+        remapped = inverse[edges].sort(dim=0).values
+        edge_order = torch.argsort(remapped[0] * num_nodes + remapped[1])
+        edges = remapped[:, edge_order]
+        positions = positions[edge_order]
+        unique_labels = unique_labels[edge_order]
+        keys = list(range(num_nodes))
+    raw_nodes = raw_nodes[order]
     adjacency: list[list[int]] = [[] for _ in range(num_nodes)]
     pairs = edges.T.tolist()
     for u, v in pairs:
@@ -189,10 +243,12 @@ def build_topology(
         "coarse_node_ratio": num_coarse / num_nodes,
         "context_occurrence_ratio": sum(c.numel() for c in contexts) / num_nodes,
         "max_core_size": max(c.numel() for c in cores),
+        "canonicalized": config.canonicalize,
     }
     return CoarseTopology(
         torch.tensor(centers, dtype=torch.long), owner_tensor, cores, contexts,
         torch.arange(num_coarse) >= num_main, edges, positions,
         context_edges, context_edge_ids, core_positions, _pairs_tensor(coarse_pairs),
         torch.tensor(boundary_ids, dtype=torch.long), groups, counts, stats,
+        order, inverse, raw_nodes, unique_labels,
     )

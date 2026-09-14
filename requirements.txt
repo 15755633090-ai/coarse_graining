@@ -1,0 +1,3 @@
+-r diffusion/requirements.txt
+# Pinned because canonical numbering can change across implementations/versions.
+igraph==0.11.9
