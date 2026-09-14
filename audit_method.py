@@ -57,7 +57,7 @@ def main():
     samples = [
         ("chain_24", chain_graph(24)),
         ("chain_100", chain_graph(100)),
-        ("branched_molecule", graph_from_smiles("CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)C")),
+        ("molecule_example", graph_from_smiles("CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)CC(C)C")),
     ]
     report = {
         "seed": args.seed, "permutations": args.permutations,

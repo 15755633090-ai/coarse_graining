@@ -111,7 +111,7 @@
       "passed": true
     },
     {
-      "name": "branched_molecule",
+      "name": "molecule_example",
       "baseline_prediction": [
         -0.23193007707595825
       ],

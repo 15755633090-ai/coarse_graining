@@ -78,7 +78,7 @@
       "diameter_ratio": 0.16161616161616163
     },
     {
-      "name": "branched_molecule",
+      "name": "molecule_example",
       "baseline_prediction": [
         -0.02923721820116043
       ],
