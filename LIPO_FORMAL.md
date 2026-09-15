@@ -1,5 +1,7 @@
 # Lipo 粗粒度模型正式协议接入
 
+**当前计划已调整为先做 [Frozen 机制验证](FROZEN_MECHANISM.md)。本页记录的 finetune 实验已暂停，已有结果和断点保留；以下 finetune 启动命令现在不执行。**
+
 入口为 `run_lipo_formal.py`。默认 `--action prepare` 只做一致性检查和拓扑预计算；显式 `--action train` 才启动调参及正式训练。结果写入项目旁的 `model/results_formal/05_coarse_gnn`。已有 `01_local`、`02_dmpnn`、`03_grover`、`04_diffusion` 只读。
 
 ## 复用范围

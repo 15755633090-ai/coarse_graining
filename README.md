@@ -2,7 +2,7 @@
 
 本项目面向普通分子数据集的图级性质预测。审计中的合成链图和分子图仅用于检查重编号不变性，不限定实际数据集的分子结构。
 
-Lipo 已有正式协议的接入入口、三模型对照和启动命令见 [Lipo 正式实验说明](LIPO_FORMAL.md)。已有基线结果保留，新结果独立保存到 `model/results_formal/05_coarse_gnn`。
+当前优先做 [冻结编码器的机制验证](FROZEN_MECHANISM.md)：Frozen Region-only 与 Frozen Base coarse，共同固定配置，seed 0、1。先前的 finetune 计划已暂停，结果与断点保留。完整 finetune 协议见 [Lipo 正式实验说明](LIPO_FORMAL.md)，不自动启动第二阶段。
 
 模型框架：完整原图扩散编码 → 原始离散属性图规范化 → 分散中心与四跳上下文 → 互斥主归属与残余补充 → 区域 GNN → 粗图 GNN → 图级预测。
 
