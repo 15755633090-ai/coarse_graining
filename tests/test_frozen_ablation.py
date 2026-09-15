@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import torch
 from torch import nn
@@ -16,7 +17,7 @@ from frozen_features import FrozenGraphBatch, frozen_factory
 from scripts.experiments.ablation_models import (
     TRAIN_VARIANTS, CHECK_VARIANTS, core_only_topology, make_factory,
 )
-from scripts.experiments.run_frozen_ablation import baseline_pending, summarize
+from scripts.experiments.run_frozen_ablation import EVALUATION_POLICY, baseline_pending, summarize, train
 
 
 class FakeEncoder(nn.Module):
@@ -176,14 +177,33 @@ class FrozenAblationTests(unittest.TestCase):
                 for seed in range(5):
                     path = folder / 'lipo' / mode / f'seed_{seed}' / 'result.json'
                     path.parent.mkdir(parents=True)
-                    path.write_text(json.dumps(dict(mode=mode, seed=seed, test_metrics={'rmse': .8 + seed * .01 + offset})))
+                    path.write_text(json.dumps(dict(mode=mode, seed=seed, validation_metrics={'rmse': .8 + seed * .01 + offset}, test_metrics={'rmse': 99.0 - offset})))
             self.assertEqual(baseline_pending(mother), [])
             report = summarize(output, mother)
             self.assertFalse(report['complete'])
+            self.assertEqual(report['metric_split'], 'validation')
+            self.assertTrue(all('test_rmse' not in row for row in report['runs']))
+            self.assertTrue((output / 'comparison_validation.json').is_file())
+            self.assertFalse((output / 'comparison.json').exists())
             paired = {p['question']: p for p in report['paired']}
             self.assertEqual(paired['C_to_D']['n'], 5)
             self.assertAlmostEqual(paired['C_to_D']['mean_delta_rmse'], -.1)
             self.assertAlmostEqual(paired['inter_region_messages']['mean_delta_rmse'], -.05)
+
+    def test_training_wrapper_never_enables_test_evaluation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            args = SimpleNamespace(seeds=[0], output_dir=output, device='cpu', batch_size=4,
+                                   encoder_lr=0, head_lr=.001, dropout=.1)
+            legacy = SimpleNamespace(create_property_model=None, _save_downstream_resume=None,
+                                     single_run_config=Mock(return_value={}), initialize_single_run_config=Mock(),
+                                     run_single=Mock())
+            train(legacy, args, [], {'train': [0], 'valid': [1], 'test': [2]},
+                  SimpleNamespace(), None, {}, {'evaluation_policy': dict(EVALUATION_POLICY)},
+                  ['atom'], output / 'mother')
+            self.assertIs(legacy.run_single.call_args.kwargs['evaluate_test'], False)
+            with self.assertRaisesRegex(ValueError, 'validation-only'):
+                train(legacy, args, [], {}, None, None, {}, {}, ['atom'], output / 'mother')
 
 
 if __name__ == '__main__':

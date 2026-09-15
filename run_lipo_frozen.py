@@ -106,24 +106,8 @@ def preflight(legacy, args, source, splits, spec, data, factory, tools, features
 
 
 def summarize(args, baseline):
-    from bond_diffusion.property_prediction import summarize_runs
-    runs = [formal.read_json(path) for path in sorted((args.output_dir / "lipo").glob("*/seed_*/result.json"))]
-    formal.write_json(args.output_dir / "downstream_results.json", dict(runs=runs, summary=summarize_runs(runs)))
-    old = [formal.read_json(baseline / f"lipo/pretrained_frozen/seed_{seed}/result.json") for seed in (0, 1)]
-    paired = []
-    for seed in (0, 1):
-        pair = {row["mode"]: row for row in runs if row["seed"] == seed}
-        if all(v in pair for v in VARIANTS):
-            paired.append(dict(seed=seed, rmse_base_minus_region=pair["base_coarse"]["test_metrics"]["rmse"] - pair["region_only"]["test_metrics"]["rmse"]))
-    summary = summarize_runs(old + [row for row in runs if row["seed"] in (0, 1)])
-    formal.write_json(args.output_dir / "comparison.json", dict(summary=summary, paired=paired,
-                      baseline="existing pretrained_frozen; not retrained",
-                      interpretation="Matched fixed settings; two seeds exploratory. Does not compare against finetuned performance."))
-    if summary:
-        with (args.output_dir / "comparison_seed_0_1.csv").open("w", newline="", encoding="utf-8-sig") as handle:
-            writer = csv.DictWriter(handle, fieldnames=sorted({k for row in summary for k in row}))
-            writer.writeheader()
-            writer.writerows(summary)
+    from scripts.experiments.frozen_reporting import summarize_frozen
+    return summarize_frozen(args, baseline)
 
 
 def train(legacy, args, data, splits, spec, factory, tools, config, baseline):
@@ -180,6 +164,8 @@ def main():
         summarize(args, baseline)
         return
     config = experiment_config(legacy, args, protocol, selection)
+    from scripts.experiments.frozen_reporting import preserve_training_manifest
+    config = preserve_training_manifest(legacy, config, args.output_dir)
     legacy.initialize_or_validate_run_config(args.output_dir, config)
     source, splits, spec, inputs = formal.check_inputs(legacy, args, protocol, baseline)
     print(f"Verified existing Lipo scaffold split: {inputs['split_counts']}", flush=True)

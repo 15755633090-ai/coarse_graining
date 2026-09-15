@@ -2,7 +2,7 @@
 
 > 本页命令均在 `coarse_graining` 根目录执行。整理目录时（2026-09-15）检测到 seed 2/3/4 的 Frozen 补跑进程；下文保留最初 seed 0/1 的协议说明。三个训练源文件仍在根目录，已有实验身份与断点兼容性保持不变。入口位置见 [目录与命令索引](DIRECTORY_LAYOUT.md)。
 
-当前优先运行 **Frozen Region-only / Frozen Base coarse × seed 0、1**，共 4 次训练。暂停先前的 finetune 计划，保留原结果、最近持久化断点以及 `05_coarse_gnn/_recovery/pause_finetune_*` 备份。第一阶段完成后不会自动恢复 finetune，也不运行 Enhanced。
+当前实验范围为 **Frozen Region-only / Frozen Base coarse × seed 0–4**，最初先运行 seed 0/1，再补 seed 2/3/4。暂停先前的 finetune 计划，保留原结果、最近持久化断点以及 `05_coarse_gnn/_recovery/pause_finetune_*` 备份。第一阶段完成后不会自动恢复 finetune，也不运行 Enhanced。
 
 直接读取旧 `04_diffusion/lipo/pretrained_frozen` 结果作为历史对照，不重跑旧模型。主要机制比较是两个新模型之间的差异。
 
@@ -39,7 +39,7 @@ conda run --no-capture-output -n polyolefin_ml python -u run_lipo_frozen.py --ac
 .\scripts\launchers\start_lipo_frozen.ps1
 ```
 
-原 `scripts/launchers/start_lipo_optimized.ps1` / `run_lipo_formal.py` 属于暂停的 finetune 实验，现在不要同时运行。中断后重新运行 frozen 命令，已完成结果跳过、未完成 run 从原 `resume.pt` 接续。代码或协议改变会拒绝混入同一结果目录。
+原 `scripts/launchers/start_lipo_optimized.ps1` / `run_lipo_formal.py` 属于暂停的 finetune 实验，现在不要同时运行。中断后重新运行 frozen 命令，已完成结果跳过、未完成 run 从原 `resume.pt` 接续。训练代码或协议改变会拒绝混入同一结果目录；本次仅限汇总的修改按下述核验流程接续。
 
 ## 文件与解释
 
@@ -51,12 +51,27 @@ model/results_formal/05_coarse_gnn/frozen_mechanism/
 ├── preflight.json
 ├── downstream_results.json
 ├── comparison.json
-├── comparison_seed_0_1.csv
+├── comparison_seed_0_4.csv
+├── reporting_revision.json       # 使用新入口 prepare/train 接续旧协议时记录
 └── lipo/
-    ├── region_only/seed_0, seed_1/
-    └── base_coarse/seed_0, seed_1/
+    ├── region_only/seed_0 ... seed_4/
+    └── base_coarse/seed_0 ... seed_4/
 ```
 
 每个 run 沿用 `best.pt`、`history.json`、`run_config.json`、`result.json`、`test_predictions.csv`，训练中另有 `resume.pt` 和每轮更新的 `progress.json`。根目录配置记录旧参数选择文件哈希、新增搜索为 0、encoder 冻结、精度策略和实际源码身份。
 
-`comparison.json` 的 `rmse_base_minus_region` 为负表示该 seed 下粗图传播更好；先检查两个 seed 的方向，不能把 2 seeds 当作最终论文统计。即使这一阶段支持后续实验，也需要另行启动第二阶段 finetune 性能验证，不自动推进。
+新 `comparison.json` 统计 seed 0–4，包含每个模型/数据集分区的实际 seed 列表、数量、均值、样本标准差、逐 seed 配对差值，以及 `complete` 和 `missing_runs`。未完成的实验不会被当作五 seed 结果。`validation_rmse_base_minus_region` 是验证集配对差值；`rmse_base_minus_region` 保留原命名，专指历史 test 配对差值，均以负值表示 D 更好。
+
+后续模型开发只参考 validation。既有 C/D test 分数作为历史报告保留，旧 atom baseline 因精度策略不同而单列，不混入 C/D 配对统计。第一轮新增消融采用 validation-only 流程，见 [第一轮协议](ABLATION_ROUND1.md)。
+
+旧 `comparison_seed_0_1.csv` 保留为历史文件，新汇总写 `comparison_seed_0_4.csv`。正在运行的进程已加载旧汇总函数，不会自动热更新；补跑完成后可显式执行以下命令，只重新汇总文件，不重训：
+
+```powershell
+conda run --no-capture-output -n polyolefin_ml python run_lipo_frozen.py --action summarize
+```
+
+## 汇总修订与断点兼容
+
+本次只修改 `summarize()` 并在准备/训练入口添加报告版本核验。`scripts/experiments/frozen_reporting.py` 以已核验的旧源码 SHA256 为起点，排除汇总函数和两条精确匹配的兼容钩子后，验证剩余 Python 语法树与原训练入口完全相同；同时检查其他训练源文件、实验参数和协议不变。未知旧版本、模型代码变化或训练逻辑变化均拒绝兼容。
+
+核验通过后保留原 `run_config.json` 与断点协议身份，在独立的 `reporting_revision.json` 记录当前实际源码身份和报告模块哈希；不把新源码冒充成旧源码。新消融核验母模型时使用同一检查，但只读、不修改 C/D 文件。单独汇总输出也记录实际报告源码哈希。

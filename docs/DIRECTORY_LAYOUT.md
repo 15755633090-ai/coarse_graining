@@ -77,4 +77,5 @@ conda run --no-capture-output -n polyolefin_ml python -m scripts.validation.veri
 `run_lipo_frozen.py`、`run_lipo_formal.py`、`frozen_features.py` 的原路径及内容哈希属于现有实验协议。
 因此这三个文件集中作为稳定训练入口保留，避免目录整理改变实验身份、影响后续断点恢复。
 整理没有修改这三个文件或 `coarse_gnn/*.py`，没有改写实验配置、数值审计 JSON、权重和历史结果。
+后续代码审查仅修订了 Frozen 汇总，并加入严格限定的 reporting-only 兼容核验；训练逻辑和原协议保留，实际报告代码版本另行记录。详见 [Frozen 汇总修订说明](FROZEN_MECHANISM.md#汇总修订与断点兼容)。
 后续新工具按上表分类放置，不再堆到根目录。

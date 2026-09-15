@@ -27,7 +27,7 @@ coarse_graining/
 └── requirements.txt           # 项目依赖
 ```
 
-根目录的三个训练文件保留原位置和原内容，因为它们的路径及哈希已写入当前实验协议。其他入口已按用途分类，完整对应关系见 [目录与命令索引](docs/DIRECTORY_LAYOUT.md)。
+根目录的三个训练文件保留原位置。Frozen 汇总已扩展到 seed 0–4，通过严格的 reporting-only 核验保持原训练协议兼容，并单独记录实际报告源码。其他入口已按用途分类，完整对应关系见 [目录与命令索引](docs/DIRECTORY_LAYOUT.md)。
 
 ## 常用入口
 

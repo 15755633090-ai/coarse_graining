@@ -21,10 +21,16 @@ from frozen_features import feature_identity, frozen_tools, load_features
 from scripts.experiments.ablation_models import (
     CHECK_VARIANTS, TRAIN_VARIANTS, CoreOnlyDataset, make_factory,
 )
+from scripts.experiments.frozen_reporting import preserve_training_manifest
 
 
 DEFAULT_OUTPUT = formal.ROOT / "outputs/frozen_ablation_round1"
 SEEDS = tuple(range(5))
+EVALUATION_POLICY = dict(
+    development_metric="validation_rmse", evaluate_test_during_training=False,
+    first_round_plan_fixed=True, automatic_final_test=False,
+    existing_cd_test_scores="already exposed; excluded from development summaries",
+)
 COMPARISONS = (
     ("atom", "direct_mean", "A_to_B"),
     ("direct_mean", "region_only", "B_to_C"),
@@ -33,6 +39,14 @@ COMPARISONS = (
     ("deeper_region", "base_coarse", "matched_depth"),
     ("core_only", "base_coarse", "overlap_context"),
 )
+COMPARISON_NOTES = {
+    "A_to_B": "Core grouping plus mean-readout reweighting; not a pure information-loss measurement.",
+    "B_to_C": "Overall region-stage contextual encoding: local message passing with overlap utilization.",
+    "C_to_D": "Contribution of the whole coarse module, including self transforms and neighbor messages.",
+    "inter_region_messages": "Neighbor messages at fixed coarse nodes and fixed coarse self-update layers.",
+    "matched_depth": "Controls parameter count and layer count; node population, computation graph, LayerNorm inputs and dropout targets differ. Does not isolate shortened topology distances.",
+    "overlap_context": "Overlap context contribution conditional on the full D architecture with coarse propagation.",
+}
 
 
 def baseline_pending(root, seeds=SEEDS):
@@ -44,7 +58,7 @@ def baseline_pending(root, seeds=SEEDS):
                 missing.append(f"{mode}/seed_{seed}")
                 continue
             result = formal.read_json(path)
-            score = (result.get("test_metrics") or {}).get("rmse")
+            score = (result.get("validation_metrics") or {}).get("rmse")
             if result.get("mode") != mode or result.get("seed") != seed or score is None or not math.isfinite(score):
                 raise ValueError(f"Invalid completed baseline result: {path}")
     return missing
@@ -53,7 +67,8 @@ def baseline_pending(root, seeds=SEEDS):
 def verify_mother(legacy, args, protocol, selection, root):
     expected = frozen.experiment_config(legacy, args, protocol, selection)
     saved = formal.read_json(root / "run_config.json")
-    if expected != saved:
+    compatible = preserve_training_manifest(legacy, expected, root, write_audit=False)
+    if compatible != saved:
         raise ValueError("Current C/D source or fixed protocol differs from the saved mother experiment")
     return saved
 
@@ -100,7 +115,8 @@ def parameter_report(factory, args, tasks, legacy):
 def experiment_config(legacy, mother, mother_root, features, parameters):
     paths = [formal.ROOT / "scripts/__init__.py", *sorted(Path(__file__).parent.glob("*.py"))]
     return dict(
-        stage="frozen_ablation_round1", mother_experiment=str(mother_root.resolve()),
+        stage="frozen_ablation_round1", schema_version=2,
+        evaluation_policy=dict(EVALUATION_POLICY), mother_experiment=str(mother_root.resolve()),
         mother_manifest_sha256=formal.digest(mother), mother_protocol=mother,
         variants=list(TRAIN_VARIANTS), eligible_seeds=list(SEEDS), new_search_trials=0,
         shared_features={key: features[key] for key in ("identity", "path", "file_sha256")},
@@ -173,20 +189,20 @@ def summarize(output, mother_root):
                     row = formal.read_json(path)
                     if row.get("mode") != mode or row.get("seed") != seed:
                         raise ValueError(f"Result identity mismatch: {path}")
-                    rmse = (row.get("test_metrics") or {}).get("rmse")
+                    rmse = (row.get("validation_metrics") or {}).get("rmse")
                     if rmse is None or not math.isfinite(rmse):
-                        raise ValueError(f"Invalid final test score: {path}")
-                    runs.append(dict(mode=mode, seed=seed, test_rmse=rmse,
+                        raise ValueError(f"Invalid selected-checkpoint validation score: {path}")
+                    runs.append(dict(mode=mode, seed=seed, validation_rmse=rmse,
                                      best_epoch=row.get("best_epoch"), source=str(path.resolve())))
     stats = []
     for mode in ("atom", "direct_mean", "region_only", "base_coarse", "no_edge", "deeper_region", "core_only"):
         rows = [r for r in runs if r["mode"] == mode]
         if rows:
-            scores = [r["test_rmse"] for r in rows]
+            scores = [r["validation_rmse"] for r in rows]
             stats.append(dict(mode=mode, n=len(rows), seeds=[r["seed"] for r in rows],
                               mean_rmse=statistics.mean(scores),
                               std_rmse=statistics.stdev(scores) if len(scores) > 1 else None))
-    lookup = {(r["mode"], r["seed"]): r["test_rmse"] for r in runs}
+    lookup = {(r["mode"], r["seed"]): r["validation_rmse"] for r in runs}
     paired = []
     for before, after, question in COMPARISONS:
         deltas = [dict(seed=s, delta_rmse=lookup[after, s] - lookup[before, s]) for s in SEEDS
@@ -194,14 +210,15 @@ def summarize(output, mother_root):
         if deltas:
             values = [r["delta_rmse"] for r in deltas]
             paired.append(dict(question=question, before=before, after=after, n=len(values),
+                               scope=COMPARISON_NOTES[question],
                                per_seed=deltas, mean_delta_rmse=statistics.mean(values),
                                std_delta_rmse=statistics.stdev(values) if len(values) > 1 else None))
     complete = all((mode, seed) in lookup for mode in TRAIN_VARIANTS + frozen.VARIANTS for seed in SEEDS)
-    report = dict(runs=runs, summary=stats, paired=paired, complete=complete,
-                  interpretation="Fixed-protocol paired seed comparison; negative after-minus-before RMSE favors after. No significance claim from means alone.")
-    formal.write_json(output / "comparison.json", report)
+    report = dict(metric_split="validation", runs=runs, summary=stats, paired=paired, complete=complete,
+                  interpretation="Development-only selected-checkpoint validation comparison. Negative after-minus-before RMSE favors after. Existing C/D test scores are deliberately not included; no independent test claim.")
+    formal.write_json(output / "comparison_validation.json", report)
     if runs:
-        with (output / "per_seed.csv").open("w", newline="", encoding="utf-8-sig") as handle:
+        with (output / "per_seed_validation.csv").open("w", newline="", encoding="utf-8-sig") as handle:
             writer = csv.DictWriter(handle, fieldnames=list(runs[0]))
             writer.writeheader()
             writer.writerows(runs)
@@ -209,6 +226,8 @@ def summarize(output, mother_root):
 
 
 def train(legacy, args, data, splits, spec, factory, tools, config, modes, mother_root):
+    if config.get("evaluation_policy") != EVALUATION_POLICY:
+        raise ValueError("First-round training requires the locked validation-only evaluation policy")
     original_save = legacy._save_downstream_resume
     times = {}
 
@@ -240,11 +259,14 @@ def train(legacy, args, data, splits, spec, factory, tools, config, modes, mothe
                            {key: getattr(args, key) for key in ("batch_size", "encoder_lr", "head_lr", "dropout")}, run_args.tuning_protocol)
                 legacy.initialize_single_run_config(directory, expected)
                 if (directory / "result.json").exists():
+                    completed = formal.read_json(directory / "result.json")
+                    if completed.get("test_metrics") is not None or (directory / "test_predictions.csv").exists():
+                        raise ValueError(f"Refusing to reuse a test-evaluated run as a validation-only run: {directory}")
                     print(f"Completed already: {mode} seed={seed}", flush=True)
                     continue
                 print(f"Start {mode} seed={seed}; fixed mother settings", flush=True)
                 legacy.run_single(run_args, selected_data, splits, spec, mode, seed,
-                                  torch.device(args.device), directory, evaluate_test=True)
+                                  torch.device(args.device), directory, evaluate_test=False)
                 summarize(args.output_dir, mother_root)
 
 
@@ -279,6 +301,8 @@ def main():
         saved = formal.read_json(output / "run_config.json")
         if saved.get("mother_manifest_sha256") != formal.digest(mother):
             raise ValueError("Summary directory belongs to a different mother experiment")
+        if saved.get("evaluation_policy") != EVALUATION_POLICY:
+            raise ValueError("Summary directory does not use the validation-only development policy")
         summarize(output, mother_root)
         return
     data, splits, spec, factory, features, inputs = prepare_data(legacy, args, protocol, baseline, mother_root)
