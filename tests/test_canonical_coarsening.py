@@ -8,7 +8,7 @@ from coarse_gnn.diffusion_adapter import DiffusionCoarseModel
 from diffusion.bond_diffusion.config import ModelConfig
 from diffusion.bond_diffusion.data import MoleculeGraph, collate_graphs
 from diffusion.bond_diffusion.model import BondAwareDiffusionModel
-from run_coarse_demo import chain_graph
+from examples.run_coarse_demo import chain_graph
 
 
 class CanonicalCoarseningTests(unittest.TestCase):

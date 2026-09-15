@@ -8,7 +8,7 @@ import torch
 
 from coarse_gnn import TopologyCache
 from coarse_gnn.prepared_data import PreparedPropertyDataset, prepared_tools
-from run_coarse_demo import chain_graph
+from examples.run_coarse_demo import chain_graph
 import run_lipo_formal as entry
 
 

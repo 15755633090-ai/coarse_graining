@@ -41,7 +41,7 @@ Bliss 最坏复杂度为指数级。以上审计产生时尚未增加规范化�
 
 ```powershell
 conda run --no-capture-output -n polyolefin_ml python -m unittest discover -s tests -v
-conda run --no-capture-output -n polyolefin_ml python audit_method.py --permutations 100
-conda run --no-capture-output -n polyolefin_ml python audit_method.py --permutations 100 --variant base --output outputs/method_audit/canonical_base.json
-conda run --no-capture-output -n polyolefin_ml python audit_method.py --permutations 100 --device cuda --output outputs/method_audit/canonical_cuda.json
+conda run --no-capture-output -n polyolefin_ml python -m scripts.validation.audit_method --permutations 100
+conda run --no-capture-output -n polyolefin_ml python -m scripts.validation.audit_method --permutations 100 --variant base --output outputs/method_audit/canonical_base.json
+conda run --no-capture-output -n polyolefin_ml python -m scripts.validation.audit_method --permutations 100 --device cuda --output outputs/method_audit/canonical_cuda.json
 ```

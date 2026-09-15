@@ -1,5 +1,7 @@
 # 第一阶段：冻结编码器的粗图传播机制验证
 
+> 本页命令均在 `coarse_graining` 根目录执行。整理目录时（2026-09-15）检测到 seed 2/3/4 的 Frozen 补跑进程；下文保留最初 seed 0/1 的协议说明。三个训练源文件仍在根目录，已有实验身份与断点兼容性保持不变。入口位置见 [目录与命令索引](DIRECTORY_LAYOUT.md)。
+
 当前优先运行 **Frozen Region-only / Frozen Base coarse × seed 0、1**，共 4 次训练。暂停先前的 finetune 计划，保留原结果、最近持久化断点以及 `05_coarse_gnn/_recovery/pause_finetune_*` 备份。第一阶段完成后不会自动恢复 finetune，也不运行 Enhanced。
 
 直接读取旧 `04_diffusion/lipo/pretrained_frozen` 结果作为历史对照，不重跑旧模型。主要机制比较是两个新模型之间的差异。
@@ -34,10 +36,10 @@ conda run --no-capture-output -n polyolefin_ml python -u run_lipo_frozen.py --ac
 本机也可使用隐藏窗口后台脚本（与前台命令二选一）：
 
 ```powershell
-.\start_lipo_frozen.ps1
+.\scripts\launchers\start_lipo_frozen.ps1
 ```
 
-原 `start_lipo_optimized.ps1` / `run_lipo_formal.py` 属于暂停的 finetune 实验，现在不要同时运行。中断后重新运行 frozen 命令，已完成结果跳过、未完成 run 从原 `resume.pt` 接续。代码或协议改变会拒绝混入同一结果目录。
+原 `scripts/launchers/start_lipo_optimized.ps1` / `run_lipo_formal.py` 属于暂停的 finetune 实验，现在不要同时运行。中断后重新运行 frozen 命令，已完成结果跳过、未完成 run 从原 `resume.pt` 接续。代码或协议改变会拒绝混入同一结果目录。
 
 ## 文件与解释
 

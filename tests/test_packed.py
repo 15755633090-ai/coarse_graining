@@ -12,7 +12,7 @@ from coarse_gnn.packed import packed_predict, prepare_graph_batch
 from diffusion.bond_diffusion.config import ModelConfig
 from diffusion.bond_diffusion.data import collate_graphs
 from diffusion.bond_diffusion.model import BondAwareDiffusionModel
-from run_coarse_demo import chain_graph
+from examples.run_coarse_demo import chain_graph
 
 
 class PackedTests(unittest.TestCase):

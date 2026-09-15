@@ -10,7 +10,7 @@ import torch
 from coarse_gnn import CoarseningConfig, NetworkConfig
 from coarse_gnn.diffusion_adapter import DiffusionCoarseModel
 from diffusion.bond_diffusion.data import MoleculeGraph, collate_graphs, graph_from_smiles
-from run_coarse_demo import chain_graph
+from examples.run_coarse_demo import chain_graph
 
 
 def component_diameter(n, edges):
@@ -50,7 +50,7 @@ def main():
     torch.manual_seed(args.seed)
     network = NetworkConfig.base(input_dim=128, edge_dim=0) if args.variant == "base" else None
     model = DiffusionCoarseModel.from_checkpoint(
-        Path(__file__).resolve().parent / "diffusion/outputs/ogb_clean/encoder.pt",
+        Path(__file__).resolve().parents[2] / "diffusion/outputs/ogb_clean/encoder.pt",
         network=network, device=args.device,
         coarsening=CoarseningConfig(canonicalize=not args.legacy_coarsening),
     ).eval()

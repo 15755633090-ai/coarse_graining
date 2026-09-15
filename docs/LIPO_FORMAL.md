@@ -1,5 +1,7 @@
 # Lipo 粗粒度模型正式协议接入
 
+> 本页命令均在 `coarse_graining` 根目录执行，工具脚本的新位置见 [目录与命令索引](DIRECTORY_LAYOUT.md)。
+
 **当前计划已调整为先做 [Frozen 机制验证](FROZEN_MECHANISM.md)。本页记录的 finetune 实验已暂停，已有结果和断点保留；以下 finetune 启动命令现在不执行。**
 
 入口为 `run_lipo_formal.py`。默认 `--action prepare` 只做一致性检查和拓扑预计算；显式 `--action train` 才启动调参及正式训练。结果写入项目旁的 `model/results_formal/05_coarse_gnn`。已有 `01_local`、`02_dmpnn`、`03_grover`、`04_diffusion` 只读。
@@ -93,20 +95,20 @@ conda run --no-capture-output -n polyolefin_ml python run_lipo_formal.py --actio
 
 dropout 按原图/区域/层顺序抽取 mask，随机数状态对照一致。合批改变矩阵梯度的浮点累加顺序，所以 **BF16 训练轨迹不保证与旧串行实现逐位一致**。真实权重/输入检查中 FP32 最大预测差约 2.4e-7；BF16 预测在所测批次中一致，整体梯度相对 L2 差约 0.36%–0.57%。不能据此推断完整训练后的预测也逐位相同。
 
-本机 8 分子微批前向＋反向实测约快 6.3–6.7 倍。这不等于整轮或完整实验的加速倍数；原编码器、数据准备、验证和 checkpoint I/O 仍有开销。测量结果见 `outputs/performance/packed_audit.json`。`benchmark_resumed_epoch.py` 另在临时副本中恢复真实第 26 轮第 100 批并完成该轮；该次只剩 5 个训练批次，包含首次分子缓存准备，不能用于估算完整热缓存 epoch 的速度。副本恢复后的 validation RMSE 差约 1.5e-5，原断点文件哈希未变，未访问 test。
+本机 8 分子微批前向＋反向实测约快 6.3–6.7 倍。这不等于整轮或完整实验的加速倍数；原编码器、数据准备、验证和 checkpoint I/O 仍有开销。测量结果见 `outputs/performance/packed_audit.json`。`scripts/performance/benchmark_resumed_epoch.py` 另在临时副本中恢复真实第 26 轮第 100 批并完成该轮；该次只剩 5 个训练批次，包含首次分子缓存准备，不能用于估算完整热缓存 epoch 的速度。副本恢复后的 validation RMSE 差约 1.5e-5，原断点文件哈希未变，未访问 test。
 
 `coarse_gnn/execution_revision.py` 只允许已审计的串行源代码快照切换到通过当前哈希核验的合批版本；任何超参数、split 或其他协议字段变化都会拒绝迁移。旧 `run_config.json` 与调参协议身份保留，根 `execution_revision.json` 和每个 run 的 `execution_history.json` 单独记录实际执行源码、审计哈希、恢复断点哈希及时间。模型权重和优化器状态布局未改变。
 
 优化代码发生变化后，必须先重新运行数值审计；未通过或源码哈希过期将拒绝训练：
 
 ```powershell
-conda run --no-capture-output -n polyolefin_ml python verify_packed.py
+conda run --no-capture-output -n polyolefin_ml python -m scripts.validation.verify_packed
 ```
 
 优化前源码保存在 `outputs/performance/reference`，便于复核本次接续的来源。以上检查不能替代正式多 seed 性能实验。
 
-本机还提供后台接续脚本 `start_lipo_optimized.ps1`：检查是否已有 Lipo 训练进程，备份原 Region-only trial_0 断点，在隐藏窗口接续 seed 0、1，并返回 `_logs/lipo_optimized_时间戳.log` 路径。前台命令和后台脚本选一种使用，避免重复启动。关闭查看日志的窗口不影响后台训练。
+本机还提供后台接续脚本 `scripts/launchers/start_lipo_optimized.ps1`：检查是否已有 Lipo 训练进程，备份原 Region-only trial_0 断点，在隐藏窗口接续 seed 0、1，并返回 `_logs/lipo_optimized_时间戳.log` 路径。前台命令和后台脚本选一种使用，避免重复启动。关闭查看日志的窗口不影响后台训练。
 
 ```powershell
-.\start_lipo_optimized.ps1
+.\scripts\launchers\start_lipo_optimized.ps1
 ```

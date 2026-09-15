@@ -1,68 +1,77 @@
 # 基于粗粒度化的扩散 GNN
 
-本项目面向普通分子数据集的图级性质预测。审计中的合成链图和分子图仅用于检查重编号不变性，不限定实际数据集的分子结构。
+面向普通分子数据集的图级性质预测：完整原图扩散编码 → 分散中心与重叠上下文 → 互斥 core 归属与残余补充 → Region GNN → Coarse GNN → 图级预测。
 
-当前优先做 [冻结编码器的机制验证](FROZEN_MECHANISM.md)：Frozen Region-only 与 Frozen Base coarse，共同固定配置，seed 0、1。先前的 finetune 计划已暂停，结果与断点保留。完整 finetune 协议见 [Lipo 正式实验说明](LIPO_FORMAL.md)，不自动启动第二阶段。
-
-模型框架：完整原图扩散编码 → 原始离散属性图规范化 → 分散中心与四跳上下文 → 互斥主归属与残余补充 → 区域 GNN → 粗图 GNN → 图级预测。
-
-规范化使用 igraph/Bliss：原子颜色包含五类原始离散属性，键类型通过辅助节点颜色保留。128 维扩散表示不参与规范化。默认保留增强版配置，也可用 `--variant base` 运行无显式区域/粗边特征、无区域大小特征、mean readout 的基础版。
-
-新增模块从现有扩散编码器的 `encode_nodes()` 获取节点表示；原始编码器及内部消息门控保留。没有额外的重要节点 Gate、回溯或子图筛选模块。
+当前实验采用 **Frozen Region-only / Frozen Base coarse**。整理目录时（2026-09-15）检测到 seed 2/3/4 正在补跑；实时进度以结果目录中的 `progress.json` 和 `result.json` 为准。实验说明见 [Frozen 机制验证](docs/FROZEN_MECHANISM.md)，暂停的 finetune 计划见 [Lipo 正式协议](docs/LIPO_FORMAL.md)。
 
 ## 目录
 
 ```text
 coarse_graining/
-├── coarse_gnn/
-│   ├── config.py             # 粗化规则和网络参数
-│   ├── canonical.py          # 原子属性与键类型的 Bliss 规范化
-│   ├── cache.py              # 拓扑内存缓存与磁盘持久化
-│   ├── topology.py           # 中心、归属、残余、上下文与粗边
-│   ├── layers.py             # 纯 PyTorch 的带边特征 GIN
-│   ├── model.py              # 接收任意节点表示的通用粗图预测器
-│   ├── diffusion_adapter.py  # 与现有扩散编码器、分子批次连接
-│   └── README.md             # 接口、算法细节、限制与训练示例
-├── diffusion/                # 原扩散预训练模块与权重
-├── tests/test_coarse_gnn.py   # 拓扑、表示、批次、梯度检查
-├── run_coarse_demo.py         # 现有权重加载与前向/反向演示
-├── audit_method.py            # 完整重编号不变性审计
-├── precompute_topology.py     # 数据集粗化拓扑离线预计算，无需编码器权重
-├── requirements.txt           # 完整依赖，包括 igraph
-└── outputs/coarse_demo/      # 演示输出，不覆盖预训练权重
+├── run_lipo_frozen.py          # 当前 Frozen 实验入口
+├── run_lipo_formal.py          # 正式协议接入与共享训练支持
+├── frozen_features.py         # 固定编码器特征缓存
+├── coarse_gnn/                # 粗化及 Region/Coarse GNN 核心实现
+├── diffusion/                 # 原扩散子项目、数据与预训练权重
+├── examples/                  # 最小模型演示
+├── scripts/
+│   ├── data/                  # 拓扑预计算
+│   ├── experiments/           # 第一轮核心消融：统一母模型开关与入口
+│   ├── validation/            # 方法不变性、数值等价性检查
+│   ├── performance/           # 性能分析、断点测速
+│   ├── launchers/             # Windows 后台启动脚本
+│   └── maintenance/           # 可选打包工具
+├── tests/                     # 自动化测试
+├── docs/                      # 实验协议、目录索引、上传说明
+├── outputs/                   # 演示、审计、性能报告和缓存
+└── requirements.txt           # 项目依赖
 ```
 
-## 运行
+根目录的三个训练文件保留原位置和原内容，因为它们的路径及哈希已写入当前实验协议。其他入口已按用途分类，完整对应关系见 [目录与命令索引](docs/DIRECTORY_LAYOUT.md)。
 
-在本项目根目录，使用已有 `polyolefin_ml` 环境。网络使用纯 PyTorch，规范化另需 `igraph==0.11.9`（本机已安装），不要求 PyTorch Geometric；SMILES 输入另需 RDKit（已有环境提供）。新环境先执行 `python -m pip install -r requirements.txt`。`--no-capture-output` 避免 Windows 下 conda 对中文路径输出的转码问题。
+## 常用入口
+
+下列命令均在本目录运行，使用已有 `polyolefin_ml` 环境。迁移后的 Python 工具使用 `python -m` 启动。
 
 ```powershell
-conda run --no-capture-output -n polyolefin_ml python run_coarse_demo.py --backward
-conda run --no-capture-output -n polyolefin_ml python run_coarse_demo.py --variant base --backward --output outputs/coarse_demo/base_report.json
-conda run --no-capture-output -n polyolefin_ml python run_coarse_demo.py --smiles 'CCO' 'CC(=O)O' 'c1ccccc1' '[Na+].[Cl-]'
+# 查看当前训练入口参数，不启动训练
+conda run --no-capture-output -n polyolefin_ml python run_lipo_frozen.py --help
+
+# Base 模型演示与一次前向/反向检查
+conda run --no-capture-output -n polyolefin_ml python -m examples.run_coarse_demo --variant base --backward --output outputs/coarse_demo/new_smoke.json
+
+# 预计算分子粗化拓扑
+conda run --no-capture-output -n polyolefin_ml python -m scripts.data.precompute_topology --smiles 'CCO' 'CC(=O)O' --cache-dir outputs/topology_cache
+
+# 自动化测试
 conda run --no-capture-output -n polyolefin_ml python -m unittest discover -s tests -v
-conda run --no-capture-output -n polyolefin_ml python audit_method.py --permutations 100
 ```
 
-默认加载 `diffusion/outputs/ogb_clean/encoder.pt`，在时间步 0 冻结编码器。无 SMILES 参数时使用 1、24、100 节点的合成链图，输出每张图的规范编号、原始编号映射、归属、上下文、粗边和覆盖统计到 `outputs/coarse_demo/canonical_report.json`。`--backward` 使用合成标签执行一次优化器更新，仅用于验证梯度链路。加 `--finetune-encoder` 可检查编码器微调；加 `--device cuda` 使用 GPU。旧的 `report.json` 等演示输出是规范化修复前的历史记录。
+需要启动或恢复训练时，按 [Frozen 实验说明](docs/FROZEN_MECHANISM.md) 选择 seeds。后台脚本已移到 `scripts/launchers/`；前台命令和后台脚本二选一。
 
-**演示预测值不能作为性质预测结果。** Lipo 已接入原正式协议；新增模型的训练入口、恢复方式和执行优化见 [LIPO_FORMAL.md](LIPO_FORMAL.md)。实际进度以结果目录中的 checkpoint、history 和 result 为准。
+演示默认读取 `diffusion/outputs/ogb_clean/encoder.pt`，下游权重随机初始化，演示输出不是性质预测实验结果。规范化使用原始离散原子属性和键类型，通过 igraph/Bliss 完成，扩散向量不参与规范化。使用 `--variant base` 关闭显式区域/粗边特征及区域大小特征，采用 mean readout；演示的默认配置保留增强项。
 
-## 预计算粗化拓扑
+## 结果放在哪里
 
-可以先为普通分子数据集建立磁盘缓存，再在训练中复用。支持 SMILES CSV（默认列名 `smiles`）、`.smi`、`.txt` 和现有分子图 JSONL；预计算不加载编码器权重。
+| 结果 | 位置 |
+|---|---|
+| 当前 Frozen 实验 | `../model/results_formal/05_coarse_gnn/frozen_mechanism/` |
+| 正式 coarse 实验及断点 | `../model/results_formal/05_coarse_gnn/` |
+| 演示输出 | `outputs/coarse_demo/` |
+| 方法检查 | `outputs/method_audit/` |
+| 性能报告及历史源码快照 | `outputs/performance/` |
+| 演示用拓扑缓存 | `outputs/topology_cache/` |
 
-```powershell
-conda run --no-capture-output -n polyolefin_ml python precompute_topology.py --input molecules.csv --cache-dir outputs/topology_cache
-```
+训练输出沿用原位置；本次整理保留既有权重、结果和数值审计记录。
 
-用分子示例检查预计算和模型读取：
+## 详细说明
 
-```powershell
-conda run --no-capture-output -n polyolefin_ml python precompute_topology.py --smiles 'CCO' 'CC(=O)O' 'c1ccccc1' --cache-dir outputs/topology_cache
-conda run --no-capture-output -n polyolefin_ml python run_coarse_demo.py --smiles 'CCO' 'CC(=O)O' 'c1ccccc1' --topology-cache outputs/topology_cache --output outputs/coarse_demo/cache_report.json
-```
+- [目录、旧新路径与工具命令](docs/DIRECTORY_LAYOUT.md)
+- [Frozen 机制验证协议](docs/FROZEN_MECHANISM.md)
+- [第一轮核心消融：代码及执行范围](docs/ABLATION_ROUND1.md)
+- [Lipo 正式训练协议](docs/LIPO_FORMAL.md)
+- [粗粒度模块接口与缓存](coarse_gnn/README.md)
+- [扩散子项目](diffusion/README.md) · [编码器核验](diffusion/ENCODER_AUDIT.md)
+- [GitHub 上传说明](docs/GITHUB_UPLOAD.md)
 
-训练时向 `DiffusionCoarseModel.from_checkpoint(..., topology_cache=TopologyCache("outputs/topology_cache"))` 传入缓存即可。相同输入首次构建，后续从内存或磁盘读取；命中后不再执行 canonicalization、BFS、区域与粗边构造。图结构、原始离散属性、输入编号或粗化参数变化时生成新条目。具体接口与失效规则见 [缓存说明](coarse_gnn/README.md#拓扑缓存与预计算)。
-
-通用图接口和训练用法见 [粗粒度模块说明](coarse_gnn/README.md)。原扩散训练与编码用法见 [扩散模块说明](diffusion/README.md)，原编码器核验见 [编码器核验报告](diffusion/ENCODER_AUDIT.md)。
+新环境依赖见 `requirements.txt`，需要 PyTorch、RDKit 和 `igraph==0.11.9`；不要求 PyTorch Geometric。`conda run --no-capture-output` 用于避免本机 Windows 中文路径的输出转码问题。

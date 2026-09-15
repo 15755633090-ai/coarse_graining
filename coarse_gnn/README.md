@@ -124,7 +124,7 @@ output = model(batch, topologies=topologies)
 - 文件采用临时文件加原子替换写入；不同进程可以共用目录，各自持有内存缓存。同时首次处理同一张图时可能重复计算，但不会读取到半写入文件。损坏文件明确报错并提示重建。
 - 返回的拓扑对象应视为只读。修改粗化算法、字段格式或索引语义时必须递增 `topology.py` 中的 `TOPOLOGY_VERSION`；旧条目仍保留，但不会命中。默认 `outputs/topology_cache/` 可重建，因此不纳入 Git。
 
-CLI：`python precompute_topology.py --input molecules.csv --cache-dir outputs/topology_cache`。可用 `--smiles-column` 指定 CSV 列；图 JSONL 沿用原始数据格式。`--radius`、`--center-fraction`、`--max-residual-size` 应与模型配置一致。再次运行同一命令会读取已有文件；输出报告中 `misses=0` 表示本次未重新构建。
+CLI：`python -m scripts.data.precompute_topology --input molecules.csv --cache-dir outputs/topology_cache`。可用 `--smiles-column` 指定 CSV 列；图 JSONL 沿用原始数据格式。`--radius`、`--center-fraction`、`--max-residual-size` 应与模型配置一致。再次运行同一命令会读取已有文件；输出报告中 `misses=0` 表示本次未重新构建。
 
 缓存不消除输入哈希、磁盘 I/O、CPU/GPU 索引传输、分子适配器的稠密边检查和 GNN 计算；实际训练加速幅度仍需在选定数据集上测量。
 
@@ -174,10 +174,10 @@ base_plus_counts = NetworkConfig.base(input_dim=128, edge_dim=0, use_coarse_edge
 
 ```powershell
 conda run --no-capture-output -n polyolefin_ml python -m unittest discover -s tests -v
-conda run --no-capture-output -n polyolefin_ml python run_coarse_demo.py --backward
-conda run --no-capture-output -n polyolefin_ml python run_coarse_demo.py --variant base --backward --finetune-encoder --device cuda --output outputs/coarse_demo/canonical_base_finetune_cuda.json
-conda run --no-capture-output -n polyolefin_ml python audit_method.py --permutations 100
-conda run --no-capture-output -n polyolefin_ml python audit_method.py --permutations 100 --variant base --output outputs/method_audit/canonical_base.json
+conda run --no-capture-output -n polyolefin_ml python -m examples.run_coarse_demo --backward
+conda run --no-capture-output -n polyolefin_ml python -m examples.run_coarse_demo --variant base --backward --finetune-encoder --device cuda --output outputs/coarse_demo/canonical_base_finetune_cuda.json
+conda run --no-capture-output -n polyolefin_ml python -m scripts.validation.audit_method --permutations 100
+conda run --no-capture-output -n polyolefin_ml python -m scripts.validation.audit_method --permutations 100 --variant base --output outputs/method_audit/canonical_base.json
 ```
 
 正式方法测试不传 persistent ID，每次重排重新运行编码器和完整粗化；断言规范结构完全相同、粗节点与边数一致、预测绝对误差不超过 `1e-6`。增强项测试覆盖 32 种开关组合；同时保留主归属、边去重、上下文、冻结/微调梯度等工程测试。

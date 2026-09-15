@@ -17,4 +17,4 @@ git push origin main
 
 GitHub 普通 Git 上传单文件上限为 100 MiB，目前本项目最大单文件约 18.94 MiB，不需要 Git LFS。规则见 [GitHub 官方说明](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github)。
 
-`prepare_github_upload.py` 是此前保留的可选精简副本工具，完整 Git 上传不需要运行它。项目运行与检查命令见根目录 `README.md`。
+`scripts/maintenance/prepare_github_upload.py` 是此前保留的可选精简副本工具，完整 Git 上传不需要运行它。如需使用，在项目根目录执行 `python -m scripts.maintenance.prepare_github_upload`。项目运行与检查命令见 [根目录 README](../README.md)。

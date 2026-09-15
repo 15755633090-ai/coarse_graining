@@ -4,7 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$taskRoot = $PSScriptRoot
+$taskRoot = (Get-Item -LiteralPath $PSScriptRoot).Parent.Parent.FullName
 $condaCommand = 'C:\Users\12775\miniconda3\Scripts\conda.exe'
 if ($Worker) {
     Set-Location -LiteralPath $taskRoot

@@ -28,7 +28,7 @@ def chain_graph(n: int) -> MoleculeGraph:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint", type=Path, default=Path(__file__).resolve().parent / "diffusion/outputs/ogb_clean/encoder.pt")
+    parser.add_argument("--checkpoint", type=Path, default=Path(__file__).resolve().parents[1] / "diffusion/outputs/ogb_clean/encoder.pt")
     parser.add_argument("--smiles", nargs="+", help="Optional molecular inputs; default: synthetic chains of 1, 24, 100 nodes")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--topology-cache", type=Path, help="Reuse/prepopulate persistent topology files in this directory")

@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 DESTINATION = ROOT / "github_upload"
 ENCODER = Path("diffusion/outputs/ogb_clean/encoder.pt")
 
@@ -20,7 +20,7 @@ def include(path: Path) -> bool:
     if path.name == ".env" or (path.name.startswith(".env.") and path.name != ".env.example"):
         return False
     # Allow only project source, documentation, manifests and requirements.
-    return path.suffix in {".py", ".md", ".json"} or path.name in {"requirements.txt", ".gitignore"}
+    return path.suffix in {".py", ".ps1", ".md", ".json"} or path.name in {"requirements.txt", ".gitignore"}
 
 
 def main():
