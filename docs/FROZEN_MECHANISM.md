@@ -72,6 +72,8 @@ conda run --no-capture-output -n polyolefin_ml python run_lipo_frozen.py --actio
 
 ## 汇总修订与断点兼容
 
-本次只修改 `summarize()` 并在准备/训练入口添加报告版本核验。`scripts/experiments/frozen_reporting.py` 以已核验的旧源码 SHA256 为起点，排除汇总函数和两条精确匹配的兼容钩子后，验证剩余 Python 语法树与原训练入口完全相同；同时检查其他训练源文件、实验参数和协议不变。未知旧版本、模型代码变化或训练逻辑变化均拒绝兼容。
+本次只修改 `summarize()`、修正顶部 seed 范围注释，并在准备/训练入口添加报告版本核验。`scripts/experiments/frozen_reporting.py` 以已核验的旧源码 SHA256 为起点，先要求 `summarize()` 的完整 AST 精确匹配当前两行 wrapper（导入并返回 `summarize_frozen(args, baseline)`）；函数签名、装饰器、额外语句、调用参数改变或重复定义均拒绝。只有通过检查的 wrapper、两条精确匹配的兼容钩子，以及获准的 `seeds 0/1` → `seeds 0-4` 注释修正参与归一化，随后验证剩余训练 AST 与原版本完全相同，同时检查其他训练源文件、实验参数和协议不变。
+
+合成结果测试另检查当前汇总实现调用前后的 Python、NumPy 和 Torch CPU RNG state 不变。这是对当前实现的回归验证，不代表任意未来报告实现都能自动获得兼容许可。未知旧版本、模型代码变化或训练逻辑变化均拒绝兼容。
 
 核验通过后保留原 `run_config.json` 与断点协议身份，在独立的 `reporting_revision.json` 记录当前实际源码身份和报告模块哈希；不把新源码冒充成旧源码。新消融核验母模型时使用同一检查，但只读、不修改 C/D 文件。单独汇总输出也记录实际报告源码哈希。

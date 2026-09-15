@@ -1,4 +1,4 @@
-"""Stage one: fixed encoder, matched hyperparameters, two models and seeds 0/1."""
+"""Stage one: fixed encoder, matched hyperparameters, two models and seeds 0-4."""
 import argparse
 import copy
 import csv

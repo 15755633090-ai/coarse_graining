@@ -2,10 +2,14 @@
 import copy
 import hashlib
 import json
+import random
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+
+import numpy as np
+import torch
 
 import run_lipo_formal as formal
 from scripts.experiments import frozen_reporting as reporting
@@ -32,6 +36,39 @@ class FrozenReportingTests(unittest.TestCase):
         self.assertEqual(reporting.training_ast_digest(source), reporting.TRAINING_AST_SHA256)
         old, current = self.configs()
         reporting.verify_reporting_revision(old, current)
+
+    def test_rejects_summary_side_effects_signature_changes_and_duplicate_definitions(self):
+        source = (formal.ROOT / "run_lipo_frozen.py").read_text(encoding="utf-8")
+        signature = "def summarize(args, baseline):"
+        mutations = [
+            source.replace(signature, signature + "\n    torch.rand(1)"),
+            source.replace(signature, signature + "\n    import random\n    random.seed(7)"),
+            source.replace(signature, signature + "\n    global VARIANTS\n    VARIANTS = ()"),
+            source.replace(signature, "def summarize(args, baseline=torch.rand(1)):"),
+            source.replace(signature, "@torch.no_grad()\n" + signature),
+            source.replace("return summarize_frozen(args, baseline)", "return summarize_frozen(args, None)"),
+            source.replace(signature, "async " + signature),
+            source + "\n" + reporting._SUMMARY_WRAPPER,
+        ]
+        old, current = self.configs()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "run_lipo_frozen.py"
+            for changed in mutations:
+                with self.subTest(mutation=mutations.index(changed)):
+                    path.write_text(changed, encoding="utf-8")
+                    current["new_source_files"]["run_lipo_frozen.py"]["sha256"] = identity(path)["sha256"]
+                    with self.assertRaisesRegex(ValueError, "two-statement wrapper"):
+                        reporting.verify_reporting_revision(old, current, root)
+
+    def test_only_reviewed_docstring_change_is_allowed(self):
+        source = (formal.ROOT / "run_lipo_frozen.py").read_text(encoding="utf-8")
+        self.assertTrue(source.startswith('"""' + reporting._CURRENT_DOCSTRING + '"""'))
+        old_doc = source.replace(reporting._CURRENT_DOCSTRING, reporting._ORIGINAL_DOCSTRING, 1)
+        self.assertEqual(reporting.training_ast_digest(old_doc), reporting.TRAINING_AST_SHA256)
+        changed = source.replace(reporting._CURRENT_DOCSTRING, "unreviewed description", 1)
+        with self.assertRaisesRegex(ValueError, "docstring"):
+            reporting.training_ast_digest(changed)
 
     def test_preserves_old_manifest_and_records_actual_sources_separately(self):
         old, current = self.configs()
@@ -101,7 +138,16 @@ class FrozenReportingTests(unittest.TestCase):
             path = baseline / "lipo/pretrained_frozen/seed_0/result.json"
             path.parent.mkdir(parents=True)
             path.write_text(json.dumps(dict(mode="pretrained_frozen", seed=0, test_metrics={"rmse": 99.})))
+            python_rng = random.getstate()
+            numpy_rng = np.random.get_state()
+            torch_rng = torch.get_rng_state().clone()
             report = reporting.summarize_frozen(SimpleNamespace(output_dir=output), baseline)
+            self.assertEqual(random.getstate(), python_rng)
+            current_numpy = np.random.get_state()
+            self.assertEqual(current_numpy[0], numpy_rng[0])
+            np.testing.assert_array_equal(current_numpy[1], numpy_rng[1])
+            self.assertEqual(current_numpy[2:], numpy_rng[2:])
+            self.assertTrue(torch.equal(torch.get_rng_state(), torch_rng))
             self.assertFalse(report["complete"])
             self.assertEqual(report["missing_runs"], ["base_coarse/seed_4"])
             self.assertEqual(report["paired_summary"]["validation"]["n"], 4)

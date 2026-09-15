@@ -19,6 +19,12 @@ ORIGINAL_SOURCE_SHA256 = "91680b36ca20352d2f8690e8ad76307a06347662897d8558b8f777
 TRAINING_AST_SHA256 = "9259fe714d586a59ad1649c7214551de3a50cff0931e09c2bfd7b2c9cb0330e9"
 _COMPAT_IMPORT = "from scripts.experiments.frozen_reporting import preserve_training_manifest"
 _COMPAT_CALL = "config = preserve_training_manifest(legacy, config, args.output_dir)"
+_SUMMARY_WRAPPER = """def summarize(args, baseline):
+    from scripts.experiments.frozen_reporting import summarize_frozen
+    return summarize_frozen(args, baseline)
+"""
+_ORIGINAL_DOCSTRING = "Stage one: fixed encoder, matched hyperparameters, two models and seeds 0/1."
+_CURRENT_DOCSTRING = "Stage one: fixed encoder, matched hyperparameters, two models and seeds 0-4."
 
 
 def _stable_ast(value):
@@ -33,9 +39,19 @@ def _stable_ast(value):
 
 
 def training_ast_digest(source):
-    """Ignore summarize and only the exact two reporting-revision hook statements."""
+    """Validate the fixed summary wrapper before normalizing reporting-only edits."""
     tree = ast.parse(source)
-    tree.body = [node for node in tree.body if not isinstance(node, ast.FunctionDef) or node.name != "summarize"]
+    summaries = [node for node in tree.body
+                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == "summarize"]
+    expected = ast.parse(_SUMMARY_WRAPPER).body[0]
+    if len(summaries) != 1 or _stable_ast(summaries[0]) != _stable_ast(expected):
+        raise ValueError("Frozen summarize must exactly match the approved two-statement wrapper")
+    tree.body.remove(summaries[0])
+    # Permit only the reviewed seed-range documentation correction; normalize
+    # that exact literal to retain the independently verified old training digest.
+    if ast.get_docstring(tree, clean=False) not in (_ORIGINAL_DOCSTRING, _CURRENT_DOCSTRING):
+        raise ValueError("Unexpected Frozen module docstring revision")
+    tree.body[0].value.value = _ORIGINAL_DOCSTRING
     allowed = {ast.dump(ast.parse(line).body[0], include_attributes=False)
                for line in (_COMPAT_IMPORT, _COMPAT_CALL)}
     for node in tree.body:
@@ -81,7 +97,7 @@ def preserve_training_manifest(legacy, current, output, *, write_audit=True):
             original_manifest_preserved=True, training_ast_sha256=TRAINING_AST_SHA256,
             actual_source_files=current["new_source_files"],
             reporting_source=legacy.file_identity(Path(__file__)),
-            note="Only summary output and the exact compatibility hook differ. No model/training/checkpoint migration.",
+            note="Exact two-statement summary wrapper, reviewed seed-range docstring correction and compatibility hook only. No model/training/checkpoint migration.",
         ))
     return previous
 

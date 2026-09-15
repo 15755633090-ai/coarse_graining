@@ -55,7 +55,7 @@ B 的 Region 层数为 0，overlap context 不参与消息传播。B→C 应解�
 - `scripts/experiments/frozen_reporting.py`：既有 C/D 的五 seed 汇总及严格限定的 reporting-only 兼容核验。
 - `tests/test_frozen_ablation.py`：合成图检查，不需要实际 Lipo 训练或预训练权重。
 
-`run_lipo_frozen.py` 仅更新汇总和插入 reporting-only 兼容钩子；核验器验证其余训练语法树与原版本完全一致，且模型源码和实验参数没有变化。旧训练 manifest 保留，实际源码另记 `reporting_revision.json`。`run_lipo_formal.py`、`frozen_features.py` 和 `coarse_gnn` 实现保持不变。
+`run_lipo_frozen.py` 仅更新汇总、修正 seed 范围注释和插入 reporting-only 兼容钩子；核验器先精确匹配两行汇总 wrapper，再验证其余训练语法树与原版本完全一致，且模型源码和实验参数没有变化。旧训练 manifest 保留，实际源码另记 `reporting_revision.json`。`run_lipo_formal.py`、`frozen_features.py` 和 `coarse_gnn` 实现保持不变。
 Core-only 数据视图不修改原拓扑对象；新预检查只在内存构建拓扑，不写入原实验的拓扑缓存。
 
 ## 后续执行命令（本次不执行）
