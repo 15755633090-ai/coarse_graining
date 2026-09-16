@@ -87,7 +87,7 @@ def _load_job(manifest: dict, output_dir: Path, variant: str, seed: int) -> dict
 
 def collect(bundle: Path, output_dir: Path) -> dict:
     manifest = formal.read_json(bundle / "manifest.json")
-    if manifest.get("schema_version") != 4 or not isinstance(manifest.get("server_execution"), dict):
+    if manifest.get("schema_version") != 5 or not isinstance(manifest.get("server_execution"), dict):
         raise ValueError("Unsupported portable bundle manifest")
     references = _load_references(bundle, manifest)
     rows = []

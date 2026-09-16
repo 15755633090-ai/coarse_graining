@@ -50,14 +50,16 @@ def _verify_code(manifest: dict) -> None:
     if unexpected:
         raise ValueError(f"Experiment package contains unexpected source files: {unexpected}")
     launcher = manifest.get("launcher") or {}
-    launcher_path = root.parent / launcher.get("path", "")
+    if launcher.get("path") != "run_experiment.cmd":
+        raise ValueError("Server launcher path must be package-relative")
+    launcher_path = root.parent / "run_experiment.cmd"
     if not launcher_path.is_file() or _sha256(launcher_path) != launcher.get("sha256"):
         raise ValueError("Server launcher differs from bundle manifest")
 
 
 def load_context(bundle: Path):
     manifest = formal.read_json(bundle / "manifest.json")
-    if manifest.get("schema_version") != 4:
+    if manifest.get("schema_version") != 5:
         raise ValueError("Unsupported portable bundle manifest")
     scope = manifest.get("protocol_scope")
     if scope != {

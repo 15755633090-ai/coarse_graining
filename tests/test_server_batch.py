@@ -8,7 +8,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 import run_lipo_formal as formal
-from scripts.server_batch.bundle import _prepare_destination, _render_launcher
+from scripts.server_batch.bundle import (
+    _portable_identity,
+    _prepare_destination,
+    _render_launcher,
+)
 from scripts.server_batch.collect import collect
 from scripts.server_batch.run_job import _verify_code
 from scripts.readout_ablation.run_size_weighted import EVALUATION_POLICY
@@ -65,6 +69,12 @@ class ServerBatchCollectionTests(unittest.TestCase):
                 'set "PACKAGE_ID=abc123"\n',
             )
 
+    def test_portable_identity_drops_machine_specific_path(self):
+        first = {"path": "C:/source/file.py", "size": 12, "sha256": "abc"}
+        second = {"path": "N:/other/file.py", "size": 12, "sha256": "abc"}
+        self.assertEqual(_portable_identity(first), _portable_identity(second))
+        self.assertEqual(_portable_identity(first), {"size": 12, "sha256": "abc"})
+
     def make_batch(self, root: Path):
         bundle = root / "bundle"
         output = root / "jobs"
@@ -86,7 +96,7 @@ class ServerBatchCollectionTests(unittest.TestCase):
             "cublas_workspace_config": ":4096:8",
         }
         manifest = {
-            "schema_version": 4,
+            "schema_version": 5,
             "server_execution": execution,
             "protocol_scope": {
                 "seeds": [0, 1, 2],
@@ -219,6 +229,10 @@ class ServerBatchCollectionTests(unittest.TestCase):
                 extra.unlink()
                 launcher.write_text("@echo tampered\n", encoding="utf-8")
                 with self.assertRaisesRegex(ValueError, "launcher differs"):
+                    _verify_code(manifest)
+                launcher.write_text("@echo off\n", encoding="utf-8")
+                manifest["launcher"]["path"] = str(launcher.resolve())
+                with self.assertRaisesRegex(ValueError, "package-relative"):
                     _verify_code(manifest)
 
             manifest["code"]["mode"] = "git_checkout"

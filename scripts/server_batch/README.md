@@ -39,4 +39,6 @@ tree to a content-addressed child of
 `N:\coarse_graining_transfer\results\size_weighted\<package_id>`. The parent
 directory remains fixed, while distinct packages cannot mix their results. A
 failed network copy never deletes the server-local results. The packaged root
-launcher is SHA-256 locked alongside the source and assets.
+launcher is SHA-256 locked alongside the source and assets. Manifest identities
+store only relative member names, sizes, and SHA-256 values; absolute source
+paths never affect verification or `package_id`.

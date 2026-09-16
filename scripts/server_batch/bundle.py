@@ -16,6 +16,13 @@ def _copy(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
+def _portable_identity(identity: dict) -> dict:
+    return {
+        "size": identity["size"],
+        "sha256": identity["sha256"],
+    }
+
+
 def _reference_commit(root: Path) -> str | None:
     result = subprocess.run(
         ["git", "-c", f"safe.directory={root}", "rev-parse", "HEAD"], cwd=root,
@@ -143,11 +150,15 @@ def main() -> None:
     }
     reference_commit = _reference_commit(formal.ROOT)
     code_files = {
-        str(path.relative_to(formal.ROOT)).replace("\\", "/"): legacy.file_identity(path)
+        str(path.relative_to(formal.ROOT)).replace("\\", "/"): _portable_identity(
+            legacy.file_identity(path)
+        )
         for path in sorted(code_paths)
     }
     asset_files = {
-        str(path.relative_to(destination)).replace("\\", "/"): legacy.file_identity(path)
+        str(path.relative_to(destination)).replace("\\", "/"): _portable_identity(
+            legacy.file_identity(path)
+        )
         for path in sorted(assets.rglob("*")) if path.is_file()
     }
     package_identity = {
@@ -163,7 +174,7 @@ def main() -> None:
     _render_launcher(launcher_source, launcher_path, package_id)
 
     manifest = {
-        "schema_version": 4,
+        "schema_version": 5,
         "package_id": package_id,
         "purpose": "portable frozen size-weighted readout batch",
         "selected_hyperparameters": selected["selected_hyperparameters"],
@@ -183,7 +194,7 @@ def main() -> None:
         },
         "launcher": {
             "path": "run_experiment.cmd",
-            **legacy.file_identity(launcher_path),
+            **_portable_identity(legacy.file_identity(launcher_path)),
         },
         "reference_validation": "assets/reference_validation.json",
         "files": asset_files,
