@@ -20,9 +20,12 @@ required source code, assets, SHA-256 locks, and `run_experiment.cmd`. Copy that
 single directory to the compute server and run `run_experiment.cmd`; no Git
 checkout or protocol assembly is required on the server. The launcher is a queue: it runs
 at most one job per physical GPU and starts the next job only after completion.
-Use paths outside the repository for both the copied bundle and job output: each
-job verifies that the exact-commit repository is completely clean before it
-starts.
+Each job verifies the SHA-256 hashes of the bundled source code and assets
+before training starts.
+
+`run_experiment.cmd` contains two server-specific settings: the Conda executable
+path and environment name. They only need to be changed when moving the package
+to a server with a different Conda installation or environment name.
 
 The bundle locks `amp`, deterministic mode, micro-batch size, worker count,
 CPU thread count, logical CUDA device, and cuBLAS workspace configuration.
