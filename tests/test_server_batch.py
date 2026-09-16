@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 import hashlib
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import run_lipo_formal as formal
 from scripts.server_batch.collect import collect
+from scripts.server_batch.run_job import _verify_code
+from scripts.readout_ablation.run_size_weighted import EVALUATION_POLICY
 
 
 def sha256(path: Path) -> str:
@@ -28,8 +32,18 @@ class ServerBatchCollectionTests(unittest.TestCase):
                 {"mode": "base_coarse", "seed": seed, "validation_rmse": 0.83 + 0.01 * seed},
             ))
         formal.write_json(reference_path, references)
+        execution = {
+            "device": "cuda:0",
+            "amp": True,
+            "deterministic": True,
+            "micro_batch_size": 8,
+            "num_workers": 0,
+            "cpu_threads": 8,
+            "cublas_workspace_config": ":4096:8",
+        }
         manifest = {
-            "schema_version": 1,
+            "schema_version": 2,
+            "server_execution": execution,
             "protocol_scope": {
                 "seeds": [0, 1, 2],
                 "status": "exploratory_three_seed_validation_only",
@@ -50,9 +64,13 @@ class ServerBatchCollectionTests(unittest.TestCase):
             for seed in range(3):
                 job_root = output / f"{variant}_seed_{seed}"
                 formal.write_json(job_root / "run_config.json", {
+                    "stage": "portable_frozen_size_weighted_batch",
                     "bundle_manifest_sha256": bundle_digest,
                     "protocol_scope": manifest["protocol_scope"],
-                    "evaluation_policy": {"evaluate_test_during_training": False},
+                    "evaluation_policy": dict(EVALUATION_POLICY),
+                    "variants": [variant],
+                    "seed": seed,
+                    "execution": dict(execution),
                 })
                 formal.write_json(
                     job_root / "lipo" / variant / f"seed_{seed}" / "result.json",
@@ -85,6 +103,57 @@ class ServerBatchCollectionTests(unittest.TestCase):
             reference_path.write_text("[]", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "differs from the bundle manifest"):
                 collect(bundle, output)
+
+    def test_rejects_wrong_job_provenance_and_execution(self):
+        mutations = (
+            ("bundle sha", lambda cfg: cfg.update(bundle_manifest_sha256="wrong"), "different portable bundle"),
+            ("seed", lambda cfg: cfg.update(seed=99), "identity does not match"),
+            ("stage", lambda cfg: cfg.update(stage="wrong"), "unexpected stage"),
+            (
+                "execution",
+                lambda cfg: cfg["execution"].update(micro_batch_size=16),
+                "execution differs",
+            ),
+        )
+        for label, mutate, message in mutations:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as temporary:
+                bundle, output = self.make_batch(Path(temporary))
+                config_path = output / "region_size_weighted_seed_0/run_config.json"
+                config = formal.read_json(config_path)
+                mutate(config)
+                formal.write_json(config_path, config)
+                with self.assertRaisesRegex(ValueError, message):
+                    collect(bundle, output)
+
+    def test_rejects_nonfinite_score_and_test_predictions(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            bundle, output = self.make_batch(Path(temporary))
+            result_path = output / "region_size_weighted_seed_0/lipo/region_size_weighted/seed_0/result.json"
+            result = formal.read_json(result_path)
+            result["validation_metrics"]["rmse"] = float("nan")
+            formal.write_json(result_path, result)
+            with self.assertRaisesRegex(ValueError, "Invalid batch result"):
+                collect(bundle, output)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            bundle, output = self.make_batch(Path(temporary))
+            prediction_path = output / "region_size_weighted_seed_0/lipo/region_size_weighted/seed_0/test_predictions.csv"
+            prediction_path.write_text("forbidden", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "used test data"):
+                collect(bundle, output)
+
+    def test_code_verifier_rejects_wrong_commit_and_dirty_checkout(self):
+        manifest = {"code": {"required_commit": "expected", "files": {}}}
+        wrong = subprocess.CompletedProcess([], 0, stdout="wrong\n", stderr="")
+        with patch("scripts.server_batch.run_job.subprocess.run", return_value=wrong):
+            with self.assertRaisesRegex(ValueError, "must be commit expected"):
+                _verify_code(manifest)
+
+        correct = subprocess.CompletedProcess([], 0, stdout="expected\n", stderr="")
+        dirty = subprocess.CompletedProcess([], 0, stdout=" M changed.py\n", stderr="")
+        with patch("scripts.server_batch.run_job.subprocess.run", side_effect=(correct, dirty)):
+            with self.assertRaisesRegex(ValueError, "not clean"):
+                _verify_code(manifest)
 
 
 if __name__ == "__main__":

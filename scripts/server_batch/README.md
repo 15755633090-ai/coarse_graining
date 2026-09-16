@@ -23,5 +23,9 @@ at most one job per physical GPU and starts the next job only after completion.
 Use paths outside the repository for both the copied bundle and job output: each
 job verifies that the exact-commit repository is completely clean before it
 starts.
+
+The bundle locks `amp`, deterministic mode, micro-batch size, worker count,
+CPU thread count, logical CUDA device, and cuBLAS workspace configuration.
+Neither `launch` nor `run_job` accepts command-line overrides for these values.
 Finally run `python -m scripts.server_batch.collect` to produce the single
 validation-only comparison report.

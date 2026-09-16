@@ -12,6 +12,7 @@ import run_lipo_formal as formal
 from scripts.readout_ablation.models import REFERENCE_BY_VARIANT, TRAIN_VARIANTS
 from scripts.readout_ablation.run_size_weighted import (
     COARSE_COMPARISON_SCOPE,
+    EVALUATION_POLICY,
     READOUT_COMPARISON_SCOPE,
 )
 
@@ -55,12 +56,18 @@ def _load_job(manifest: dict, output_dir: Path, variant: str, seed: int) -> dict
     if not config_path.is_file():
         raise FileNotFoundError(f"Missing batch job configuration: {config_path}")
     config = formal.read_json(config_path)
+    if config.get("stage") != "portable_frozen_size_weighted_batch":
+        raise ValueError(f"Job has an unexpected stage: {job_root}")
+    if config.get("variants") != [variant] or config.get("seed") != seed:
+        raise ValueError(f"Job identity does not match its collection slot: {job_root}")
     if config.get("bundle_manifest_sha256") != formal.digest(manifest):
         raise ValueError(f"Job belongs to a different portable bundle: {job_root}")
     if config.get("protocol_scope") != manifest["protocol_scope"]:
         raise ValueError(f"Job has a different protocol scope: {job_root}")
-    if config.get("evaluation_policy", {}).get("evaluate_test_during_training") is not False:
+    if config.get("evaluation_policy") != EVALUATION_POLICY:
         raise ValueError(f"Job does not have the locked validation-only policy: {job_root}")
+    if config.get("execution") != manifest["server_execution"]:
+        raise ValueError(f"Job execution differs from the locked bundle execution: {job_root}")
     result_path = job_root / "lipo" / variant / f"seed_{seed}" / "result.json"
     if not result_path.is_file():
         raise FileNotFoundError(f"Missing batch job result: {result_path}")
@@ -80,6 +87,8 @@ def _load_job(manifest: dict, output_dir: Path, variant: str, seed: int) -> dict
 
 def collect(bundle: Path, output_dir: Path) -> dict:
     manifest = formal.read_json(bundle / "manifest.json")
+    if manifest.get("schema_version") != 2 or not isinstance(manifest.get("server_execution"), dict):
+        raise ValueError("Unsupported portable bundle manifest")
     references = _load_references(bundle, manifest)
     rows = []
     for variant in TRAIN_VARIANTS:
@@ -138,7 +147,8 @@ def collect(bundle: Path, output_dir: Path) -> dict:
         "mean_delta_rmse": statistics.mean(row["delta_rmse"] for row in weighted_coarse_rows),
         "std_delta_rmse": statistics.stdev(row["delta_rmse"] for row in weighted_coarse_rows) if len(weighted_coarse_rows) > 1 else None,
     })
-    report = {"protocol_scope": manifest["protocol_scope"], "metric_split": "validation", "test_metrics_used": False,
+    report = {"protocol_scope": manifest["protocol_scope"], "execution": manifest["server_execution"],
+              "metric_split": "validation", "test_metrics_used": False,
               "runs": rows, "summary": summary,
               "paired": paired,
               "coarse_readout_interaction": {

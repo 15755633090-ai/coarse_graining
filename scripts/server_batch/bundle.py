@@ -60,6 +60,16 @@ def main() -> None:
         raise ValueError("Selected hyperparameters differ from the locked frozen C/D mother")
     if mother_manifest.get("encoder_lr_effective") != 0:
         raise ValueError("Frozen C/D mother must retain a zero effective encoder learning rate")
+    mother_execution = frozen_protocol["execution"]
+    server_execution = {
+        "device": "cuda:0",
+        "amp": mother_execution["amp"],
+        "deterministic": mother_execution["deterministic"],
+        "micro_batch_size": mother_execution["micro_batch_size"],
+        "num_workers": mother_execution["num_workers"],
+        "cpu_threads": 8,
+        "cublas_workspace_config": mother_execution["cublas_workspace_config"],
+    }
 
     assets = destination / "assets"
     legacy_root = Path(frozen_protocol["source_files"]["downstream_benchmark.py"]["path"]).parent
@@ -109,10 +119,11 @@ def main() -> None:
     ]
 
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "purpose": "portable frozen size-weighted readout batch",
         "selected_hyperparameters": selected["selected_hyperparameters"],
         "frozen_protocol": frozen_protocol,
+        "server_execution": server_execution,
         "feature_cache": {
             "source_identity": preflight["feature_cache"],
             "bundle_file": "assets/frozen_encoder_features.pt",

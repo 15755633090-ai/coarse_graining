@@ -5,6 +5,7 @@ import argparse
 import copy
 import hashlib
 import importlib
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -60,9 +61,9 @@ def _verify_code(manifest: dict) -> None:
             raise ValueError(f"Required project source differs from bundle: {relative}")
 
 
-def load_context(bundle: Path, device: str, micro_batch_size: int, cpu_threads: int):
+def load_context(bundle: Path):
     manifest = formal.read_json(bundle / "manifest.json")
-    if manifest.get("schema_version") != 1:
+    if manifest.get("schema_version") != 2:
         raise ValueError("Unsupported portable bundle manifest")
     scope = manifest.get("protocol_scope")
     if scope != {
@@ -71,6 +72,19 @@ def load_context(bundle: Path, device: str, micro_batch_size: int, cpu_threads: 
         "not_a_replacement_for": "five_seed_formal_protocol",
     }:
         raise ValueError("Unexpected server protocol scope")
+    execution = manifest.get("server_execution")
+    expected_execution = {
+        "device": "cuda:0",
+        "amp": manifest["frozen_protocol"]["execution"]["amp"],
+        "deterministic": manifest["frozen_protocol"]["execution"]["deterministic"],
+        "micro_batch_size": manifest["frozen_protocol"]["execution"]["micro_batch_size"],
+        "num_workers": manifest["frozen_protocol"]["execution"]["num_workers"],
+        "cpu_threads": 8,
+        "cublas_workspace_config": manifest["frozen_protocol"]["execution"]["cublas_workspace_config"],
+    }
+    if execution != expected_execution:
+        raise ValueError("Server execution does not match the locked mother execution protocol")
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = execution["cublas_workspace_config"]
     _verify_code(manifest)
     assets = bundle / "assets"
     for relative, expected in manifest["files"].items():
@@ -96,12 +110,15 @@ def load_context(bundle: Path, device: str, micro_batch_size: int, cpu_threads: 
     args.checkpoint = assets / "encoder_best.pt"
     args.pretrain_smiles = assets / "ogb_pretrain_clean.csv"
     args.search_space = assets / "search_spaces.json"
-    args.device, args.micro_batch_size, args.num_workers = device, micro_batch_size, 0
-    args.amp, args.deterministic = True, True
+    args.device = execution["device"]
+    args.micro_batch_size = execution["micro_batch_size"]
+    args.num_workers = execution["num_workers"]
+    args.amp = execution["amp"]
+    args.deterministic = execution["deterministic"]
     for key, value in manifest["selected_hyperparameters"].items():
         setattr(args, key, value)
-    torch.set_num_threads(cpu_threads)
-    torch.use_deterministic_algorithms(True)
+    torch.set_num_threads(execution["cpu_threads"])
+    torch.use_deterministic_algorithms(execution["deterministic"])
 
     source, splits, spec = legacy.build_property_data(args.data_root, "lipo")
     if legacy.split_sha256(source, splits) != protocol["split_sha256"]:
@@ -137,9 +154,7 @@ def load_context(bundle: Path, device: str, micro_batch_size: int, cpu_threads: 
 def run(options: argparse.Namespace) -> None:
     bundle = options.bundle.resolve()
     output = options.output_dir.resolve()
-    manifest, legacy, args, data, splits, spec, factory, tools = load_context(
-        bundle, options.device, options.micro_batch_size, options.cpu_threads
-    )
+    manifest, legacy, args, data, splits, spec, factory, tools = load_context(bundle)
     args.output_dir = output
     parameters = readout.parameter_report(factory, args, spec.num_tasks, legacy)
     config = {
@@ -150,13 +165,13 @@ def run(options: argparse.Namespace) -> None:
         "evaluation_policy": dict(readout.EVALUATION_POLICY),
         "variants": [options.variant],
         "seed": options.seed,
-        "execution": {"device": options.device, "micro_batch_size": options.micro_batch_size, "cpu_threads": options.cpu_threads},
+        "execution": dict(manifest["server_execution"]),
         "models": parameters,
         "change": "graph_pool only: mean -> size_weighted_mean",
     }
     output.mkdir(parents=True, exist_ok=True)
     formal.write_json(output / "run_config.json", config)
-    report = readout.preflight(legacy, args, data, splits, spec, factory, tools, options.device)
+    report = readout.preflight(legacy, args, data, splits, spec, factory, tools, args.device)
     formal.write_json(output / "preflight.json", report)
     if options.action == "prepare":
         print(f"Prepared portable job: {output}", flush=True)
@@ -174,7 +189,7 @@ def run(options: argparse.Namespace) -> None:
         print(f"Already complete: {options.variant} seed={options.seed}", flush=True)
         return
     with formal.overrides(legacy, create_property_model=factory, **tools):
-        legacy.run_single(run_args, data, splits, spec, options.variant, options.seed, torch.device(options.device), directory, evaluate_test=False)
+        legacy.run_single(run_args, data, splits, spec, options.variant, options.seed, torch.device(args.device), directory, evaluate_test=False)
 
 
 def main() -> None:
@@ -184,12 +199,7 @@ def main() -> None:
     parser.add_argument("--variant", choices=TRAIN_VARIANTS, required=True)
     parser.add_argument("--seed", type=int, choices=range(3), required=True)
     parser.add_argument("--action", choices=("prepare", "train"), default="train")
-    parser.add_argument("--device", default="cuda:0")
-    parser.add_argument("--micro-batch-size", type=int, default=32)
-    parser.add_argument("--cpu-threads", type=int, default=8)
     options = parser.parse_args()
-    if options.micro_batch_size < 1 or options.cpu_threads < 1:
-        parser.error("micro-batch-size and cpu-threads must be positive")
     run(options)
 
 
