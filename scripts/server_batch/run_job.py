@@ -1,0 +1,147 @@
+"""Run one portable frozen size-weighted readout job on one CUDA device."""
+from __future__ import annotations
+
+import argparse
+import copy
+import importlib
+import sys
+from dataclasses import asdict
+from pathlib import Path
+
+import torch
+
+import run_lipo_formal as formal
+from coarse_gnn import TopologyCache
+from coarse_gnn.prepared_data import PreparedPropertyDataset
+from frozen_features import FrozenDataset, frozen_tools
+from scripts.readout_ablation import run_size_weighted as readout
+from scripts.readout_ablation.models import TRAIN_VARIANTS, make_factory
+
+
+def _identity(legacy, path: Path) -> dict:
+    return legacy.file_identity(path)
+
+
+def load_context(bundle: Path, device: str, micro_batch_size: int, cpu_threads: int):
+    manifest = formal.read_json(bundle / "manifest.json")
+    if manifest.get("schema_version") != 1:
+        raise ValueError("Unsupported portable bundle manifest")
+    assets = bundle / "assets"
+    for relative, expected in manifest["files"].items():
+        actual = _identity_from_sha(assets.parent / relative, expected)
+        if actual != expected["sha256"]:
+            raise ValueError(f"Bundle file changed: {relative}")
+
+    legacy_root = assets / "legacy"
+    sys.path.insert(0, str(legacy_root))
+    legacy = importlib.import_module("downstream_benchmark")
+    protocol = manifest["frozen_protocol"]
+    for name, expected in protocol["source_files"].items():
+        copied = legacy_root / ("downstream_benchmark.py" if name == "downstream_benchmark.py" else f"bond_diffusion/{name}")
+        if _identity(legacy, copied)["sha256"] != expected["sha256"]:
+            raise ValueError(f"Original source hash changed: {name}")
+    with formal.overrides(sys, argv=[str(legacy_root / "downstream_benchmark.py")]):
+        args = legacy.parse_args()
+    for key in ("epochs", "patience", "tuning_seed", "overlap_policy"):
+        setattr(args, key, protocol[key])
+    args.weight_decay = protocol["optimizer"]["weight_decay"]
+    args.grad_clip = protocol["optimizer"]["grad_clip"]
+    args.data_root = assets / "data"
+    args.checkpoint = assets / "encoder_best.pt"
+    args.pretrain_smiles = assets / "ogb_pretrain_clean.csv"
+    args.search_space = assets / "search_spaces.json"
+    args.device, args.micro_batch_size, args.num_workers = device, micro_batch_size, 0
+    args.amp, args.deterministic = True, True
+    for key, value in manifest["selected_hyperparameters"].items():
+        setattr(args, key, value)
+    torch.set_num_threads(cpu_threads)
+    torch.use_deterministic_algorithms(True)
+
+    source, splits, spec = legacy.build_property_data(args.data_root, "lipo")
+    if legacy.split_sha256(source, splits) != protocol["split_sha256"]:
+        raise ValueError("Portable Lipo data does not match the locked split")
+    cache = TopologyCache(max_memory_entries=8192)
+    prepared = PreparedPropertyDataset(source, legacy.collate_property_batch, cache, formal.STRUCTURE)
+    saved = torch.load(assets / "frozen_encoder_features.pt", map_location="cpu", weights_only=True)
+    if saved["identity"]["checkpoint"]["sha256"] != protocol["checkpoint"]["sha256"]:
+        raise ValueError("Frozen feature cache checkpoint identity mismatch")
+    if len(saved["features"]) != len(prepared):
+        raise ValueError("Frozen feature cache sample count mismatch")
+    for index, nodes in enumerate(saved["features"]):
+        if tuple(nodes.shape) != (len(prepared[index][3].owner), 128) or nodes.dtype != torch.float32:
+            raise ValueError(f"Invalid frozen feature tensor: {index}")
+    data = FrozenDataset(prepared, saved["features"])
+    factory = make_factory(legacy.create_property_model, cache)
+    tools = frozen_tools(legacy)
+    return manifest, legacy, args, data, splits, spec, factory, tools
+
+
+def _identity_from_sha(path: Path, expected: dict) -> str:
+    import hashlib
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def run(options: argparse.Namespace) -> None:
+    bundle = options.bundle.resolve()
+    output = options.output_dir.resolve()
+    manifest, legacy, args, data, splits, spec, factory, tools = load_context(
+        bundle, options.device, options.micro_batch_size, options.cpu_threads
+    )
+    args.output_dir = output
+    parameters = readout.parameter_report(factory, args, spec.num_tasks, legacy)
+    config = {
+        "stage": "portable_frozen_size_weighted_batch",
+        "schema_version": 1,
+        "bundle_manifest_sha256": formal.digest(manifest),
+        "evaluation_policy": dict(readout.EVALUATION_POLICY),
+        "variants": [options.variant],
+        "seed": options.seed,
+        "execution": {"device": options.device, "micro_batch_size": options.micro_batch_size, "cpu_threads": options.cpu_threads},
+        "models": parameters,
+        "change": "graph_pool only: mean -> size_weighted_mean",
+    }
+    output.mkdir(parents=True, exist_ok=True)
+    formal.write_json(output / "run_config.json", config)
+    report = readout.preflight(legacy, args, data, splits, spec, factory, tools, options.device)
+    formal.write_json(output / "preflight.json", report)
+    if options.action == "prepare":
+        print(f"Prepared portable job: {output}", flush=True)
+        return
+    run_args = copy.copy(args)
+    payload = dict(config, mode=options.variant)
+    run_args.tuning_protocol = {"payload": payload, "sha256": formal.digest(payload)}
+    directory = output / "lipo" / options.variant / f"seed_{options.seed}"
+    expected = legacy.single_run_config(spec, options.variant, options.seed, "report", {key: getattr(args, key) for key in ("batch_size", "encoder_lr", "head_lr", "dropout")}, run_args.tuning_protocol)
+    legacy.initialize_single_run_config(directory, expected)
+    if (directory / "result.json").is_file():
+        result = formal.read_json(directory / "result.json")
+        if result.get("test_metrics") is not None:
+            raise ValueError("Refusing to reuse a test-evaluated result")
+        print(f"Already complete: {options.variant} seed={options.seed}", flush=True)
+        return
+    with formal.overrides(legacy, create_property_model=factory, **tools):
+        legacy.run_single(run_args, data, splits, spec, options.variant, options.seed, torch.device(options.device), directory, evaluate_test=False)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--bundle", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--variant", choices=TRAIN_VARIANTS, required=True)
+    parser.add_argument("--seed", type=int, choices=range(3), required=True)
+    parser.add_argument("--action", choices=("prepare", "train"), default="train")
+    parser.add_argument("--device", default="cuda:0")
+    parser.add_argument("--micro-batch-size", type=int, default=32)
+    parser.add_argument("--cpu-threads", type=int, default=8)
+    options = parser.parse_args()
+    if options.micro_batch_size < 1 or options.cpu_threads < 1:
+        parser.error("micro-batch-size and cpu-threads must be positive")
+    run(options)
+
+
+if __name__ == "__main__":
+    main()
