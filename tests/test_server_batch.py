@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import run_lipo_formal as formal
-from scripts.server_batch.bundle import _prepare_destination
+from scripts.server_batch.bundle import _prepare_destination, _render_launcher
 from scripts.server_batch.collect import collect
 from scripts.server_batch.run_job import _verify_code
 from scripts.readout_ablation.run_size_weighted import EVALUATION_POLICY
@@ -52,6 +52,18 @@ class ServerBatchCollectionTests(unittest.TestCase):
             (new_destination / "stale.txt").write_text("stale", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "must be empty"):
                 _prepare_destination(new_destination)
+
+    def test_launcher_rendering_is_python39_compatible(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "template.cmd"
+            destination = root / "run.cmd"
+            source.write_text('set "PACKAGE_ID=__PACKAGE_ID__"\n', encoding="utf-8")
+            _render_launcher(source, destination, "abc123")
+            self.assertEqual(
+                destination.read_text(encoding="utf-8"),
+                'set "PACKAGE_ID=abc123"\n',
+            )
 
     def make_batch(self, root: Path):
         bundle = root / "bundle"

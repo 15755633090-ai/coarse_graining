@@ -34,6 +34,14 @@ def _prepare_destination(destination: Path) -> None:
         destination.mkdir(parents=True)
 
 
+def _render_launcher(source: Path, destination: Path, package_id: str) -> None:
+    launcher_text = source.read_text(encoding="utf-8")
+    if launcher_text.count("__PACKAGE_ID__") != 1:
+        raise ValueError("Server launcher must contain exactly one package-id placeholder")
+    with destination.open("w", encoding="utf-8", newline="") as handle:
+        handle.write(launcher_text.replace("__PACKAGE_ID__", package_id))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--destination", type=Path, required=True)
@@ -151,15 +159,8 @@ def main() -> None:
     }
     package_id = formal.digest(package_identity)[:12]
     launcher_source = formal.ROOT / "scripts/server_batch/run_experiment.cmd"
-    launcher_text = launcher_source.read_text(encoding="utf-8")
-    if launcher_text.count("__PACKAGE_ID__") != 1:
-        raise ValueError("Server launcher must contain exactly one package-id placeholder")
     launcher_path = destination / "run_experiment.cmd"
-    launcher_path.write_text(
-        launcher_text.replace("__PACKAGE_ID__", package_id),
-        encoding="utf-8",
-        newline="",
-    )
+    _render_launcher(launcher_source, launcher_path, package_id)
 
     manifest = {
         "schema_version": 4,
