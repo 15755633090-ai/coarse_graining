@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import importlib
+import subprocess
 import sys
-from dataclasses import asdict
 from pathlib import Path
 
 import torch
@@ -22,13 +23,49 @@ def _identity(legacy, path: Path) -> dict:
     return legacy.file_identity(path)
 
 
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _verify_code(manifest: dict) -> None:
+    root = formal.ROOT
+    code = manifest.get("code") or {}
+    required_commit = code.get("required_commit")
+    if not required_commit:
+        raise ValueError("Bundle does not lock the required project commit")
+    result = subprocess.run(
+        ["git", "-c", f"safe.directory={root}", "rev-parse", "HEAD"], cwd=root, text=True, capture_output=True,
+    )
+    if result.returncode or result.stdout.strip() != required_commit:
+        raise ValueError(
+            f"Project checkout must be commit {required_commit}; "
+            "clone/fetch the repository and checkout that exact commit"
+        )
+    for relative, expected in code.get("files", {}).items():
+        path = root / relative
+        if not path.is_file() or _sha256(path) != expected["sha256"]:
+            raise ValueError(f"Required project source differs from bundle: {relative}")
+
+
 def load_context(bundle: Path, device: str, micro_batch_size: int, cpu_threads: int):
     manifest = formal.read_json(bundle / "manifest.json")
     if manifest.get("schema_version") != 1:
         raise ValueError("Unsupported portable bundle manifest")
+    scope = manifest.get("protocol_scope")
+    if scope != {
+        "seeds": [0, 1, 2],
+        "status": "exploratory_three_seed_validation_only",
+        "not_a_replacement_for": "five_seed_formal_protocol",
+    }:
+        raise ValueError("Unexpected server protocol scope")
+    _verify_code(manifest)
     assets = bundle / "assets"
     for relative, expected in manifest["files"].items():
-        actual = _identity_from_sha(assets.parent / relative, expected)
+        actual = _sha256(assets.parent / relative)
         if actual != expected["sha256"]:
             raise ValueError(f"Bundle file changed: {relative}")
 
@@ -63,8 +100,18 @@ def load_context(bundle: Path, device: str, micro_batch_size: int, cpu_threads: 
     cache = TopologyCache(max_memory_entries=8192)
     prepared = PreparedPropertyDataset(source, legacy.collate_property_batch, cache, formal.STRUCTURE)
     saved = torch.load(assets / "frozen_encoder_features.pt", map_location="cpu", weights_only=True)
-    if saved["identity"]["checkpoint"]["sha256"] != protocol["checkpoint"]["sha256"]:
+    identity = saved.get("identity")
+    if not isinstance(identity, dict):
+        raise ValueError("Frozen feature cache has no identity")
+    if identity["checkpoint"]["sha256"] != protocol["checkpoint"]["sha256"]:
         raise ValueError("Frozen feature cache checkpoint identity mismatch")
+    if identity.get("structure") != formal.STRUCTURE.__dict__:
+        raise ValueError("Frozen feature cache coarsening configuration mismatch")
+    if identity.get("encoder_mode") != "eval_no_grad" or identity.get("precision") != "float32_autocast_disabled":
+        raise ValueError("Frozen feature cache encoder mode or precision mismatch")
+    expected_fingerprints = [prepared[index][3].input_fingerprint for index in range(len(prepared))]
+    if identity.get("graph_fingerprints") != expected_fingerprints:
+        raise ValueError("Frozen feature cache graph fingerprints/order mismatch")
     if len(saved["features"]) != len(prepared):
         raise ValueError("Frozen feature cache sample count mismatch")
     for index, nodes in enumerate(saved["features"]):
@@ -74,15 +121,6 @@ def load_context(bundle: Path, device: str, micro_batch_size: int, cpu_threads: 
     factory = make_factory(legacy.create_property_model, cache)
     tools = frozen_tools(legacy)
     return manifest, legacy, args, data, splits, spec, factory, tools
-
-
-def _identity_from_sha(path: Path, expected: dict) -> str:
-    import hashlib
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def run(options: argparse.Namespace) -> None:
@@ -97,6 +135,7 @@ def run(options: argparse.Namespace) -> None:
         "stage": "portable_frozen_size_weighted_batch",
         "schema_version": 1,
         "bundle_manifest_sha256": formal.digest(manifest),
+        "protocol_scope": manifest["protocol_scope"],
         "evaluation_policy": dict(readout.EVALUATION_POLICY),
         "variants": [options.variant],
         "seed": options.seed,
