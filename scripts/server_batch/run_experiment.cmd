@@ -6,6 +6,7 @@ set "CODE_ROOT=%PACKAGE_ROOT%\code"
 set "OUTPUT_ROOT=%PACKAGE_ROOT%\..\experiment_outputs\size_weighted"
 set "CONDA_EXE=D:\Users\nieyuhang\miniconda3\Scripts\conda.exe"
 set "CONDA_ENV=polyolefin_ml"
+set "NETWORK_RESULT_ROOT=N:\coarse_graining_transfer\results\size_weighted"
 
 if not exist "%CONDA_EXE%" (
   echo Conda executable not found: %CONDA_EXE%
@@ -27,5 +28,18 @@ echo Collecting validation-only results...
 "%CONDA_EXE%" run --no-capture-output -n "%CONDA_ENV%" python -u -m scripts.server_batch.collect --bundle "%PACKAGE_ROOT%" --output-dir "%OUTPUT_ROOT%\jobs"
 if errorlevel 1 exit /b 1
 
+if not exist "N:\" (
+  echo Network drive N: is unavailable. Results remain safe at: %OUTPUT_ROOT%
+  exit /b 1
+)
+
+echo Synchronizing completed results to network storage...
+robocopy "%OUTPUT_ROOT%" "%NETWORK_RESULT_ROOT%" /E /Z /J /R:2 /W:3 /MT:16
+if errorlevel 8 (
+  echo Network result synchronization failed. Results remain safe at: %OUTPUT_ROOT%
+  exit /b 8
+)
+
 echo Experiment completed: %OUTPUT_ROOT%
+echo Network copy completed: %NETWORK_RESULT_ROOT%
 endlocal

@@ -23,12 +23,15 @@ at most one job per physical GPU and starts the next job only after completion.
 Each job verifies the SHA-256 hashes of the bundled source code and assets
 before training starts.
 
-`run_experiment.cmd` contains two server-specific settings: the Conda executable
-path and environment name. They only need to be changed when moving the package
-to a server with a different Conda installation or environment name.
+`run_experiment.cmd` contains three server-specific settings: the Conda
+executable path, environment name, and network result directory. They only need
+to be changed when moving the package to a server with different paths.
 
 The bundle locks `amp`, deterministic mode, micro-batch size, worker count,
 CPU thread count, logical CUDA device, and cuBLAS workspace configuration.
 Neither `launch` nor `run_job` accepts command-line overrides for these values.
 Finally run `python -m scripts.server_batch.collect` to produce the single
-validation-only comparison report.
+validation-only comparison report. The one-command launcher runs collection
+automatically and, only after collection succeeds, copies the complete output
+tree to `N:\coarse_graining_transfer\results\size_weighted`. A failed network
+copy never deletes the server-local results.

@@ -20,6 +20,21 @@ def sha256(path: Path) -> str:
 
 
 class ServerBatchCollectionTests(unittest.TestCase):
+    def test_windows_launcher_exports_only_after_collection(self):
+        launcher = (
+            Path(__file__).resolve().parents[1]
+            / "scripts/server_batch/run_experiment.cmd"
+        ).read_text(encoding="utf-8")
+        collect_position = launcher.index("scripts.server_batch.collect")
+        export_position = launcher.index('robocopy "%OUTPUT_ROOT%"')
+        self.assertLess(collect_position, export_position)
+        self.assertIn(
+            'set "NETWORK_RESULT_ROOT=N:\\coarse_graining_transfer\\results\\size_weighted"',
+            launcher,
+        )
+        self.assertIn("if errorlevel 8", launcher)
+        self.assertIn("Results remain safe at: %OUTPUT_ROOT%", launcher)
+
     def make_batch(self, root: Path):
         bundle = root / "bundle"
         output = root / "jobs"
