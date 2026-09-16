@@ -45,6 +45,7 @@ class ServerBatchCollectionTests(unittest.TestCase):
         self.assertIn('set "PACKAGE_ID=__PACKAGE_ID__"', launcher)
         self.assertIn("if errorlevel 8", launcher)
         self.assertIn("Results remain safe at: %OUTPUT_ROOT%", launcher)
+        self.assertTrue(launcher.rstrip().endswith("exit /b 0"))
 
     def test_bundle_destination_must_be_empty(self):
         with tempfile.TemporaryDirectory() as temporary:

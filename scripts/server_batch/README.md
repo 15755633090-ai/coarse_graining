@@ -40,5 +40,6 @@ tree to a content-addressed child of
 directory remains fixed, while distinct packages cannot mix their results. A
 failed network copy never deletes the server-local results. The packaged root
 launcher is SHA-256 locked alongside the source and assets. Manifest identities
-store only relative member names, sizes, and SHA-256 values; absolute source
-paths never affect verification or `package_id`.
+for packaged code, assets, and the launcher store only relative member names,
+sizes, and SHA-256 values; absolute source paths never affect verification or
+`package_id`. The launcher template hash also participates in `package_id`.

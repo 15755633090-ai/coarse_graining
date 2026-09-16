@@ -161,15 +161,17 @@ def main() -> None:
         )
         for path in sorted(assets.rglob("*")) if path.is_file()
     }
+    launcher_source = formal.ROOT / "scripts/server_batch/run_experiment.cmd"
+    launcher_template_identity = _portable_identity(legacy.file_identity(launcher_source))
     package_identity = {
         "selected_hyperparameters": selected["selected_hyperparameters"],
         "server_execution": server_execution,
         "protocol_scope": protocol_scope,
         "code_files": code_files,
         "asset_files": asset_files,
+        "launcher_template": launcher_template_identity,
     }
     package_id = formal.digest(package_identity)[:12]
-    launcher_source = formal.ROOT / "scripts/server_batch/run_experiment.cmd"
     launcher_path = destination / "run_experiment.cmd"
     _render_launcher(launcher_source, launcher_path, package_id)
 

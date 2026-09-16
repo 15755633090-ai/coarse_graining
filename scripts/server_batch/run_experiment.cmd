@@ -48,3 +48,4 @@ if errorlevel 8 (
 echo Experiment completed: %OUTPUT_ROOT%
 echo Network copy completed: %NETWORK_RESULT_ROOT%
 endlocal
+exit /b 0
