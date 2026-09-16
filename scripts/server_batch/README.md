@@ -15,7 +15,8 @@ This is an explicitly **exploratory three-seed** protocol. It is not a
 replacement for the locked five-seed formal protocol.
 
 Run `python -m scripts.server_batch.bundle --destination <directory>` on the
-source machine. The generated directory is self-contained: it includes the
+source machine. The destination must be absent or empty, so an old package can
+never contribute unlisted files. The generated directory is self-contained: it includes the
 required source code, assets, SHA-256 locks, and `run_experiment.cmd`. Copy that
 single directory to the compute server and run `run_experiment.cmd`; no Git
 checkout or protocol assembly is required on the server. The launcher is a queue: it runs
@@ -23,9 +24,10 @@ at most one job per physical GPU and starts the next job only after completion.
 Each job verifies the SHA-256 hashes of the bundled source code and assets
 before training starts.
 
-`run_experiment.cmd` contains three server-specific settings: the Conda
-executable path, environment name, and network result directory. They only need
-to be changed when moving the package to a server with different paths.
+`run_experiment.cmd` keeps the experiment label separate from the server paths.
+For another experiment package, change `EXPERIMENT_NAME`; when moving servers,
+change only the Conda executable, environment name, or `NETWORK_RESULTS_BASE`.
+Both server-local and network outputs are derived from these variables.
 
 The bundle locks `amp`, deterministic mode, micro-batch size, worker count,
 CPU thread count, logical CUDA device, and cuBLAS workspace configuration.
@@ -33,5 +35,8 @@ Neither `launch` nor `run_job` accepts command-line overrides for these values.
 Finally run `python -m scripts.server_batch.collect` to produce the single
 validation-only comparison report. The one-command launcher runs collection
 automatically and, only after collection succeeds, copies the complete output
-tree to `N:\coarse_graining_transfer\results\size_weighted`. A failed network
-copy never deletes the server-local results.
+tree to a content-addressed child of
+`N:\coarse_graining_transfer\results\size_weighted\<package_id>`. The parent
+directory remains fixed, while distinct packages cannot mix their results. A
+failed network copy never deletes the server-local results. The packaged root
+launcher is SHA-256 locked alongside the source and assets.

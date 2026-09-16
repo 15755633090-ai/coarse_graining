@@ -36,15 +36,28 @@ def _verify_code(manifest: dict) -> None:
     code = manifest.get("code") or {}
     if code.get("mode") != "self_contained_hash_locked" or code.get("root") != "code":
         raise ValueError("Experiment package does not contain a self-contained source lock")
-    for relative, expected in code.get("files", {}).items():
+    expected_files = code.get("files", {})
+    for relative, expected in expected_files.items():
         path = root / relative
         if not path.is_file() or _sha256(path) != expected["sha256"]:
             raise ValueError(f"Required project source differs from bundle: {relative}")
+    actual_files = {
+        path.relative_to(root).as_posix()
+        for path in root.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
+    }
+    unexpected = sorted(actual_files - set(expected_files))
+    if unexpected:
+        raise ValueError(f"Experiment package contains unexpected source files: {unexpected}")
+    launcher = manifest.get("launcher") or {}
+    launcher_path = root.parent / launcher.get("path", "")
+    if not launcher_path.is_file() or _sha256(launcher_path) != launcher.get("sha256"):
+        raise ValueError("Server launcher differs from bundle manifest")
 
 
 def load_context(bundle: Path):
     manifest = formal.read_json(bundle / "manifest.json")
-    if manifest.get("schema_version") != 3:
+    if manifest.get("schema_version") != 4:
         raise ValueError("Unsupported portable bundle manifest")
     scope = manifest.get("protocol_scope")
     if scope != {

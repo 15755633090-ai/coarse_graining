@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import run_lipo_formal as formal
+from scripts.server_batch.bundle import _prepare_destination
 from scripts.server_batch.collect import collect
 from scripts.server_batch.run_job import _verify_code
 from scripts.readout_ablation.run_size_weighted import EVALUATION_POLICY
@@ -29,11 +30,28 @@ class ServerBatchCollectionTests(unittest.TestCase):
         export_position = launcher.index('robocopy "%OUTPUT_ROOT%"')
         self.assertLess(collect_position, export_position)
         self.assertIn(
-            'set "NETWORK_RESULT_ROOT=N:\\coarse_graining_transfer\\results\\size_weighted"',
+            'set "NETWORK_RESULTS_BASE=N:\\coarse_graining_transfer\\results"',
             launcher,
         )
+        self.assertIn('set "EXPERIMENT_NAME=size_weighted"', launcher)
+        self.assertIn(
+            'set "NETWORK_RESULT_ROOT=%NETWORK_RESULTS_BASE%\\%EXPERIMENT_NAME%\\%PACKAGE_ID%"',
+            launcher,
+        )
+        self.assertIn('set "PACKAGE_ID=__PACKAGE_ID__"', launcher)
         self.assertIn("if errorlevel 8", launcher)
         self.assertIn("Results remain safe at: %OUTPUT_ROOT%", launcher)
+
+    def test_bundle_destination_must_be_empty(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            new_destination = root / "new"
+            _prepare_destination(new_destination)
+            self.assertTrue(new_destination.is_dir())
+            _prepare_destination(new_destination)
+            (new_destination / "stale.txt").write_text("stale", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "must be empty"):
+                _prepare_destination(new_destination)
 
     def make_batch(self, root: Path):
         bundle = root / "bundle"
@@ -56,7 +74,7 @@ class ServerBatchCollectionTests(unittest.TestCase):
             "cublas_workspace_config": ":4096:8",
         }
         manifest = {
-            "schema_version": 3,
+            "schema_version": 4,
             "server_execution": execution,
             "protocol_scope": {
                 "seeds": [0, 1, 2],
@@ -158,20 +176,37 @@ class ServerBatchCollectionTests(unittest.TestCase):
 
     def test_code_verifier_uses_packaged_source_hashes_without_git(self):
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
+            package = Path(temporary) / "bundle"
+            root = package / "code"
+            root.mkdir(parents=True)
             source = root / "module.py"
             source.write_text("VALUE = 1\n", encoding="utf-8")
+            launcher = package / "run_experiment.cmd"
+            launcher.write_text("@echo off\n", encoding="utf-8")
             manifest = {
                 "code": {
                     "mode": "self_contained_hash_locked",
                     "root": "code",
                     "files": {"module.py": {"sha256": sha256(source)}},
-                }
+                },
+                "launcher": {
+                    "path": "run_experiment.cmd",
+                    "sha256": sha256(launcher),
+                },
             }
             with patch("scripts.server_batch.run_job.formal.ROOT", root):
                 _verify_code(manifest)
                 source.write_text("VALUE = 2\n", encoding="utf-8")
                 with self.assertRaisesRegex(ValueError, "source differs"):
+                    _verify_code(manifest)
+                source.write_text("VALUE = 1\n", encoding="utf-8")
+                extra = root / "old_module.py"
+                extra.write_text("OLD = True\n", encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "unexpected source files"):
+                    _verify_code(manifest)
+                extra.unlink()
+                launcher.write_text("@echo tampered\n", encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "launcher differs"):
                     _verify_code(manifest)
 
             manifest["code"]["mode"] = "git_checkout"

@@ -3,10 +3,15 @@ setlocal
 
 for %%I in ("%~dp0.") do set "PACKAGE_ROOT=%%~fI"
 set "CODE_ROOT=%PACKAGE_ROOT%\code"
-set "OUTPUT_ROOT=%PACKAGE_ROOT%\..\experiment_outputs\size_weighted"
+set "PACKAGE_ID=__PACKAGE_ID__"
+set "EXPERIMENT_NAME=size_weighted"
+set "OUTPUT_BASE=%PACKAGE_ROOT%\..\experiment_outputs"
+set "NETWORK_RESULTS_BASE=N:\coarse_graining_transfer\results"
+set "OUTPUT_ROOT=%OUTPUT_BASE%\%EXPERIMENT_NAME%\%PACKAGE_ID%"
+set "NETWORK_RESULT_ROOT=%NETWORK_RESULTS_BASE%\%EXPERIMENT_NAME%\%PACKAGE_ID%"
 set "CONDA_EXE=D:\Users\nieyuhang\miniconda3\Scripts\conda.exe"
 set "CONDA_ENV=polyolefin_ml"
-set "NETWORK_RESULT_ROOT=N:\coarse_graining_transfer\results\size_weighted"
+set "PYTHONDONTWRITEBYTECODE=1"
 
 if not exist "%CONDA_EXE%" (
   echo Conda executable not found: %CONDA_EXE%
