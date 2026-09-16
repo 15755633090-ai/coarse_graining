@@ -15,10 +15,10 @@ This is an explicitly **exploratory three-seed** protocol. It is not a
 replacement for the locked five-seed formal protocol.
 
 Run `python -m scripts.server_batch.bundle --destination <directory>` on the
-source machine. The generated manifest locks the exact Git commit and SHA-256
-of every server-side source file. On the compute server, clone the repository,
-checkout that manifest commit, copy the bundle, run one `run_job --action
-prepare` check, then run `launch --gpus 0 1`. The launcher is a queue: it runs
+source machine. The generated directory is self-contained: it includes the
+required source code, assets, SHA-256 locks, and `run_experiment.cmd`. Copy that
+single directory to the compute server and run `run_experiment.cmd`; no Git
+checkout or protocol assembly is required on the server. The launcher is a queue: it runs
 at most one job per physical GPU and starts the next job only after completion.
 Use paths outside the repository for both the copied bundle and job output: each
 job verifies that the exact-commit repository is completely clean before it

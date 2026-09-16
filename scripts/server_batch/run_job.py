@@ -6,7 +6,6 @@ import copy
 import hashlib
 import importlib
 import os
-import subprocess
 import sys
 from pathlib import Path
 
@@ -35,26 +34,8 @@ def _sha256(path: Path) -> str:
 def _verify_code(manifest: dict) -> None:
     root = formal.ROOT
     code = manifest.get("code") or {}
-    required_commit = code.get("required_commit")
-    if not required_commit:
-        raise ValueError("Bundle does not lock the required project commit")
-    result = subprocess.run(
-        ["git", "-c", f"safe.directory={root}", "rev-parse", "HEAD"], cwd=root, text=True, capture_output=True,
-    )
-    if result.returncode or result.stdout.strip() != required_commit:
-        raise ValueError(
-            f"Project checkout must be commit {required_commit}; "
-            "clone/fetch the repository and checkout that exact commit"
-        )
-    status = subprocess.run(
-        ["git", "-c", f"safe.directory={root}", "status", "--porcelain"],
-        cwd=root, text=True, capture_output=True,
-    )
-    if status.returncode or status.stdout.strip():
-        raise ValueError(
-            "Project checkout is not clean; use a fresh exact-commit clone and keep "
-            "bundle/job outputs outside that repository"
-        )
+    if code.get("mode") != "self_contained_hash_locked" or code.get("root") != "code":
+        raise ValueError("Experiment package does not contain a self-contained source lock")
     for relative, expected in code.get("files", {}).items():
         path = root / relative
         if not path.is_file() or _sha256(path) != expected["sha256"]:
@@ -63,7 +44,7 @@ def _verify_code(manifest: dict) -> None:
 
 def load_context(bundle: Path):
     manifest = formal.read_json(bundle / "manifest.json")
-    if manifest.get("schema_version") != 2:
+    if manifest.get("schema_version") != 3:
         raise ValueError("Unsupported portable bundle manifest")
     scope = manifest.get("protocol_scope")
     if scope != {

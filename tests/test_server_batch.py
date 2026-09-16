@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import hashlib
-import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -42,7 +41,7 @@ class ServerBatchCollectionTests(unittest.TestCase):
             "cublas_workspace_config": ":4096:8",
         }
         manifest = {
-            "schema_version": 2,
+            "schema_version": 3,
             "server_execution": execution,
             "protocol_scope": {
                 "seeds": [0, 1, 2],
@@ -142,18 +141,28 @@ class ServerBatchCollectionTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "used test data"):
                 collect(bundle, output)
 
-    def test_code_verifier_rejects_wrong_commit_and_dirty_checkout(self):
-        manifest = {"code": {"required_commit": "expected", "files": {}}}
-        wrong = subprocess.CompletedProcess([], 0, stdout="wrong\n", stderr="")
-        with patch("scripts.server_batch.run_job.subprocess.run", return_value=wrong):
-            with self.assertRaisesRegex(ValueError, "must be commit expected"):
+    def test_code_verifier_uses_packaged_source_hashes_without_git(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "module.py"
+            source.write_text("VALUE = 1\n", encoding="utf-8")
+            manifest = {
+                "code": {
+                    "mode": "self_contained_hash_locked",
+                    "root": "code",
+                    "files": {"module.py": {"sha256": sha256(source)}},
+                }
+            }
+            with patch("scripts.server_batch.run_job.formal.ROOT", root):
                 _verify_code(manifest)
+                source.write_text("VALUE = 2\n", encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "source differs"):
+                    _verify_code(manifest)
 
-        correct = subprocess.CompletedProcess([], 0, stdout="expected\n", stderr="")
-        dirty = subprocess.CompletedProcess([], 0, stdout=" M changed.py\n", stderr="")
-        with patch("scripts.server_batch.run_job.subprocess.run", side_effect=(correct, dirty)):
-            with self.assertRaisesRegex(ValueError, "not clean"):
-                _verify_code(manifest)
+            manifest["code"]["mode"] = "git_checkout"
+            with patch("scripts.server_batch.run_job.formal.ROOT", root):
+                with self.assertRaisesRegex(ValueError, "self-contained source lock"):
+                    _verify_code(manifest)
 
 
 if __name__ == "__main__":

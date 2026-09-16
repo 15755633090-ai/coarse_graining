@@ -16,21 +16,12 @@ def _copy(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
-def _commit(root: Path) -> str:
-    status = subprocess.run(
-        ["git", "-c", f"safe.directory={root}", "status", "--porcelain"],
-        cwd=root, check=True, text=True, capture_output=True,
-    )
-    if status.stdout.strip():
-        raise ValueError(
-            "Refusing to build a server bundle from a dirty checkout; commit or remove "
-            "all project-source changes first"
-        )
+def _reference_commit(root: Path) -> str | None:
     result = subprocess.run(
-        ["git", "-c", f"safe.directory={root}", "rev-parse", "HEAD"], cwd=root, check=True,
+        ["git", "-c", f"safe.directory={root}", "rev-parse", "HEAD"], cwd=root,
         text=True, capture_output=True,
     )
-    return result.stdout.strip()
+    return result.stdout.strip() if result.returncode == 0 else None
 
 
 def main() -> None:
@@ -109,17 +100,24 @@ def main() -> None:
 
     code_paths = [
         formal.ROOT / "run_lipo_formal.py",
+        formal.ROOT / "run_lipo_frozen.py",
         formal.ROOT / "frozen_features.py",
+        formal.ROOT / "requirements.txt",
         *(formal.ROOT / "coarse_gnn").glob("*.py"),
+        formal.ROOT / "scripts/__init__.py",
+        formal.ROOT / "scripts/readout_ablation/__init__.py",
         formal.ROOT / "scripts/readout_ablation/models.py",
         formal.ROOT / "scripts/readout_ablation/run_size_weighted.py",
-        formal.ROOT / "run_lipo_frozen.py",
+        formal.ROOT / "scripts/experiments/__init__.py",
         formal.ROOT / "scripts/experiments/frozen_reporting.py",
         *(formal.ROOT / "scripts/server_batch").glob("*.py"),
     ]
+    for source in code_paths:
+        _copy(source, destination / "code" / source.relative_to(formal.ROOT))
+    _copy(formal.ROOT / "scripts/server_batch/run_experiment.cmd", destination / "run_experiment.cmd")
 
     manifest = {
-        "schema_version": 2,
+        "schema_version": 3,
         "purpose": "portable frozen size-weighted readout batch",
         "selected_hyperparameters": selected["selected_hyperparameters"],
         "frozen_protocol": frozen_protocol,
@@ -135,7 +133,9 @@ def main() -> None:
             "not_a_replacement_for": "five_seed_formal_protocol",
         },
         "code": {
-            "required_commit": _commit(formal.ROOT),
+            "mode": "self_contained_hash_locked",
+            "root": "code",
+            "reference_commit": _reference_commit(formal.ROOT),
             "files": {
                 str(path.relative_to(formal.ROOT)).replace("\\", "/"): legacy.file_identity(path)
                 for path in sorted(code_paths)
