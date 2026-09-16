@@ -54,8 +54,12 @@ def main() -> None:
     mother_manifest = readout.verify_mother(
         frozen_legacy, frozen_args, frozen_protocol_args, selection, frozen_args.output_dir
     )
-    if mother_manifest["fixed_hyperparameters"] != selected["selected_hyperparameters"]:
+    effective_keys = tuple(mother_manifest["fixed_hyperparameters"])
+    selected_effective = {key: selected["selected_hyperparameters"][key] for key in effective_keys}
+    if mother_manifest["fixed_hyperparameters"] != selected_effective:
         raise ValueError("Selected hyperparameters differ from the locked frozen C/D mother")
+    if mother_manifest.get("encoder_lr_effective") != 0:
+        raise ValueError("Frozen C/D mother must retain a zero effective encoder learning rate")
 
     assets = destination / "assets"
     legacy_root = Path(frozen_protocol["source_files"]["downstream_benchmark.py"]["path"]).parent
