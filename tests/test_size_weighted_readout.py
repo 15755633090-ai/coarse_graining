@@ -145,6 +145,8 @@ class SizeWeightedReadoutTests(unittest.TestCase):
             self.assertAlmostEqual(paired["C_equal_vs_size_weighted"]["mean_delta_rmse"], -0.04)
             self.assertAlmostEqual(paired["D_equal_vs_size_weighted"]["mean_delta_rmse"], -0.02)
             self.assertAlmostEqual(paired["C_size_vs_D_size"]["mean_delta_rmse"], -0.05)
+            self.assertIn("graph_pool", paired["C_equal_vs_size_weighted"]["scope"])
+            self.assertIn("Coarse GNN", paired["C_size_vs_D_size"]["scope"])
             self.assertAlmostEqual(
                 report["coarse_readout_interaction"]["mean_interaction_delta_rmse"], 0.02
             )

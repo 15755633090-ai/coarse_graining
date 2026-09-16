@@ -37,15 +37,19 @@ EVALUATION_POLICY = {
     "readout_only_ablation": True,
     "existing_cd_test_scores": "already exposed; excluded from development summaries",
 }
-COMPARISONS = (
-    ("region_only", "region_size_weighted", "C_equal_vs_size_weighted"),
-    ("base_coarse", "base_size_weighted", "D_equal_vs_size_weighted"),
-    ("region_size_weighted", "base_size_weighted", "C_size_vs_D_size"),
-)
-COMPARISON_SCOPE = (
+READOUT_COMPARISON_SCOPE = (
     "Only graph_pool changes from equal coarse-node mean to core-size-weighted mean. "
     "After Region/Coarse processing this is a conservation-oriented inductive bias, "
     "not an algebraic reconstruction of the atom mean."
+)
+COARSE_COMPARISON_SCOPE = (
+    "With size-weighted readout fixed, this comparison adds the three-layer "
+    "topology-only Coarse GNN."
+)
+COMPARISONS = (
+    ("region_only", "region_size_weighted", "C_equal_vs_size_weighted", READOUT_COMPARISON_SCOPE),
+    ("base_coarse", "base_size_weighted", "D_equal_vs_size_weighted", READOUT_COMPARISON_SCOPE),
+    ("region_size_weighted", "base_size_weighted", "C_size_vs_D_size", COARSE_COMPARISON_SCOPE),
 )
 
 
@@ -130,7 +134,7 @@ def experiment_config(legacy, mother, mother_root, features, parameters):
         "shared_features": {key: features[key] for key in ("identity", "path", "file_sha256")},
         "models": parameters,
         "change": "graph_pool only: mean -> size_weighted_mean",
-        "interpretation_limit": COMPARISON_SCOPE,
+        "interpretation_limit": READOUT_COMPARISON_SCOPE,
         "initialization": "construct identical Base, then change pooling and optionally remove coarse layers; no new random draws",
         "new_source_files": {
             str(path.relative_to(formal.ROOT)): legacy.file_identity(path) for path in source_paths
@@ -232,7 +236,7 @@ def summarize(output, mother_root):
 
     lookup = {(row["mode"], row["seed"]): row["validation_rmse"] for row in runs}
     paired = []
-    for before, after, question in COMPARISONS:
+    for before, after, question, scope in COMPARISONS:
         deltas = [
             {"seed": seed, "delta_rmse": lookup[after, seed] - lookup[before, seed]}
             for seed in SEEDS
@@ -245,7 +249,7 @@ def summarize(output, mother_root):
                 "before": before,
                 "after": after,
                 "n": len(values),
-                "scope": COMPARISON_SCOPE,
+                "scope": scope,
                 "per_seed": deltas,
                 "mean_delta_rmse": statistics.mean(values),
                 "std_delta_rmse": statistics.stdev(values) if len(values) > 1 else None,

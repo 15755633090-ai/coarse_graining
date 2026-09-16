@@ -169,7 +169,7 @@ def run(options: argparse.Namespace) -> None:
     legacy.initialize_single_run_config(directory, expected)
     if (directory / "result.json").is_file():
         result = formal.read_json(directory / "result.json")
-        if result.get("test_metrics") is not None:
+        if result.get("test_metrics") is not None or (directory / "test_predictions.csv").exists():
             raise ValueError("Refusing to reuse a test-evaluated result")
         print(f"Already complete: {options.variant} seed={options.seed}", flush=True)
         return
