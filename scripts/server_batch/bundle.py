@@ -104,6 +104,7 @@ def main() -> None:
         formal.ROOT / "frozen_features.py",
         formal.ROOT / "requirements.txt",
         *(formal.ROOT / "coarse_gnn").glob("*.py"),
+        *(formal.ROOT / "diffusion/bond_diffusion").glob("*.py"),
         formal.ROOT / "scripts/__init__.py",
         formal.ROOT / "scripts/readout_ablation/__init__.py",
         formal.ROOT / "scripts/readout_ablation/models.py",
