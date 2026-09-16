@@ -20,5 +20,8 @@ of every server-side source file. On the compute server, clone the repository,
 checkout that manifest commit, copy the bundle, run one `run_job --action
 prepare` check, then run `launch --gpus 0 1`. The launcher is a queue: it runs
 at most one job per physical GPU and starts the next job only after completion.
+Use paths outside the repository for both the copied bundle and job output: each
+job verifies that the exact-commit repository is completely clean before it
+starts.
 Finally run `python -m scripts.server_batch.collect` to produce the single
 validation-only comparison report.

@@ -7,6 +7,8 @@ import subprocess
 from pathlib import Path
 
 import run_lipo_formal as formal
+import run_lipo_frozen as frozen
+from scripts.readout_ablation import run_size_weighted as readout
 
 
 def _copy(source: Path, destination: Path) -> None:
@@ -15,6 +17,15 @@ def _copy(source: Path, destination: Path) -> None:
 
 
 def _commit(root: Path) -> str:
+    status = subprocess.run(
+        ["git", "-c", f"safe.directory={root}", "status", "--porcelain"],
+        cwd=root, check=True, text=True, capture_output=True,
+    )
+    if status.stdout.strip():
+        raise ValueError(
+            "Refusing to build a server bundle from a dirty checkout; commit or remove "
+            "all project-source changes first"
+        )
     result = subprocess.run(
         ["git", "-c", f"safe.directory={root}", "rev-parse", "HEAD"], cwd=root, check=True,
         text=True, capture_output=True,
@@ -36,6 +47,16 @@ def main() -> None:
         if frozen_protocol[key] != protocol[key]:
             raise ValueError(f"Frozen protocol differs from formal protocol: {key}")
 
+    # Reuse the same mother-manifest validation as the local readout runner.  This
+    # prevents a bundle from silently mixing selected hyperparameters with a
+    # different frozen C/D mother experiment.
+    frozen_legacy, frozen_args, frozen_protocol_args, _, selection = frozen.load_protocol(formal.PROJECT)
+    mother_manifest = readout.verify_mother(
+        frozen_legacy, frozen_args, frozen_protocol_args, selection, frozen_args.output_dir
+    )
+    if mother_manifest["fixed_hyperparameters"] != selected["selected_hyperparameters"]:
+        raise ValueError("Selected hyperparameters differ from the locked frozen C/D mother")
+
     assets = destination / "assets"
     legacy_root = Path(frozen_protocol["source_files"]["downstream_benchmark.py"]["path"]).parent
     for source in (legacy_root / "downstream_benchmark.py", *(legacy_root / "bond_diffusion").glob("*.py")):
@@ -53,6 +74,8 @@ def main() -> None:
     mother = formal.PROJECT / "model/results_formal/05_coarse_gnn/frozen_mechanism"
     preflight = formal.read_json(mother / "preflight.json")
     cache_source = Path(preflight["feature_cache"]["path"])
+    if legacy.file_identity(cache_source)["sha256"] != preflight["feature_cache"]["file_sha256"]:
+        raise ValueError("Mother frozen feature cache no longer matches its preflight identity")
     _copy(cache_source, assets / "frozen_encoder_features.pt")
 
     references = []
@@ -75,6 +98,9 @@ def main() -> None:
         formal.ROOT / "frozen_features.py",
         *(formal.ROOT / "coarse_gnn").glob("*.py"),
         formal.ROOT / "scripts/readout_ablation/models.py",
+        formal.ROOT / "scripts/readout_ablation/run_size_weighted.py",
+        formal.ROOT / "run_lipo_frozen.py",
+        formal.ROOT / "scripts/experiments/frozen_reporting.py",
         *(formal.ROOT / "scripts/server_batch").glob("*.py"),
     ]
 

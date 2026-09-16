@@ -144,6 +144,10 @@ class SizeWeightedReadoutTests(unittest.TestCase):
             paired = {row["question"]: row for row in report["paired"]}
             self.assertAlmostEqual(paired["C_equal_vs_size_weighted"]["mean_delta_rmse"], -0.04)
             self.assertAlmostEqual(paired["D_equal_vs_size_weighted"]["mean_delta_rmse"], -0.02)
+            self.assertAlmostEqual(paired["C_size_vs_D_size"]["mean_delta_rmse"], -0.05)
+            self.assertAlmostEqual(
+                report["coarse_readout_interaction"]["mean_interaction_delta_rmse"], 0.02
+            )
 
     def test_training_never_enables_test_evaluation(self):
         with tempfile.TemporaryDirectory() as temporary:

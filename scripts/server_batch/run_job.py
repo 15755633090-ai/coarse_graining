@@ -45,6 +45,15 @@ def _verify_code(manifest: dict) -> None:
             f"Project checkout must be commit {required_commit}; "
             "clone/fetch the repository and checkout that exact commit"
         )
+    status = subprocess.run(
+        ["git", "-c", f"safe.directory={root}", "status", "--porcelain"],
+        cwd=root, text=True, capture_output=True,
+    )
+    if status.returncode or status.stdout.strip():
+        raise ValueError(
+            "Project checkout is not clean; use a fresh exact-commit clone and keep "
+            "bundle/job outputs outside that repository"
+        )
     for relative, expected in code.get("files", {}).items():
         path = root / relative
         if not path.is_file() or _sha256(path) != expected["sha256"]:
@@ -117,6 +126,8 @@ def load_context(bundle: Path, device: str, micro_batch_size: int, cpu_threads: 
     for index, nodes in enumerate(saved["features"]):
         if tuple(nodes.shape) != (len(prepared[index][3].owner), 128) or nodes.dtype != torch.float32:
             raise ValueError(f"Invalid frozen feature tensor: {index}")
+        if not torch.isfinite(nodes).all():
+            raise ValueError(f"Nonfinite frozen feature tensor: {index}")
     data = FrozenDataset(prepared, saved["features"])
     factory = make_factory(legacy.create_property_model, cache)
     tools = frozen_tools(legacy)

@@ -7,8 +7,10 @@ outputs/topology_cache/
 .venv/
 venv/
 
-# Dataset files, model checkpoints and run outputs are intentionally tracked
-# for this complete project upload.
+# Reproducible source assets are tracked; locally generated experiment outputs
+# and portable bundles are not.
+outputs/
+tmp/
 
 # Upload copies and local credentials
 github_upload/

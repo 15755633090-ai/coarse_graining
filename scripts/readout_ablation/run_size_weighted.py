@@ -40,6 +40,7 @@ EVALUATION_POLICY = {
 COMPARISONS = (
     ("region_only", "region_size_weighted", "C_equal_vs_size_weighted"),
     ("base_coarse", "base_size_weighted", "D_equal_vs_size_weighted"),
+    ("region_size_weighted", "base_size_weighted", "C_size_vs_D_size"),
 )
 COMPARISON_SCOPE = (
     "Only graph_pool changes from equal coarse-node mean to core-size-weighted mean. "
@@ -250,12 +251,32 @@ def summarize(output, mother_root):
                 "std_delta_rmse": statistics.stdev(values) if len(values) > 1 else None,
             })
 
+    interaction = []
+    for seed in SEEDS:
+        required = ("region_only", "base_coarse", "region_size_weighted", "base_size_weighted")
+        if not all((mode, seed) in lookup for mode in required):
+            continue
+        equal_coarse = lookup["base_coarse", seed] - lookup["region_only", seed]
+        weighted_coarse = lookup["base_size_weighted", seed] - lookup["region_size_weighted", seed]
+        interaction.append({
+            "seed": seed,
+            "equal_readout_coarse_delta_rmse": equal_coarse,
+            "size_weighted_coarse_delta_rmse": weighted_coarse,
+            "interaction_delta_rmse": weighted_coarse - equal_coarse,
+        })
+
     complete = all((mode, seed) in lookup for mode in ALL_VARIANTS for seed in SEEDS)
     report = {
         "metric_split": "validation",
         "runs": runs,
         "summary": summary,
         "paired": paired,
+        "coarse_readout_interaction": {
+            "scope": "Difference in the Coarse-GNN effect after switching to size-weighted readout.",
+            "per_seed": interaction,
+            "mean_interaction_delta_rmse": statistics.mean(row["interaction_delta_rmse"] for row in interaction) if interaction else None,
+            "std_interaction_delta_rmse": statistics.stdev(row["interaction_delta_rmse"] for row in interaction) if len(interaction) > 1 else None,
+        },
         "complete": complete,
         "interpretation": (
             "Negative weighted-minus-equal RMSE favors size weighting. "
