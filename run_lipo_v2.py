@@ -96,6 +96,7 @@ def train(legacy, args, old_protocol, cache, factory):
         result["payload"].update(
             method="v2_exclusive_relation_correction",
             variant=values[-1],
+            encoder_mode="pretrained_finetune",
             coarsening=asdict(STRUCTURE),
             network={
                 "region_layers": 2,
@@ -113,7 +114,8 @@ def train(legacy, args, old_protocol, cache, factory):
         result = original_manifest(values)
         result.update(
             method="v2_exclusive_relation_correction",
-            seeds=[0, 1, 2, 3, 4],
+            seeds=list(args.seeds),
+            encoder_mode="pretrained_finetune",
             coarsening=asdict(STRUCTURE),
             new_source_files=sources,
         )

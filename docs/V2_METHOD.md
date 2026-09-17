@@ -38,6 +38,10 @@ python run_lipo_v2.py --action prepare --seeds 0
 python run_lipo_v2.py --action train --seeds 0
 ```
 
+当前 `train` 入口明确使用 `pretrained_finetune`：encoder、Region、Coarse 和 heads
+从第一步开始联合优化。它用于与已有端到端 baseline 做匹配比较，不代表“先冻结、
+后解冻”的两阶段上限训练。
+
 ## 后续消融
 
 - 结构：0/1-hop context，Coarse 0/1/2 层。
