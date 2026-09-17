@@ -237,15 +237,50 @@ def packed_v2_predict(predictor: V2CoarseGraphPredictor, node_states: Tensor, pl
     messages never cross molecule boundaries.
     """
     cfg = predictor.config
+
+    def masked_mlp(module, values, mask):
+        hidden = module[1](module[0](values))
+        if mask is None:
+            hidden = module[2](hidden)
+        else:
+            hidden = torch.ops.aten.native_dropout_backward(
+                hidden, mask, 1.0 / (1.0 - module[2].p),
+            )
+        return module[3](hidden)
+
     canonical_nodes = node_states.flatten(0, 1)[plan.atom_gather]
     projected = predictor.input_projection(canonical_nodes)
+    region_parts = [[] for _ in predictor.region_gnn.layers]
+    message_parts, delta_parts = [], []
+    # Draw masks in exactly the former per-graph execution order:
+    # every region layer, then the coarse correction for that graph.
+    for contexts, coarse_count, region_count in zip(
+        plan.context_sizes, plan.coarse_lengths.tolist(), plan.graph_lengths.tolist(),
+    ):
+        for size in contexts:
+            for index, layer in enumerate(predictor.region_gnn.layers):
+                if predictor.training and layer.mlp[2].p:
+                    region_parts[index].append(layer.mlp[2](torch.ones(
+                        (size, 2 * cfg.hidden_dim), device=node_states.device,
+                        dtype=node_states.dtype,
+                    )).ne(0))
+        if coarse_count and predictor.training and predictor.coarse_message[2].p:
+            message_parts.append(predictor.coarse_message[2](torch.ones(
+                (coarse_count, 2 * cfg.hidden_dim), device=node_states.device,
+                dtype=node_states.dtype,
+            )).ne(0))
+            delta_parts.append(predictor.delta_projection[2](torch.ones(
+                (region_count, 2 * cfg.hidden_dim), device=node_states.device,
+                dtype=node_states.dtype,
+            )).ne(0))
+    region_masks = [torch.cat(parts) if parts else None for parts in region_parts]
     local = packed_gnn(
         predictor.region_gnn,
         projected[plan.context_gather],
         plan.region_source,
         plan.region_target,
         plan.region_attributes.to(dtype=node_states.dtype),
-        [None] * cfg.region_layers,
+        region_masks,
     )
     regions = segment_pool(local[plan.core_gather], plan.core_lengths, "mean")
     sizes = plan.core_lengths.to(device=regions.device, dtype=regions.dtype)
@@ -255,13 +290,27 @@ def packed_v2_predict(predictor: V2CoarseGraphPredictor, node_states: Tensor, pl
     if cfg.coarse_layers == 0 or plan.coarse_source.numel() == 0:
         delta = torch.zeros_like(regions)
     else:
-        messages = predictor.coarse_message(torch.cat((
+        cursor = 0
+        active = []
+        for region_count, coarse_count in zip(plan.graph_lengths.tolist(), plan.coarse_lengths.tolist()):
+            if coarse_count:
+                active.append(torch.arange(cursor, cursor + region_count, device=regions.device))
+            cursor += region_count
+        message_mask = torch.cat(message_parts) if message_parts else None
+        delta_mask = torch.cat(delta_parts) if delta_parts else None
+        messages = masked_mlp(predictor.coarse_message, torch.cat((
             regions[plan.coarse_target], regions[plan.coarse_source], attributes,
-        ), dim=1)).to(regions.dtype)
+        ), dim=1), message_mask).to(regions.dtype)
         totals = torch.zeros_like(regions).index_add(0, plan.coarse_target, messages)
         degree = torch.zeros(regions.size(0), device=regions.device, dtype=regions.dtype)
         degree.index_add_(0, plan.coarse_target, torch.ones_like(plan.coarse_target, dtype=regions.dtype))
-        delta = predictor.delta_projection(totals / degree.clamp_min(1).unsqueeze(1)).to(regions.dtype)
+        active = torch.cat(active)
+        correction = masked_mlp(
+            predictor.delta_projection,
+            (totals / degree.clamp_min(1).unsqueeze(1))[active],
+            delta_mask,
+        ).to(regions.dtype)
+        delta = torch.zeros_like(regions).index_copy(0, active, correction)
         delta = delta * degree.gt(0).to(regions.dtype).unsqueeze(1)
     region_graph = torch.segment_reduce(
         regions * sizes.unsqueeze(1), "sum", lengths=plan.graph_lengths,

@@ -188,6 +188,34 @@ class V2Tests(unittest.TestCase):
         )
         torch.testing.assert_close(packed, torch.stack(expected), rtol=1e-6, atol=1e-6)
 
+    def test_packed_v2_preserves_dropout_rng_order(self):
+        torch.manual_seed(37)
+        predictor = V2CoarseGraphPredictor(
+            V2NetworkConfig(input_dim=5, hidden_dim=8, dropout=0.2),
+        ).train()
+        batch = collate_graphs([
+            molecule(17, chain_edges(17)),
+            molecule(23, chain_edges(23)),
+        ])
+        entries = molecular_graph_inputs(batch)
+        topologies = [predictor.prepare_topology(
+            len(valid), edges, node_labels=raw_nodes, edge_labels=edge_labels,
+        ) for valid, edges, raw_nodes, edge_labels in entries]
+        states = torch.randn(batch.node_features.size(0), batch.node_features.size(1), 5)
+        torch.manual_seed(73)
+        expected = []
+        for index, (valid, edges, raw_nodes, edge_labels) in enumerate(entries):
+            attributes = torch.nn.functional.one_hot(edge_labels - 1, num_classes=4).float()
+            expected.append(predictor(
+                states[index, valid], edges, attributes,
+                node_labels=raw_nodes, edge_labels=edge_labels, topology=topologies[index],
+            ).prediction)
+        torch.manual_seed(73)
+        packed = packed_v2_predict(
+            predictor, states, PreparedGraphBatch(batch, topologies).plan,
+        )
+        torch.testing.assert_close(packed, torch.stack(expected), rtol=1e-6, atol=1e-6)
+
     @unittest.skipUnless(torch.cuda.is_available(), "CUDA is unavailable")
     def test_full_v2_forward_backward_under_bfloat16_autocast(self):
         torch.manual_seed(13)

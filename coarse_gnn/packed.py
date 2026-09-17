@@ -28,6 +28,7 @@ class PackedPlan:
     coarse_counts: torch.Tensor
     coarse_bond_sums: torch.Tensor
     graph_lengths: torch.Tensor
+    coarse_lengths: torch.Tensor
     context_sizes: tuple[tuple[int, ...], ...]
 
     def to(self, device):
@@ -38,7 +39,7 @@ class PackedPlan:
 
 def make_plan(topologies, padded_nodes):
     atom, contexts, src, dst, attrs, core, lengths = [], [], [], [], [], [], []
-    coarse_src, coarse_dst, counts, sums, graph_lengths, sizes = [], [], [], [], [], []
+    coarse_src, coarse_dst, counts, sums, graph_lengths, coarse_lengths, sizes = [], [], [], [], [], [], []
     node_offset = context_offset = region_offset = 0
     for graph_id, topology in enumerate(topologies):
         atom.append(topology.atom_order + graph_id * padded_nodes)
@@ -59,6 +60,7 @@ def make_plan(topologies, padded_nodes):
         edges = topology.coarse_edges
         coarse_src.append(torch.cat((edges[0], edges[1])) + region_offset)
         coarse_dst.append(torch.cat((edges[1], edges[0])) + region_offset)
+        coarse_lengths.append(2 * edges.size(1))
         edge_counts = topology.edge_counts.float().unsqueeze(1)
         boundary = torch.zeros(len(edge_counts), 4).index_add_(
             0, topology.boundary_groups, bonds[topology.boundary_edge_ids])
@@ -71,7 +73,7 @@ def make_plan(topologies, padded_nodes):
     return PackedPlan(torch.cat(atom), torch.cat(contexts), torch.cat(src), torch.cat(dst),
                       torch.cat(attrs), torch.cat(core), torch.tensor(lengths),
                       torch.cat(coarse_src), torch.cat(coarse_dst), torch.cat(counts), torch.cat(sums),
-                      torch.tensor(graph_lengths), tuple(sizes))
+                      torch.tensor(graph_lengths), torch.tensor(coarse_lengths), tuple(sizes))
 
 
 class PreparedGraphBatch:
