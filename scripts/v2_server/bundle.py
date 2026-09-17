@@ -117,7 +117,7 @@ def build(destination: Path) -> None:
         command.write_text(
             "@echo off\r\n"
             "call \"%~dp0run_v2.cmd\" --action train --seeds 0 1 2 "
-            f"--variants {variant} --device cuda:{gpu} --micro-batch-size 32 --num-workers 4 "
+            f"--variants {variant} --device cuda:{gpu} --micro-batch-size 32 --num-workers 0 "
             f"--output-dir \"%~dp0results\\{variant}\"\r\n"
             "exit /b %ERRORLEVEL%\r\n",
             encoding="utf-8",
