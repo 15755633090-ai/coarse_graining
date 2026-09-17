@@ -10,7 +10,7 @@ from pathlib import Path
 import torch
 
 from .config import CoarseningConfig
-from .topology import CoarseTopology, TOPOLOGY_VERSION, build_topology, topology_fingerprint
+from .topology import CoarseTopology, TOPOLOGY_VERSION, build_topology, build_v2_topology, topology_fingerprint
 
 
 class TopologyCache:
@@ -68,7 +68,8 @@ class TopologyCache:
                 raise RuntimeError(f"Cannot read topology cache {path}; remove this file and precompute again") from exc
             self.disk_hits += 1
         else:
-            topology = build_topology(num_nodes, edge_index, config, **labels)
+            builder = build_v2_topology if getattr(config, "algorithm", None) == "v2_exclusive_regions" else build_topology
+            topology = builder(num_nodes, edge_index, config, **labels)
             self.misses += 1
             if path is not None:
                 path.parent.mkdir(parents=True, exist_ok=True)

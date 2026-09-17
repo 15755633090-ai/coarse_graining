@@ -293,3 +293,245 @@ def build_topology(
         topology_fingerprint(num_nodes, edge_index, config, node_ids=node_ids,
                              node_labels=node_labels, edge_labels=edge_labels),
     )
+
+
+def _v2_multisource_partition(adjacency, centers, keys):
+    """Connected graph Voronoi cells with deterministic whole-layer expansion."""
+    import heapq
+
+    owner = [-1] * len(adjacency)
+    distance = [math.inf] * len(adjacency)
+    queue = []
+    for region, center in enumerate(centers):
+        owner[center] = region
+        distance[center] = 0
+        heapq.heappush(queue, (0, keys[center], region, center))
+    while queue:
+        depth, _, region, node = heapq.heappop(queue)
+        if depth != distance[node] or owner[node] != region:
+            continue
+        for neighbor in sorted(adjacency[node], key=keys.__getitem__):
+            candidate = depth + 1
+            choice = (candidate, keys[centers[region]])
+            current = (distance[neighbor], keys[centers[owner[neighbor]]]) if owner[neighbor] >= 0 else (math.inf, math.inf)
+            if choice < current:
+                distance[neighbor] = candidate
+                owner[neighbor] = region
+                heapq.heappush(queue, (candidate, keys[neighbor], region, neighbor))
+    if any(value < 0 for value in owner):
+        raise RuntimeError("Every connected component must receive a V2 center")
+    return owner
+
+
+def _v2_induced_distances(adjacency, source, members):
+    allowed = set(members)
+    distance = {source: 0}
+    queue = deque([source])
+    while queue:
+        node = queue.popleft()
+        for neighbor in adjacency[node]:
+            if neighbor in allowed and neighbor not in distance:
+                distance[neighbor] = distance[node] + 1
+                queue.append(neighbor)
+    if len(distance) != len(allowed):
+        raise RuntimeError("V2 produced a disconnected main region")
+    return distance
+
+
+def _v2_partition_objective(adjacency, pairs, centers, owner, keys):
+    regions = [[v for v, value in enumerate(owner) if value == k] for k in range(len(centers))]
+    radii = []
+    for center, members in zip(centers, regions):
+        distances = _v2_induced_distances(adjacency, center, members)
+        radii.append(max(distances.values(), default=0))
+    cut = sum(owner[u] != owner[v] for u, v in pairs)
+    sizes = [len(members) for members in regions]
+    # For fixed K, sum of squared sizes is monotonic with CV and avoids floats.
+    imbalance = sum(size * size for size in sizes)
+    canonical = tuple(sorted(keys[center] for center in centers))
+    return (max(radii, default=0), sum(radii), cut, imbalance, canonical), radii, regions
+
+
+def _v2_recenter(adjacency, pairs, centers, owner, keys, rounds):
+    accepted = 0
+    objective, _, regions = _v2_partition_objective(adjacency, pairs, centers, owner, keys)
+    for _ in range(rounds):
+        candidates = []
+        for current, members in zip(centers, regions):
+            best = None
+            for candidate in members:
+                distances = _v2_induced_distances(adjacency, candidate, members)
+                value = (max(distances.values(), default=0), sum(distances.values()), keys[candidate])
+                if best is None or value < best[0]:
+                    best = (value, candidate)
+            candidates.append(current if best is None else best[1])
+        candidate_owner = _v2_multisource_partition(adjacency, candidates, keys)
+        candidate_objective, _, candidate_regions = _v2_partition_objective(
+            adjacency, pairs, candidates, candidate_owner, keys,
+        )
+        if candidate_objective >= objective:
+            break
+        centers, owner = candidates, candidate_owner
+        objective, regions = candidate_objective, candidate_regions
+        accepted += 1
+    return centers, owner, accepted
+
+
+def _v2_component_budgets(components, total_budget):
+    """Largest-remainder allocation after assigning one center per component."""
+    remaining = total_budget - len(components)
+    budgets = [1] * len(components)
+    if remaining <= 0:
+        return budgets
+    total_nodes = sum(map(len, components))
+    quotas = [remaining * len(component) / total_nodes for component in components]
+    floors = [math.floor(value) for value in quotas]
+    budgets = [base + extra for base, extra in zip(budgets, floors)]
+    leftover = remaining - sum(floors)
+    order = sorted(range(len(components)), key=lambda i: (-(quotas[i] - floors[i]), components[i][0]))
+    for index in order[:leftover]:
+        budgets[index] += 1
+    return budgets
+
+
+def build_v2_topology(
+    num_nodes: int,
+    edge_index: Tensor,
+    config,
+    *,
+    node_ids: Tensor | None = None,
+    node_labels: Tensor | None = None,
+    edge_labels: Tensor | None = None,
+) -> CoarseTopology:
+    """Build the frozen V2 exclusive, connected and radius-bounded partition."""
+    if num_nodes < 1:
+        raise ValueError("Empty graphs are not supported")
+    if node_ids is not None:
+        raise ValueError("V2 does not accept persistent node IDs")
+    if not config.canonicalize:
+        raise ValueError("V2 requires canonicalization for deterministic tie breaking")
+
+    edges, positions = _canonical_edges(num_nodes, edge_index)
+    raw_nodes = discrete_rows(node_labels, num_nodes, "node_labels")
+    raw_edges = discrete_rows(edge_labels, edge_index.size(1), "edge_labels")
+    unique_labels = raw_edges[positions]
+    physical_ids = {tuple(pair): i for i, pair in enumerate(edges.T.tolist())}
+    for i, (u, v) in enumerate(edge_index.detach().cpu().T.tolist()):
+        if not torch.equal(raw_edges[i], unique_labels[physical_ids[(min(u, v), max(u, v))]]):
+            raise ValueError("Opposite directions must have identical discrete edge_labels")
+    order = canonical_atom_order(num_nodes, edges, raw_nodes, unique_labels)
+    inverse = torch.argsort(order)
+    remapped = inverse[edges].sort(dim=0).values
+    edge_order = torch.argsort(remapped[0] * num_nodes + remapped[1])
+    edges = remapped[:, edge_order]
+    positions = positions[edge_order]
+    unique_labels = unique_labels[edge_order]
+    raw_nodes = raw_nodes[order]
+    keys = list(range(num_nodes))
+    canonical_ids = {tuple(pair): i for i, pair in enumerate(edges.T.tolist())}
+    input_edge_ids = torch.tensor([
+        canonical_ids[(min(u, v), max(u, v))]
+        for u, v in inverse[edge_index.detach().cpu()].T.tolist()
+    ], dtype=torch.long)
+    adjacency = [[] for _ in range(num_nodes)]
+    pairs = edges.T.tolist()
+    for u, v in pairs:
+        adjacency[u].append(v)
+        adjacency[v].append(u)
+
+    components = _components(adjacency, set(range(num_nodes)), keys)
+    initial_budget = max(len(components), math.ceil(num_nodes / config.target_region_size))
+    budgets = _v2_component_budgets(components, initial_budget)
+    centers = []
+    for component, budget in zip(components, budgets):
+        # First center: graph center (minimum eccentricity), then canonical tie break.
+        first = min(component, key=lambda candidate: (
+            max(_distances(adjacency, candidate)[node] for node in component), keys[candidate],
+        ))
+        selected = [first]
+        while len(selected) < min(budget, len(component)):
+            candidate = max(
+                (node for node in component if node not in selected),
+                key=lambda node: (min(_distances(adjacency, center)[node] for center in selected), -keys[node]),
+            )
+            selected.append(candidate)
+        centers.extend(selected)
+
+    owner = _v2_multisource_partition(adjacency, centers, keys)
+    centers, owner, recenter_accepts = _v2_recenter(
+        adjacency, pairs, centers, owner, keys, config.recenter_rounds,
+    )
+    additions = 0
+    while True:
+        _, radii, regions = _v2_partition_objective(adjacency, pairs, centers, owner, keys)
+        worst = max(range(len(radii)), key=lambda i: (radii[i], -keys[centers[i]]))
+        if radii[worst] <= config.max_region_radius:
+            break
+        distances = _v2_induced_distances(adjacency, centers[worst], regions[worst])
+        new_center = max(regions[worst], key=lambda node: (distances[node], -keys[node]))
+        if new_center in centers:
+            raise RuntimeError("V2 radius repair failed to add a distinct center")
+        centers.append(new_center)
+        additions += 1
+        owner = _v2_multisource_partition(adjacency, centers, keys)
+        centers, owner, accepted = _v2_recenter(
+            adjacency, pairs, centers, owner, keys, config.recenter_rounds,
+        )
+        recenter_accepts += accepted
+        if len(centers) > num_nodes:
+            raise RuntimeError("V2 center repair did not terminate")
+
+    owner_tensor = torch.tensor(owner, dtype=torch.long)
+    cores = [torch.where(owner_tensor == k)[0] for k in range(len(centers))]
+    contexts = [core.clone() for core in cores]
+    context_edges, context_edge_ids, core_positions = [], [], []
+    for core in cores:
+        local = {v: i for i, v in enumerate(core.tolist())}
+        ids = [i for i, (u, v) in enumerate(pairs) if u in local and v in local]
+        context_edge_ids.append(torch.tensor(ids, dtype=torch.long))
+        context_edges.append(_pairs_tensor([(local[pairs[i][0]], local[pairs[i][1]]) for i in ids]))
+        core_positions.append(torch.arange(len(core), dtype=torch.long))
+
+    boundary_ids, boundary_pairs = [], []
+    for edge_id, (u, v) in enumerate(pairs):
+        a, b = owner[u], owner[v]
+        if a != b:
+            boundary_ids.append(edge_id)
+            boundary_pairs.append((min(a, b), max(a, b)))
+    coarse_pairs = sorted(set(boundary_pairs))
+    pair_to_id = {pair: i for i, pair in enumerate(coarse_pairs)}
+    groups = torch.tensor([pair_to_id[pair] for pair in boundary_pairs], dtype=torch.long)
+    counts = torch.bincount(groups, minlength=len(coarse_pairs))
+    _, final_radii, _ = _v2_partition_objective(adjacency, pairs, centers, owner, keys)
+    stats = {
+        "num_nodes": num_nodes,
+        "num_edges": edges.size(1),
+        "num_components": len(components),
+        "initial_center_budget": initial_budget,
+        "num_main_regions": len(centers),
+        "num_added_centers": additions,
+        "num_residual_regions": 0,
+        "num_residual_nodes": 0,
+        "num_coarse_nodes": len(centers),
+        "num_coarse_edges": len(coarse_pairs),
+        "coarse_node_ratio": len(centers) / num_nodes,
+        "context_occurrence_ratio": 1.0,
+        "max_core_size": max(map(len, cores)),
+        "max_region_radius": max(final_radii, default=0),
+        "cut_edge_count": len(boundary_ids),
+        "cut_edge_ratio": len(boundary_ids) / max(1, len(pairs)),
+        "recenter_accepts": recenter_accepts,
+        "canonicalized": True,
+        "algorithm": config.algorithm,
+    }
+    fingerprint = topology_fingerprint(
+        num_nodes, edge_index, config, node_ids=node_ids,
+        node_labels=node_labels, edge_labels=edge_labels,
+    )
+    return CoarseTopology(
+        torch.tensor(centers, dtype=torch.long), owner_tensor, cores, contexts,
+        torch.zeros(len(centers), dtype=torch.bool), edges, positions,
+        context_edges, context_edge_ids, core_positions, _pairs_tensor(coarse_pairs),
+        torch.tensor(boundary_ids, dtype=torch.long), groups, counts, stats,
+        order, inverse, raw_nodes, unique_labels, input_edge_ids, fingerprint,
+    )

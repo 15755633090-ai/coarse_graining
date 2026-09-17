@@ -71,6 +71,7 @@ conda run --no-capture-output -n polyolefin_ml python -m unittest discover -s te
 - [第一轮核心消融：代码及执行范围](docs/ABLATION_ROUND1.md)
 - [Lipo 正式训练协议](docs/LIPO_FORMAL.md)
 - [粗粒度模块接口与缓存](coarse_gnn/README.md)
+- [V2 互斥区域与关系增量方法](docs/V2_METHOD.md)
 - [扩散子项目](diffusion/README.md) · [编码器核验](diffusion/ENCODER_AUDIT.md)
 - [GitHub 上传说明](docs/GITHUB_UPLOAD.md)
 
