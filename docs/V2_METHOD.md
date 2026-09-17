@@ -34,6 +34,9 @@ V2 是新的实验身份；历史 V1 粗化、结果与恢复协议保持不变�
 # 仅构建缓存并写拓扑 sanity 汇总，不训练
 python run_lipo_v2.py --action prepare --seeds 0
 
+# 每个 V2 变体只在真实数据上做一个 batch 的前向、反向和 optimizer step
+python run_lipo_v2.py --action smoke --seeds 0
+
 # 正式训练入口；按需要指定 1/3/5 个 seeds
 python run_lipo_v2.py --action train --seeds 0
 ```

@@ -143,12 +143,12 @@ class V2CoarseGraphPredictor(nn.Module):
         directed_attributes = torch.cat((attributes, attributes))
         messages = self.coarse_message(torch.cat(
             (regions[target], regions[source], directed_attributes), dim=1,
-        ))
+        )).to(regions.dtype)
         totals = torch.zeros_like(regions).index_add(0, target, messages)
         degree = torch.zeros(regions.size(0), device=regions.device, dtype=regions.dtype)
         degree.index_add_(0, target, torch.ones_like(target, dtype=regions.dtype))
         mean = totals / degree.clamp_min(1).unsqueeze(1)
-        delta = self.delta_projection(mean)
+        delta = self.delta_projection(mean).to(regions.dtype)
         return delta * degree.gt(0).to(regions.dtype).unsqueeze(1)
 
     def forward(

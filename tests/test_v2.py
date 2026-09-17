@@ -158,6 +158,29 @@ class V2Tests(unittest.TestCase):
             torch.testing.assert_close(output.coarse_edge_attr[:, 1:].sum(1), torch.ones(output.coarse_edge_attr.size(0)))
             torch.testing.assert_close(output.coarse_edge_attr[:, 0], output.topology.edge_counts.float().log1p())
 
+    @unittest.skipUnless(torch.cuda.is_available(), "CUDA is unavailable")
+    def test_full_v2_forward_backward_under_bfloat16_autocast(self):
+        torch.manual_seed(13)
+        n = 20
+        edges = chain_edges(n).cuda()
+        raw = labels(n, edges.cpu())
+        attributes = torch.nn.functional.one_hot(
+            raw["edge_labels"] - 1, num_classes=4,
+        ).float().cuda()
+        model = V2CoarseGraphPredictor(
+            V2NetworkConfig(input_dim=5, hidden_dim=8, dropout=0),
+        ).cuda().train()
+        x = torch.randn(n, 5, device="cuda", requires_grad=True)
+        with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+            output = model(x, edges, attributes, **raw)
+            loss = output.prediction.square().sum()
+        loss.backward()
+        self.assertTrue(torch.isfinite(loss))
+        self.assertTrue(all(
+            torch.isfinite(parameter.grad).all()
+            for parameter in model.parameters() if parameter.grad is not None
+        ))
+
 
 if __name__ == "__main__":
     unittest.main()

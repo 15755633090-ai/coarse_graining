@@ -85,6 +85,71 @@ def prepare(legacy, args, cache):
     return report
 
 
+def smoke(legacy, args, cache, factory):
+    """Run one real-data optimizer step per V2 variant; never enter formal tuning."""
+    dataset, splits, spec = legacy.build_property_data(args.data_root, "lipo")
+    scaler = legacy.TargetScaler.fit(
+        dataset.targets[splits["train"]], dataset.target_mask[splits["train"]],
+    )
+    rows = [dataset[i] for i in splits["train"][:args.micro_batch_size]]
+    batch = legacy.collate_property_batch(rows).to(args.device)
+    results = []
+    for variant in VARIANTS:
+        legacy.seed_everything(0, deterministic=True)
+        model = factory(
+            variant, spec.num_tasks, args.checkpoint, args.device,
+            args.search_candidates[0]["dropout"],
+        ).train()
+        optimizer = torch.optim.AdamW(
+            [p for p in model.parameters() if p.requires_grad],
+            lr=args.search_candidates[0]["head_lr"],
+            weight_decay=args.weight_decay,
+        )
+        optimizer.zero_grad(set_to_none=True)
+        if torch.device(args.device).type == "cuda":
+            torch.cuda.reset_peak_memory_stats(torch.device(args.device))
+        with torch.autocast(
+            device_type=torch.device(args.device).type,
+            dtype=torch.bfloat16,
+            enabled=args.amp and torch.device(args.device).type == "cuda",
+        ):
+            predictions = model(batch.graph)
+            loss = legacy.property_loss(
+                predictions, batch.targets, batch.target_mask, spec, scaler, None,
+            )
+        loss.backward()
+        gradients = [p.grad for p in model.parameters() if p.grad is not None]
+        if not torch.isfinite(loss) or not gradients or not all(torch.isfinite(g).all() for g in gradients):
+            raise RuntimeError(f"Nonfinite or missing smoke gradients for {variant}")
+        torch.nn.utils.clip_grad_norm_(
+            [p for p in model.parameters() if p.requires_grad], args.grad_clip,
+        )
+        optimizer.step()
+        results.append({
+            "variant": variant,
+            "loss": float(loss.detach()),
+            "prediction_shape": list(predictions.shape),
+            "parameters_with_gradients": len(gradients),
+            "peak_cuda_bytes": (
+                int(torch.cuda.max_memory_allocated(torch.device(args.device)))
+                if torch.device(args.device).type == "cuda" else None
+            ),
+            "alpha": float(model.predictor.alpha.detach()),
+        })
+        del optimizer, model
+    report = {
+        "stage": "v2_one_batch_smoke",
+        "encoder_mode": "pretrained_finetune",
+        "device": str(args.device),
+        "batch_size": len(rows),
+        "variants": results,
+        "cache": cache.stats,
+        "notice": "One optimizer step per variant; not a scientific training result.",
+    }
+    formal.write_json(args.output_dir / "smoke.json", report)
+    return report
+
+
 def train(legacy, args, old_protocol, cache, factory):
     original_protocol = legacy.diffusion_tuning_protocol
     original_manifest = legacy.benchmark_run_config
@@ -133,7 +198,7 @@ def train(legacy, args, old_protocol, cache, factory):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--action", choices=("prepare", "train"), default="prepare")
+    parser.add_argument("--action", choices=("prepare", "smoke", "train"), default="prepare")
     parser.add_argument("--seeds", nargs="+", type=int, default=[0])
     parser.add_argument("--project-root", type=Path, default=PROJECT)
     parser.add_argument("--output-dir", type=Path)
@@ -154,6 +219,9 @@ def main():
     factory = make_factory(legacy.create_property_model, cache)
     if options.action == "prepare":
         report = prepare(legacy, args, cache)
+        print(report["notice"], flush=True)
+    elif options.action == "smoke":
+        report = smoke(legacy, args, cache, factory)
         print(report["notice"], flush=True)
     else:
         train(legacy, args, old_protocol, cache, factory)
