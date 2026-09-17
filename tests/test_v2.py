@@ -13,6 +13,9 @@ from coarse_gnn import (
     build_v2_topology,
 )
 from coarse_gnn.diffusion_adapter import DiffusionCoarseModel
+from coarse_gnn.diffusion_adapter import molecular_graph_inputs
+from coarse_gnn.packed import PreparedGraphBatch
+from coarse_gnn.v2 import packed_v2_predict
 from diffusion.bond_diffusion.config import ModelConfig
 from diffusion.bond_diffusion.data import MoleculeGraph, collate_graphs
 from diffusion.bond_diffusion.model import BondAwareDiffusionModel
@@ -157,6 +160,33 @@ class V2Tests(unittest.TestCase):
         if output.coarse_edge_attr.numel():
             torch.testing.assert_close(output.coarse_edge_attr[:, 1:].sum(1), torch.ones(output.coarse_edge_attr.size(0)))
             torch.testing.assert_close(output.coarse_edge_attr[:, 0], output.topology.edge_counts.float().log1p())
+
+    def test_packed_v2_matches_independent_graphs_without_dropout(self):
+        torch.manual_seed(31)
+        predictor = V2CoarseGraphPredictor(
+            V2NetworkConfig(input_dim=5, hidden_dim=8, dropout=0),
+        ).eval()
+        batch = collate_graphs([
+            molecule(17, chain_edges(17)),
+            molecule(23, chain_edges(23)),
+            molecule(11, chain_edges(11)),
+        ])
+        entries = molecular_graph_inputs(batch)
+        topologies = [predictor.prepare_topology(
+            len(valid), edges, node_labels=raw_nodes, edge_labels=edge_labels,
+        ) for valid, edges, raw_nodes, edge_labels in entries]
+        states = torch.randn(batch.node_features.size(0), batch.node_features.size(1), 5)
+        expected = []
+        for index, (valid, edges, raw_nodes, edge_labels) in enumerate(entries):
+            attributes = torch.nn.functional.one_hot(edge_labels - 1, num_classes=4).float()
+            expected.append(predictor(
+                states[index, valid], edges, attributes,
+                node_labels=raw_nodes, edge_labels=edge_labels, topology=topologies[index],
+            ).prediction)
+        packed = packed_v2_predict(
+            predictor, states, PreparedGraphBatch(batch, topologies).plan,
+        )
+        torch.testing.assert_close(packed, torch.stack(expected), rtol=1e-6, atol=1e-6)
 
     @unittest.skipUnless(torch.cuda.is_available(), "CUDA is unavailable")
     def test_full_v2_forward_backward_under_bfloat16_autocast(self):

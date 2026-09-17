@@ -9,6 +9,7 @@ from torch import Tensor, nn
 from .cache import TopologyCache
 from .layers import EdgeGIN
 from .model import GraphOutput
+from .packed import PackedPlan, packed_gnn, segment_pool
 from .topology import CoarseTopology, build_v2_topology, topology_fingerprint
 
 
@@ -224,3 +225,48 @@ class V2CoarseGraphPredictor(nn.Module):
             coarse_edge_attr=coarse_edge_attr,
             topology=topology,
         )
+
+
+def packed_v2_predict(predictor: V2CoarseGraphPredictor, node_states: Tensor, plan: PackedPlan) -> Tensor:
+    """Execute V2's variable-size regions as one disjoint-union graph batch.
+
+    V2 regions are exclusive, so their local region graphs have no shared
+    atoms.  Concatenating them preserves every within-region edge while
+    replacing thousands of tiny GPU launches with one launch per GNN layer.
+    Coarse edges are likewise a disjoint union: offsets in ``plan`` ensure
+    messages never cross molecule boundaries.
+    """
+    cfg = predictor.config
+    canonical_nodes = node_states.flatten(0, 1)[plan.atom_gather]
+    projected = predictor.input_projection(canonical_nodes)
+    local = packed_gnn(
+        predictor.region_gnn,
+        projected[plan.context_gather],
+        plan.region_source,
+        plan.region_target,
+        plan.region_attributes.to(dtype=node_states.dtype),
+        [None] * cfg.region_layers,
+    )
+    regions = segment_pool(local[plan.core_gather], plan.core_lengths, "mean")
+    sizes = plan.core_lengths.to(device=regions.device, dtype=regions.dtype)
+    counts = plan.coarse_counts.to(device=regions.device, dtype=regions.dtype)
+    bond_sums = plan.coarse_bond_sums.to(device=regions.device, dtype=regions.dtype)
+    attributes = torch.cat((counts.log1p(), bond_sums / counts.clamp_min(1)), dim=1)
+    if cfg.coarse_layers == 0 or plan.coarse_source.numel() == 0:
+        delta = torch.zeros_like(regions)
+    else:
+        messages = predictor.coarse_message(torch.cat((
+            regions[plan.coarse_target], regions[plan.coarse_source], attributes,
+        ), dim=1)).to(regions.dtype)
+        totals = torch.zeros_like(regions).index_add(0, plan.coarse_target, messages)
+        degree = torch.zeros(regions.size(0), device=regions.device, dtype=regions.dtype)
+        degree.index_add_(0, plan.coarse_target, torch.ones_like(plan.coarse_target, dtype=regions.dtype))
+        delta = predictor.delta_projection(totals / degree.clamp_min(1).unsqueeze(1)).to(regions.dtype)
+        delta = delta * degree.gt(0).to(regions.dtype).unsqueeze(1)
+    region_graph = torch.segment_reduce(
+        regions * sizes.unsqueeze(1), "sum", lengths=plan.graph_lengths,
+    ) / torch.segment_reduce(sizes, "sum", lengths=plan.graph_lengths).unsqueeze(1)
+    delta_graph = torch.segment_reduce(
+        delta * sizes.unsqueeze(1), "sum", lengths=plan.graph_lengths,
+    ) / torch.segment_reduce(sizes, "sum", lengths=plan.graph_lengths).unsqueeze(1)
+    return predictor.region_head(region_graph) + predictor.alpha * predictor.delta_head(delta_graph)

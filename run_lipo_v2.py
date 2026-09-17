@@ -19,6 +19,9 @@ from coarse_gnn import (
     V2NetworkConfig,
 )
 from coarse_gnn.diffusion_adapter import DiffusionCoarseModel, precompute_batch_topologies
+from coarse_gnn.packed import PreparedGraphBatch
+from coarse_gnn.prepared_data import prepared_tools
+from coarse_gnn.v2 import packed_v2_predict
 
 
 ROOT = Path(__file__).resolve().parent
@@ -35,6 +38,9 @@ class V2FormalModel(DiffusionCoarseModel):
         return self.predictor
 
     def forward(self, batch):
+        if isinstance(batch, PreparedGraphBatch):
+            nodes = self.encoder.encode_nodes(batch.node_features, batch.bonds, batch.node_mask)
+            return packed_v2_predict(self.predictor, nodes, batch.plan)
         return super().forward(batch).predictions
 
 
@@ -92,9 +98,13 @@ def smoke(legacy, args, cache, factory):
         dataset.targets[splits["train"]], dataset.target_mask[splits["train"]],
     )
     rows = [dataset[i] for i in splits["train"][:args.micro_batch_size]]
-    batch = legacy.collate_property_batch(rows).to(args.device)
+    batch = legacy.collate_property_batch(rows)
+    batch.graph = PreparedGraphBatch(
+        batch.graph, precompute_batch_topologies(batch.graph, cache, STRUCTURE),
+    )
+    batch = batch.to(args.device)
     results = []
-    for variant in VARIANTS:
+    for variant in args.modes:
         legacy.seed_everything(0, deterministic=True)
         model = factory(
             variant, spec.num_tasks, args.checkpoint, args.device,
@@ -192,6 +202,7 @@ def train(legacy, args, old_protocol, cache, factory):
         create_property_model=factory,
         diffusion_tuning_protocol=protocol,
         benchmark_run_config=manifest,
+        **prepared_tools(legacy, cache, STRUCTURE),
     ):
         legacy.main()
 
@@ -200,21 +211,42 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--action", choices=("prepare", "smoke", "train"), default="prepare")
     parser.add_argument("--seeds", nargs="+", type=int, default=[0])
+    parser.add_argument("--variants", nargs="+", choices=VARIANTS, default=list(VARIANTS))
+    parser.add_argument("--device", help="Override the recorded execution device, e.g. cuda:1")
+    parser.add_argument("--micro-batch-size", type=int,
+                        help="Override the recorded micro-batch size for this new V2 experiment")
+    parser.add_argument("--num-workers", type=int,
+                        help="Override the recorded data-loader worker count for this new V2 experiment")
+    parser.add_argument("--cpu-threads", type=int, default=4,
+                        help="CPU math threads per V2 process (default: 4)")
     parser.add_argument("--project-root", type=Path, default=PROJECT)
     parser.add_argument("--output-dir", type=Path)
     options = parser.parse_args()
     if len(set(options.seeds)) != len(options.seeds) or not set(options.seeds) <= set(range(5)):
         parser.error("Only distinct seeds 0..4 are allowed")
+    if options.cpu_threads < 1:
+        parser.error("--cpu-threads must be positive")
 
     project = options.project_root.resolve()
     legacy, args, old_protocol, _ = formal.load_protocol(project)
+    if options.micro_batch_size is not None:
+        if options.micro_batch_size < 1:
+            parser.error("--micro-batch-size must be positive")
+        args.micro_batch_size = options.micro_batch_size
+    if options.num_workers is not None:
+        if options.num_workers < 0:
+            parser.error("--num-workers must be non-negative")
+        args.num_workers = options.num_workers
+    if options.device is not None:
+        args.device = options.device
     args.output_dir = (
         options.output_dir
         or project / "model/results_formal/05_coarse_gnn/v2"
     ).resolve()
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.seeds = options.seeds
-    args.modes = list(VARIANTS)
+    args.modes = list(options.variants)
+    torch.set_num_threads(options.cpu_threads)
     cache = TopologyCache(args.output_dir / "_topology_cache", max_memory_entries=8192)
     factory = make_factory(legacy.create_property_model, cache)
     if options.action == "prepare":
