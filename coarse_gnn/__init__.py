@@ -16,6 +16,9 @@ from .hierarchy import (
     pack_hierarchy_contexts,
 )
 from .hierarchy_cache import HierarchyCache
+from .hierarchy_packed import PackedHierarchyLevelPlan, PackedHierarchyPlan, pack_hierarchy
+from .hierarchy_model import HierarchicalPredictor, HierarchyNetworkConfig, HierarchyOutput
+from .batching import AtomCountBucketBatchSampler
 
 __all__ = [
     "CoarseningConfig", "NetworkConfig", "CoarseGraphPredictor", "GraphOutput",
@@ -26,4 +29,7 @@ __all__ = [
     "HierarchyConfig", "HierarchyLevel", "PackedHierarchyContextPlan",
     "HierarchyCache", "build_hierarchical_topology",
     "hierarchy_input_fingerprint", "pack_hierarchy_contexts",
+    "PackedHierarchyLevelPlan", "PackedHierarchyPlan", "pack_hierarchy",
+    "HierarchicalPredictor", "HierarchyNetworkConfig", "HierarchyOutput",
+    "AtomCountBucketBatchSampler",
 ]

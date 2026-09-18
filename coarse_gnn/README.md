@@ -14,6 +14,25 @@
 
 默认保留增强配置：区域 GNN 为 2 层、粗图 GNN 为 3 层、隐藏维度 128，所有统计特征开关开启。实现采用双向求和消息、自身更新、残差与 LayerNorm；启用边特征时增加边投影和消息 ReLU，关闭时使用普通 GIN 的邻居求和。没有新增 Gate。两个 GNN 的参数互不共享，各区域的区域 GNN 参数共享。
 
+## Near-Fine/Far-Coarse packed 执行
+
+新层级分支使用 `HierarchyCache` 在 CPU 离线保存规范拓扑和默认 adaptive context，再由 `pack_hierarchy()` 只为当前 batch 拼接全局索引。`PackedHierarchyPlan.pin_memory().to(device)` 可将 Atom→L1、L1→L2、L2→L3、跨尺度 context 和图级 segment 一次复制到 GPU。GPU 前向没有按分子、父区域或 query 的 Python 循环：L1 pooling、两级父块内部 GINE、segmented attention 和 graph readout 均为 packed tensor 运算。
+
+```python
+from coarse_gnn import HierarchicalPredictor, HierarchyNetworkConfig, pack_hierarchy
+
+plan = pack_hierarchy(topologies, padded_nodes=batch.node_features.size(1))
+plan = plan.pin_memory().to(device)
+model = HierarchicalPredictor(HierarchyNetworkConfig(
+    input_dim=encoder.config.hidden_dim,
+    base_dim=base_embedding.size(1),
+    hidden_dim=128,
+)).to(device)
+output = model(h2, base_embedding, base_prediction, plan)
+```
+
+`pack_hierarchy(..., full_l1=True)` 仅替换 context plan，可在完全相同的网络参数和执行路径下做全 L1 消融。正式 DataLoader 可用 `AtomCountBucketBatchSampler` 按原子数做 sortish batching，降低 dense diffusion 的平方级 padding 浪费。冻结 backbone 的阶段还可将 `h2`、`base_embedding` 和 `base_prediction` 作为数据特征离线保存；联合微调时再恢复在线编码。
+
 ## 通用图接口
 
 ```python
@@ -165,7 +184,7 @@ base_plus_counts = NetworkConfig.base(input_dim=128, edge_dim=0, use_coarse_edge
 - 当前分子适配器使用二维连接关系、已有离散原子属性和键类型。
 - 残余区域保证节点进入表示，但不保证大幅压缩或消除长程瓶颈；主区域的四跳半径也不限制高分支图的节点数。
 - 区域上下文不保证为每个边界主节点提供完整的多层外部邻域。共享全图扩散表示提供已有上下文，区域 GNN 使用其截取到的诱导子图。
-- 当前规范化与拓扑在 CPU 上构建，启用缓存后只在未命中时计算，区域逐个编码，批次内粗图逐图处理。首次构建时 Bliss 的最坏时间复杂度是指数级；在其后，中心 BFS 约为 `O(K(N+E))`，上下文边筛选约为 `O(K_final E)`，残余检查另有遍历开销。尚未实现区域并行批处理。
+- 当前规范化与拓扑在 CPU 上构建，启用缓存后只在未命中时计算。旧 `CoarseGraphPredictor` 仍是区域逐个编码、批次内粗图逐图处理；新 `HierarchicalPredictor` 已使用 packed batch。首次构建时 Bliss 的最坏时间复杂度是指数级；旧算法其后的中心 BFS 约为 `O(K(N+E))`，上下文边筛选约为 `O(K_final E)`，残余检查另有遍历开销。
 - 扩散适配器沿用原编码器的稠密分子边矩阵，因此整体仍有原图二次规模的内存开销。通用粗图预测器不要求稠密矩阵。
 - 当前只支持图级预测，不包含粗图向原节点回传或节点级预测头。通用粗图模块不限定材料种类，但现有预训练编码器及其适配器仍是分子图模型。
 - 尚未进行正式下游训练、长程性能验证或创新性验证。

@@ -12,6 +12,7 @@ import torch
 from .hierarchy import (
     HIERARCHY_VERSION,
     ComponentHierarchy,
+    ContextToken,
     HierarchicalTopology,
     HierarchyConfig,
     HierarchyLevel,
@@ -24,13 +25,20 @@ def _restore_topology(payload: dict) -> HierarchicalTopology:
     components = []
     for component in payload["components"]:
         component = dict(component)
-        # Runtime memoization is intentionally not part of persistent identity.
-        component.pop("_context_cache", None)
+        raw_contexts = component.pop("_context_cache", {})
+        context_cache = {
+            float(threshold): [
+                None if row is None else [ContextToken(**token) for token in row]
+                for row in rows
+            ]
+            for threshold, rows in raw_contexts.items()
+        }
         levels = [HierarchyLevel(**level) for level in component["levels"]]
         components.append(ComponentHierarchy(
             atom_indices=component["atom_indices"],
             levels=levels,
             l1_distances=component["l1_distances"],
+            _context_cache=context_cache,
         ))
     return HierarchicalTopology(
         components=components,
@@ -116,6 +124,11 @@ class HierarchyCache:
                 num_nodes, edge_index, config,
                 node_labels=node_labels, edge_labels=edge_labels,
             )
+            # Compile the default adaptive covers during offline preprocessing;
+            # disk loads and training epochs never repeat the tree traversal.
+            for component in topology.components:
+                for query in range(component.levels[0].num_tokens):
+                    component.adaptive_context(query, config.expansion_threshold)
             self.misses += 1
             if path is not None:
                 path.parent.mkdir(parents=True, exist_ok=True)

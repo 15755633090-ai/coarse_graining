@@ -160,6 +160,7 @@ class HierarchyTests(unittest.TestCase):
         self.assertEqual(plan.query_offsets.numel(), plan.query_l1_indices.numel() + 1)
         self.assertEqual(int(plan.query_offsets[-1]), plan.context_indices.numel())
         self.assertEqual(plan.context_levels.shape, plan.context_indices.shape)
+        self.assertEqual(plan.context_query_indices.shape, plan.context_indices.shape)
         self.assertEqual(plan.d_min.shape, plan.context_indices.shape)
         self.assertEqual(plan.d_max.shape, plan.context_indices.shape)
         self.assertEqual(plan.d_mean.shape, plan.context_indices.shape)
@@ -172,6 +173,9 @@ class HierarchyTests(unittest.TestCase):
             torch.testing.assert_close(getattr(plan, name), getattr(moved, name))
         self.assertEqual(plan.graph_query_lengths.numel(), len(topologies))
         self.assertTrue(bool((plan.context_indices >= 0).all()))
+        for query in range(plan.query_l1_indices.numel()):
+            start, stop = plan.query_offsets[query:query + 2]
+            self.assertTrue(bool((plan.context_query_indices[start:stop] == query).all()))
         for level in (1, 2, 3):
             selected = plan.context_indices[plan.context_levels == level]
             if selected.numel():
@@ -193,6 +197,9 @@ class HierarchyTests(unittest.TestCase):
                 [value.canonical_signature() for value in reversed(actual)],
             )
             self.assertEqual(second.disk_hits, 2)
+            self.assertTrue(all(
+                topology.components[0]._context_cache for topology in actual
+            ))
 
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ from .canonical import canonical_atom_order, discrete_rows
 from .topology import _bliss_version, _canonical_edges, _pairs_tensor
 
 
-HIERARCHY_VERSION = 2
+HIERARCHY_VERSION = 3
 
 
 @dataclass(frozen=True)
@@ -106,6 +106,7 @@ class PackedHierarchyContextPlan:
     query_offsets: Tensor
     context_levels: Tensor
     context_indices: Tensor
+    context_query_indices: Tensor
     d_min: Tensor
     d_max: Tensor
     d_mean: Tensor
@@ -271,6 +272,8 @@ class HierarchicalTopology:
 
 def pack_hierarchy_contexts(
     topologies: list[HierarchicalTopology],
+    *,
+    full_l1: bool = False,
 ) -> PackedHierarchyContextPlan:
     """Precompile every graph/query tree traversal into flat CPU tensors.
 
@@ -288,7 +291,7 @@ def pack_hierarchy_contexts(
                 level_counts[level_index] += level.num_tokens
 
     query_indices, offsets = [], [0]
-    context_levels, context_indices = [], []
+    context_levels, context_indices, context_query_indices = [], [], []
     d_min, d_max, d_mean, rho = [], [], [], []
     leaf_counts, atom_counts, query_diameters = [], [], []
     graph_query_lengths = []
@@ -298,13 +301,27 @@ def pack_hierarchy_contexts(
             l1_base = level_bases[(graph_index, component_index, 0)]
             component_diameter = int(component.l1_distances.max())
             for query in range(component.levels[0].num_tokens):
+                packed_query = len(query_indices)
                 graph_queries += 1
                 query_indices.append(l1_base + query)
                 query_diameters.append(max(1, component_diameter))
-                context = component.adaptive_context(
-                    query, topology.config.expansion_threshold,
-                )
+                if full_l1:
+                    context = [
+                        ContextToken(
+                            1, index,
+                            int(component.l1_distances[query, index]),
+                            int(component.l1_distances[query, index]),
+                            float(component.l1_distances[query, index]), 0,
+                        )
+                        for index in range(component.levels[0].num_tokens)
+                        if index != query
+                    ]
+                else:
+                    context = component.adaptive_context(
+                        query, topology.config.expansion_threshold,
+                    )
                 for token in context:
+                    context_query_indices.append(packed_query)
                     context_levels.append(token.level)
                     context_indices.append(
                         level_bases[(graph_index, component_index, token.level - 1)] + token.index
@@ -324,6 +341,7 @@ def pack_hierarchy_contexts(
         query_offsets=torch.tensor(offsets, dtype=torch.long),
         context_levels=torch.tensor(context_levels, dtype=torch.long),
         context_indices=torch.tensor(context_indices, dtype=torch.long),
+        context_query_indices=torch.tensor(context_query_indices, dtype=torch.long),
         d_min=torch.tensor(d_min, dtype=torch.long),
         d_max=torch.tensor(d_max, dtype=torch.long),
         d_mean=torch.tensor(d_mean, dtype=torch.float32),

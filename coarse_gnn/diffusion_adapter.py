@@ -15,6 +15,8 @@ from .config import CoarseningConfig, NetworkConfig
 from .model import CoarseGraphPredictor, GraphOutput
 from .cache import TopologyCache
 from .topology import CoarseTopology
+from .hierarchy import HierarchicalTopology, HierarchyConfig
+from .hierarchy_cache import HierarchyCache
 
 
 def encode_nodes_with_intermediates(
@@ -91,6 +93,19 @@ def precompute_batch_topologies(batch: MoleculeBatch, cache: TopologyCache,
     """Populate a cache without constructing/loading a neural encoder."""
     return [cache.get_or_build(len(valid), edges, config, node_labels=nodes, edge_labels=labels)
             for valid, edges, nodes, labels in molecular_graph_inputs(batch)]
+
+
+def precompute_batch_hierarchies(
+    batch: MoleculeBatch, cache: HierarchyCache,
+    config: HierarchyConfig | None = None,
+) -> list[HierarchicalTopology]:
+    """Persist hierarchy and adaptive contexts without running the encoder."""
+    return [
+        cache.get_or_build(
+            len(valid), edges, config, node_labels=nodes, edge_labels=labels,
+        )
+        for valid, edges, nodes, labels in molecular_graph_inputs(batch)
+    ]
 
 
 @dataclass
