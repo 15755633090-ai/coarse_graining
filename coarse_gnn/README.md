@@ -43,6 +43,16 @@ RTX 5070 Laptop 上使用现有 4 层/128 维 checkpoint、256 个真实 OGB 分
 
 最坏 batch 的峰值显存约为 210/396/766 MiB；因为两种顺序最终都包含同一个最大分子，峰值几乎不变。交错区间的整卡利用率约为 5.3%/4.3%/9.5%，说明该小分子样本尚未喂满 GPU，不能只凭 packed 结构宣称高利用率。可用 `python -m scripts.validation.benchmark_hierarchy_gpu` 在目标机器和正式数据分布上复现；默认写出未纳入 Git 的 `outputs/hierarchy_gpu_benchmark.json`。
 
+冻结 Base 的正式编排入口为 `scripts.experiments.run_hierarchy_lipo`。`base` 直接读取既有 `pretrained_frozen` 各 seed 的已选 checkpoint；`full_l1` 与 `adaptive` 共享固定的 (h^{(2)})、(h_{base})、Base 预测、初始化和验证协议，只训练新分支。首次阶段不计算测试集指标。
+
+```powershell
+conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.run_hierarchy_lipo --action prepare --seeds 0 1 --batch-size 32
+conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.run_hierarchy_lipo --action train --seeds 0 1 --variants full_l1 adaptive --batch-size 32
+conda run --no-capture-output -n polyolefin_ml python -m scripts.experiments.run_hierarchy_lipo --action summarize --seeds 0 1
+```
+
+训练使用按原子数 sortish bucket、原训练器的断点恢复、BF16、验证集 checkpoint selection 和 patience。全数据特征与 hierarchy/context 只在 `prepare` 首次生成，之后命中 `outputs/hierarchy_lipo_frozen` 下的缓存。
+
 ## 通用图接口
 
 ```python
