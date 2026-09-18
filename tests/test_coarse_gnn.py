@@ -3,7 +3,7 @@ import unittest
 import torch
 
 from coarse_gnn import CoarseGraphPredictor, CoarseningConfig, NetworkConfig, build_topology
-from coarse_gnn.diffusion_adapter import DiffusionCoarseModel
+from coarse_gnn.diffusion_adapter import DiffusionCoarseModel, encode_nodes_with_intermediates
 from diffusion.bond_diffusion.config import ModelConfig
 from diffusion.bond_diffusion.data import collate_graphs
 from diffusion.bond_diffusion.model import BondAwareDiffusionModel
@@ -21,6 +21,36 @@ class CoarseFrameworkTests(unittest.TestCase):
 
     def setUp(self):
         torch.manual_seed(12)
+
+    def test_intermediate_adapter_runs_backbone_once_and_preserves_final_nodes(self):
+        encoder = BondAwareDiffusionModel(
+            ModelConfig(hidden_dim=16, num_layers=3, dropout=0, time_dim=8),
+        ).eval()
+        batch = collate_graphs([chain_graph(8), chain_graph(5)])
+        calls = [0, 0, 0]
+        handles = [
+            layer.register_forward_hook(
+                lambda _module, _inputs, _output, index=index: calls.__setitem__(index, calls[index] + 1)
+            )
+            for index, layer in enumerate(encoder.layers)
+        ]
+        try:
+            final, states = encode_nodes_with_intermediates(
+                encoder, batch.node_features, batch.bonds, batch.node_mask,
+                layers=(1, 2),
+            )
+        finally:
+            for handle in handles:
+                handle.remove()
+        self.assertEqual(calls, [1, 1, 1])
+        self.assertEqual(set(states), {1, 2})
+        expected = encoder.encode_nodes(batch.node_features, batch.bonds, batch.node_mask)
+        torch.testing.assert_close(final, expected, rtol=0, atol=0)
+        with self.assertRaises(ValueError):
+            encode_nodes_with_intermediates(
+                encoder, batch.node_features, batch.bonds, batch.node_mask,
+                layers=(encoder.config.num_layers + 1,),
+            )
 
     def check_partition(self, topology, n):
         self.assertEqual(sorted(torch.cat(topology.cores).tolist()), list(range(n)))

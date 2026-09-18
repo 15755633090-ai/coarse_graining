@@ -45,6 +45,24 @@ with torch.no_grad():
     # batch.node_mask 标识有效原子。
 ```
 
+需要层级分支时，可在同一次 backbone forward 中取得中间层和最终层：
+
+```python
+with torch.no_grad():
+    from coarse_gnn.diffusion_adapter import encode_nodes_with_intermediates
+    h_final, states = encode_nodes_with_intermediates(
+        encoder, batch.node_features, batch.bonds, batch.node_mask, layers=(2,)
+    )
+    h_level2 = states[2]
+```
+
+层号从 1 开始，并根据实际加载 checkpoint 的 `encoder.config.num_layers`
+校验；调用方不得假设所有 checkpoint 都固定为4层。
+
+当前图表示包含元素、形式电荷、芳香性、杂化和度数，以及
+单/双/三/芳香键；没有编码原子手性或键的 E/Z 立体信息。因此当前扩散表示和
+基于它的 canonicalization 都不能区分只在这些立体属性上不同的异构体。
+
 批量命令行示例（输出原子表示及 sum/mean 拼接的 256 维图表示）：
 
 ```powershell

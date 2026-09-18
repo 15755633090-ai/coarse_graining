@@ -11,16 +11,16 @@ import hashlib
 import json
 import math
 from collections import deque
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields
 
 import torch
 from torch import Tensor
 
 from .canonical import canonical_atom_order, discrete_rows
-from .topology import _canonical_edges, _pairs_tensor
+from .topology import _bliss_version, _canonical_edges, _pairs_tensor
 
 
-HIERARCHY_VERSION = 1
+HIERARCHY_VERSION = 2
 
 
 @dataclass(frozen=True)
@@ -115,6 +115,20 @@ class PackedHierarchyContextPlan:
     query_diameters: Tensor
     graph_query_lengths: Tensor
     level_token_counts: Tensor
+
+    def to(self, device) -> "PackedHierarchyContextPlan":
+        """Move every packed tensor together for non-blocking GPU execution."""
+        return PackedHierarchyContextPlan(**{
+            item.name: getattr(self, item.name).to(device, non_blocking=True)
+            for item in fields(self)
+        })
+
+    def pin_memory(self) -> "PackedHierarchyContextPlan":
+        """Allow DataLoader pin-memory traversal to prepare one async copy."""
+        return PackedHierarchyContextPlan(**{
+            item.name: getattr(self, item.name).pin_memory()
+            for item in fields(self)
+        })
 
 
 @dataclass
@@ -345,6 +359,7 @@ def hierarchy_input_fingerprint(
     """Hash exact caller layout for safe cache reuse before canonicalization."""
     header = {
         "version": HIERARCHY_VERSION,
+        "igraph": _bliss_version(),
         "num_nodes": num_nodes,
         "config": asdict(config),
     }

@@ -120,6 +120,28 @@ class HierarchyTests(unittest.TestCase):
             )
             self.assertEqual(reference, moved.canonical_signature())
 
+    def test_highly_symmetric_graphs_are_reindexing_stable(self):
+        cycle_nodes = 18
+        cycle = torch.cat((chain_edges(cycle_nodes), torch.tensor([[cycle_nodes - 1], [0]])), dim=1)
+        leaves = 16
+        star = torch.stack((torch.zeros(leaves, dtype=torch.long), torch.arange(1, leaves + 1)))
+        first = torch.cat((chain_edges(10), torch.tensor([[9], [0]])), dim=1)
+        twins = torch.cat((first, first + 10), dim=1)
+        for count, edges in ((cycle_nodes, cycle), (leaves + 1, star), (20, twins)):
+            with self.subTest(nodes=count):
+                nodes, labels = attributed(count, edges)
+                reference = build_hierarchical_topology(
+                    count, edges, node_labels=nodes, edge_labels=labels,
+                ).canonical_signature()
+                generator = torch.Generator().manual_seed(617 + count)
+                for _ in range(20):
+                    permutation = torch.randperm(count, generator=generator)
+                    inverse = torch.argsort(permutation)
+                    actual = build_hierarchical_topology(
+                        count, inverse[edges], node_labels=nodes[permutation], edge_labels=labels,
+                    ).canonical_signature()
+                    self.assertEqual(reference, actual)
+
     def test_bidirectional_storage_does_not_double_count_edges(self):
         count = 30
         edges = chain_edges(count)
@@ -145,6 +167,9 @@ class HierarchyTests(unittest.TestCase):
         self.assertEqual(plan.leaf_counts.shape, plan.context_indices.shape)
         self.assertEqual(plan.atom_counts.shape, plan.context_indices.shape)
         self.assertEqual(plan.query_diameters.shape, plan.query_l1_indices.shape)
+        moved = plan.to("cpu")
+        for name in plan.__dataclass_fields__:
+            torch.testing.assert_close(getattr(plan, name), getattr(moved, name))
         self.assertEqual(plan.graph_query_lengths.numel(), len(topologies))
         self.assertTrue(bool((plan.context_indices >= 0).all()))
         for level in (1, 2, 3):

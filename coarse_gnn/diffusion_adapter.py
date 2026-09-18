@@ -17,6 +17,51 @@ from .cache import TopologyCache
 from .topology import CoarseTopology
 
 
+def encode_nodes_with_intermediates(
+    encoder: nn.Module,
+    node_features: Tensor,
+    bonds: Tensor,
+    node_mask: Tensor,
+    *,
+    layers=(2,),
+    timesteps: Tensor | None = None,
+) -> tuple[Tensor, dict[int, Tensor]]:
+    """Capture selected 1-based backbone layers without modifying the encoder.
+
+    Hooks preserve the original checkpoint class, its forward behavior and the
+    autograd graph. The dense backbone still runs exactly once for the batch.
+    """
+    requested = tuple(sorted(set(layers)))
+    backbone = getattr(encoder, "layers", None)
+    if backbone is None:
+        raise TypeError("encoder must expose its message-passing layers")
+    if any(not isinstance(index, int) or isinstance(index, bool) for index in requested):
+        raise TypeError("intermediate layer indices must be integers")
+    if any(index < 1 or index > len(backbone) for index in requested):
+        raise ValueError(f"intermediate layers must be in [1, {len(backbone)}]")
+    captured: dict[int, Tensor] = {}
+    handles = []
+
+    def capture(index):
+        def hook(_module, _inputs, output):
+            captured[index] = output[0] if isinstance(output, tuple) else output
+        return hook
+
+    try:
+        for index in requested:
+            handles.append(backbone[index - 1].register_forward_hook(capture(index)))
+        if timesteps is None:
+            final = encoder.encode_nodes(node_features, bonds, node_mask)
+        else:
+            final = encoder.encode_nodes(node_features, bonds, node_mask, timesteps)
+    finally:
+        for handle in handles:
+            handle.remove()
+    if set(captured) != set(requested):
+        raise RuntimeError("encoder did not execute every requested intermediate layer")
+    return final, captured
+
+
 def molecular_graph_inputs(batch: MoleculeBatch):
     """Validate clean molecular graphs and extract unpadded sparse inputs."""
     if batch.node_features.ndim != 3 or batch.node_features.size(-1) != 5:

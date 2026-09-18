@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
+from collections import Counter
 from dataclasses import asdict
 from pathlib import Path
 
@@ -41,6 +43,14 @@ def summarize(index, graph, topology, repeats, generator):
         levels.append([
             {
                 "tokens": level.num_tokens,
+                "min_children": min((len(value) for value in level.members), default=0),
+                "mean_children": (
+                    sum(len(value) for value in level.members) / max(1, level.num_tokens)
+                ),
+                "max_children": max((len(value) for value in level.members), default=0),
+                "child_count_histogram": dict(sorted(Counter(
+                    len(value) for value in level.members
+                ).items())),
                 "max_atoms": int(level.atom_counts.max()),
                 "max_child_radius": int(level.child_radii.max()),
                 "max_child_diameter": int(level.child_diameters.max()),
@@ -86,11 +96,15 @@ def main():
     for index in range(min(args.limit, len(dataset))):
         graph = dataset[index]
         edges, nodes, edge_labels = graph_inputs(graph)
+        started = time.perf_counter()
         topology = cache.get_or_build(
             nodes.size(0), edges, config,
             node_labels=nodes, edge_labels=edge_labels,
         )
-        records.append(summarize(index, graph, topology, args.permutations, generator))
+        hierarchy_seconds = time.perf_counter() - started
+        record = summarize(index, graph, topology, args.permutations, generator)
+        record["hierarchy_seconds"] = hierarchy_seconds
+        records.append(record)
         print(
             f"{index + 1}/{min(args.limit, len(dataset))}: atoms={nodes.size(0)} "
             f"levels={records[-1]['level_counts']}",
