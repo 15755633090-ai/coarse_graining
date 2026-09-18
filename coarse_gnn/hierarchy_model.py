@@ -132,7 +132,7 @@ class HierarchicalPredictor(nn.Module):
         ), dim=1)
         score = score + self.distance_mlp(distance_features).squeeze(1)
         score = score + self.level_bias(context.context_levels - 1).squeeze(1)
-        score = score + self.beta_leaf * context.leaf_counts.to(score.dtype).log1p()
+        score = score + self.beta_leaf * context.leaf_counts.to(score.dtype).log()
         score = score + self.beta_atom * context.atom_counts.to(score.dtype).log1p()
 
         query_count = queries.size(0)
@@ -143,7 +143,9 @@ class HierarchicalPredictor(nn.Module):
         weights = weights / sums[pair_queries].clamp_min(torch.finfo(weights.dtype).tiny)
         values = self.value_projection(selected)
         summaries = values.new_zeros((query_count, values.size(1)))
-        summaries.index_add_(0, pair_queries, weights.unsqueeze(1) * values)
+        summaries.index_add_(
+            0, pair_queries, weights.to(values.dtype).unsqueeze(1) * values,
+        )
         gated = torch.sigmoid(self.gate(torch.cat((queries, summaries), dim=1)))
         updated_queries = queries + gated * self.context_projection(summaries)
         return levels[0].index_copy(0, context.query_l1_indices, updated_queries)

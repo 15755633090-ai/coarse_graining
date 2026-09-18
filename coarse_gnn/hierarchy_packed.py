@@ -14,7 +14,12 @@ class _TensorPlan:
         values = {}
         for item in fields(self):
             value = getattr(self, item.name)
-            values[item.name] = value.to(device, non_blocking=True) if hasattr(value, "to") else value
+            if isinstance(value, Tensor):
+                values[item.name] = value.to(device, non_blocking=True)
+            elif hasattr(value, "to"):
+                values[item.name] = value.to(device)
+            else:
+                values[item.name] = value
         return type(self)(**values)
 
     def pin_memory(self):

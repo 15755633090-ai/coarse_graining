@@ -33,6 +33,16 @@ output = model(h2, base_embedding, base_prediction, plan)
 
 `pack_hierarchy(..., full_l1=True)` 仅替换 context plan，可在完全相同的网络参数和执行路径下做全 L1 消融。正式 DataLoader 可用 `AtomCountBucketBatchSampler` 按原子数做 sortish batching，降低 dense diffusion 的平方级 padding 浪费。冻结 backbone 的阶段还可将 `h2`、`base_embedding` 和 `base_prediction` 作为数据特征离线保存；联合微调时再恢复在线编码。
 
+RTX 5070 Laptop 上使用现有 4 层/128 维 checkpoint、256 个真实 OGB 分子、BF16 forward+backward 做了交错基准；每种顺序完整预热后重复 3 轮。random/bucket 在同一轮逐 batch 交替执行，以降低功耗状态和测试顺序偏差。
+
+| batch | random samples/s | bucket samples/s | bucket 变化 | padding ratio random→bucket |
+|---:|---:|---:|---:|---:|
+| 8 | 38.70 | 40.35 | +4.3% | 1.30→1.04 |
+| 16 | 71.10 | 72.42 | +1.8% | 1.39→1.04 |
+| 32 | 138.26 | 146.23 | +5.8% | 1.49→1.08 |
+
+最坏 batch 的峰值显存约为 210/396/766 MiB；因为两种顺序最终都包含同一个最大分子，峰值几乎不变。交错区间的整卡利用率约为 5.3%/4.3%/9.5%，说明该小分子样本尚未喂满 GPU，不能只凭 packed 结构宣称高利用率。可用 `python -m scripts.validation.benchmark_hierarchy_gpu` 在目标机器和正式数据分布上复现；默认写出未纳入 Git 的 `outputs/hierarchy_gpu_benchmark.json`。
+
 ## 通用图接口
 
 ```python
