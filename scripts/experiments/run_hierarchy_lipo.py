@@ -519,7 +519,12 @@ def preflight(legacy, args, data, spec, factory):
             if not bool((context_levels > 1).any()):
                 raise AssertionError("Adaptive preflight did not use an L2/L3 context")
             used_levels = set(context_levels.tolist())
-            for level in sorted(used_levels & {2, 3}):
+            construction_levels = set()
+            if used_levels & {2, 3}:
+                construction_levels.add(2)
+            if 3 in used_levels:
+                construction_levels.add(3)
+            for level in sorted(construction_levels):
                 module_index = level - 2
                 modules = (
                     model.head.gines[module_index],
@@ -605,16 +610,18 @@ def main():
             baseline / f"lipo/pretrained_frozen/seed_{seed}/best.pt"
         ) for seed in options.seeds
     }
+    feature_dim = feature_report["identity"]["hidden_dim"]
     config = dict(
         stage="hierarchy_lipo_frozen_v1", schema_version=1,
         groups=list(ALL_GROUPS), train_variants=list(VARIANTS), seeds=options.seeds,
         hierarchy=asdict(HIERARCHY),
         network=asdict(HierarchyNetworkConfig(
-            input_dim=128, base_dim=256, hidden_dim=options.hidden_dim,
+            input_dim=feature_dim, base_dim=2 * feature_dim,
+            hidden_dim=options.hidden_dim,
             output_dim=spec.num_tasks, dropout=args.dropout,
         )),
         controls=dict(
-            base_corr="frozen Base prediction + trainable MLP(h_global), no hierarchy input",
+            base_corr="frozen Base prediction + trainable MLP(h_base), no hierarchy input; not parameter-matched",
             full_l1="all L1 context; unused L2/L3 modules frozen",
             adaptive="adaptive L1/L2/L3 context",
         ),
@@ -631,7 +638,8 @@ def main():
             batch_size=args.batch_size, micro_batch_size=args.micro_batch_size,
             head_lr=args.head_lr, weight_decay=args.weight_decay,
             epochs=args.epochs, patience=args.patience, amp=args.amp,
-            bucket_batching=True, test_metrics_used=False,
+            num_workers=args.num_workers, bucket_batching=True,
+            test_metrics_used=False,
         ),
         source_files={
             **formal.source_identity(legacy),

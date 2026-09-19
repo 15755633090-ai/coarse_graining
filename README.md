@@ -53,7 +53,7 @@ conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.
 conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.run_hierarchy_lipo --action train --variants base_corr full_l1 adaptive --seeds 0 1 --batch-size 32 --micro-batch-size 32
 ```
 
-`Base+Corr` 只用冻结 Base 的全局表示学习残差，用来控制新增参数容量；`Full-L1` 使用全部一级区域；`Adaptive` 使用自适应 L1/L2/L3 远程上下文。正式编排全程只用 validation 选模，不读取 test 指标。
+`Base+Corr` 只用冻结 Base 的 `h_base` 学习残差，用来检验“仅在 Base 后增加 correction MLP”是否已能带来提升；它不是与层级模型参数量匹配的对照。`Full-L1` 使用全部一级区域；`Adaptive` 使用自适应 L1/L2/L3 远程上下文。正式编排全程只用 validation 选模，不读取 test 指标。
 
 需要启动或恢复训练时，按 [Frozen 实验说明](docs/FROZEN_MECHANISM.md) 选择 seeds。后台脚本已移到 `scripts/launchers/`；前台命令和后台脚本二选一。
 
