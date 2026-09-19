@@ -1,4 +1,4 @@
-"""Frozen-base Lipo orchestration for Base, Full-L1 and Adaptive hierarchy."""
+"""Frozen-base Lipo orchestration for Base, Base+Corr, Full-L1 and Adaptive."""
 from __future__ import annotations
 
 import argparse
@@ -20,6 +20,7 @@ from coarse_gnn import (
     HierarchyCache,
     HierarchyConfig,
     HierarchyNetworkConfig,
+    hierarchy_input_fingerprint,
     pack_hierarchy,
 )
 from coarse_gnn.diffusion_adapter import (
@@ -27,7 +28,7 @@ from coarse_gnn.diffusion_adapter import (
 )
 
 
-VARIANTS = ("full_l1", "adaptive")
+VARIANTS = ("base_corr", "full_l1", "adaptive")
 ALL_GROUPS = ("base", *VARIANTS)
 SEEDS = tuple(range(5))
 DEFAULT_OUTPUT = formal.ROOT / "outputs/hierarchy_lipo_frozen"
@@ -71,7 +72,8 @@ class HierarchyGraphBatch:
         return HierarchyGraphBatch(
             self.h2.to(device, non_blocking=True),
             self.hbase.to(device, non_blocking=True),
-            self.topologies, self.plan.to(device), self.full_l1,
+            self.topologies,
+            None if self.plan is None else self.plan.to(device), self.full_l1,
         )
 
 
@@ -108,9 +110,11 @@ class GeneratorBucketBatchSampler(Sampler[list[int]]):
 
 def hierarchy_tools(legacy, data, variant):
     full_l1 = variant == "full_l1"
+    uses_hierarchy = variant != "base_corr"
+    base_collate = legacy.collate_property_batch
 
     def collate(rows):
-        batch = legacy.collate_property_batch([row[:3] for row in rows])
+        batch = base_collate([row[:3] for row in rows])
         padded = batch.graph.node_features.size(1)
         h2 = torch.zeros((len(rows), padded, rows[0][4].size(1)), dtype=torch.float32)
         for index, row in enumerate(rows):
@@ -118,7 +122,9 @@ def hierarchy_tools(legacy, data, variant):
         topologies = [row[3] for row in rows]
         batch.graph = HierarchyGraphBatch(
             h2, torch.stack([row[5] for row in rows]), topologies,
-            pack_hierarchy(topologies, padded, full_l1=full_l1), full_l1,
+            pack_hierarchy(topologies, padded, full_l1=full_l1)
+            if uses_hierarchy else None,
+            full_l1,
         )
         return batch
 
@@ -131,7 +137,9 @@ def hierarchy_tools(legacy, data, variant):
         return type(batch)(
             HierarchyGraphBatch(
                 graph.h2[start:end, :padded], graph.hbase[start:end], topologies,
-                pack_hierarchy(topologies, padded, full_l1=full_l1), full_l1,
+                pack_hierarchy(topologies, padded, full_l1=full_l1)
+                if uses_hierarchy else None,
+                full_l1,
             ),
             batch.targets[start:end], batch.target_mask[start:end],
         )
@@ -157,11 +165,12 @@ def hierarchy_tools(legacy, data, variant):
 
 
 class FrozenHierarchyModel(nn.Module):
-    def __init__(self, base_model, predictor):
+    def __init__(self, base_model, predictor, variant):
         super().__init__()
         self.encoder = base_model.encoder
         self.base_head = base_model.head
         self.head = predictor
+        self.variant = variant
         self.encoder.requires_grad_(False).eval()
         self.base_head.requires_grad_(False).eval()
 
@@ -175,18 +184,39 @@ class FrozenHierarchyModel(nn.Module):
     def forward(self, batch):
         with torch.no_grad():
             base_prediction = self.base_head(batch.hbase)
+        if self.variant == "base_corr":
+            return self.head(batch.hbase, base_prediction)
         return self.head(batch.h2, batch.hbase, base_prediction, batch.plan).prediction
+
+
+class BaseCorrectionPredictor(nn.Module):
+    """Capacity control: y_base + f(h_base), without graph hierarchy input."""
+    def __init__(self, base_dim, hidden_dim, output_dim, dropout):
+        super().__init__()
+        self.base_projection = nn.Sequential(
+            nn.Linear(base_dim, hidden_dim), nn.LayerNorm(hidden_dim),
+        )
+        self.correction = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim), nn.SiLU(), nn.Dropout(dropout),
+            nn.Linear(hidden_dim, output_dim),
+        )
+        nn.init.normal_(self.correction[-1].weight, std=1e-3)
+        nn.init.zeros_(self.correction[-1].bias)
+
+    def forward(self, base_embedding, base_prediction):
+        return base_prediction + self.correction(self.base_projection(base_embedding))
 
 
 class HierarchyFactory:
     def __init__(self, legacy, baseline, hidden_dim):
         self.legacy, self.baseline, self.hidden_dim = legacy, baseline, hidden_dim
+        self.create_base_model = legacy.create_property_model
         self.seed = None
 
     def __call__(self, variant, num_tasks, checkpoint, device, dropout):
         if variant not in VARIANTS or self.seed not in SEEDS:
             raise ValueError("Hierarchy factory requires a variant and active seed")
-        base = self.legacy.create_property_model(
+        base = self.create_base_model(
             "pretrained_frozen", num_tasks, checkpoint, device, dropout,
         )
         saved = torch.load(
@@ -194,38 +224,83 @@ class HierarchyFactory:
             map_location=device, weights_only=False,
         )
         base.load_state_dict(saved["model_state"])
-        predictor = HierarchicalPredictor(HierarchyNetworkConfig(
-            input_dim=base.encoder.config.hidden_dim,
-            base_dim=2 * base.encoder.config.hidden_dim,
-            hidden_dim=self.hidden_dim,
-            output_dim=num_tasks,
-            dropout=dropout,
-        ))
+        if variant == "base_corr":
+            predictor = BaseCorrectionPredictor(
+                2 * base.encoder.config.hidden_dim, self.hidden_dim, num_tasks, dropout,
+            )
+        else:
+            predictor = HierarchicalPredictor(HierarchyNetworkConfig(
+                input_dim=base.encoder.config.hidden_dim,
+                base_dim=2 * base.encoder.config.hidden_dim,
+                hidden_dim=self.hidden_dim,
+                output_dim=num_tasks,
+                dropout=dropout,
+            ))
         if variant == "full_l1":
             # These modules cannot affect an all-L1 context. Freeze them so
             # reported trainable capacity matches the actual baseline.
             predictor.parent_mlps.requires_grad_(False)
             predictor.gines.requires_grad_(False)
             predictor.level_projections[1:].requires_grad_(False)
-        return FrozenHierarchyModel(base, predictor).to(device)
+        return FrozenHierarchyModel(base, predictor, variant).to(device)
 
 
-def feature_identity(legacy, args, split_sha):
+def feature_identity(legacy, args, source, split_sha, protocol):
+    fingerprints, atom_counts = [], []
+    for index in range(len(source)):
+        graph = source[index][0]
+        edges = torch.triu(graph.bonds > 0, diagonal=1).nonzero().T.contiguous()
+        labels = graph.bonds[edges[0], edges[1]]
+        fingerprints.append(hierarchy_input_fingerprint(
+            graph.node_features.size(0), edges, HIERARCHY,
+            node_labels=graph.node_features, edge_labels=labels,
+        ))
+        atom_counts.append(graph.node_features.size(0))
+    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
     return dict(
-        version=1, split_sha256=split_sha,
+        version=2, split_sha256=split_sha,
         checkpoint=legacy.file_identity(args.checkpoint),
+        graph_fingerprints=fingerprints, atom_counts=atom_counts,
+        hidden_dim=int(checkpoint["model_config"]["hidden_dim"]),
         layer=2, precision="float32", encoder_mode="frozen_eval",
         torch_version=str(torch.__version__),
+        extraction_sources={
+            **protocol["source_files"],
+            "coarse_gnn/diffusion_adapter.py": legacy.file_identity(
+                formal.ROOT / "coarse_gnn/diffusion_adapter.py"
+            ),
+            "scripts/experiments/run_hierarchy_lipo.py": legacy.file_identity(Path(__file__)),
+        },
     )
 
 
-def load_or_extract_features(legacy, args, source, split_sha, directory):
-    identity = feature_identity(legacy, args, split_sha)
+def validate_features(saved, identity):
+    h2_rows, hbase_rows = saved.get("h2"), saved.get("hbase")
+    expected = len(identity["graph_fingerprints"])
+    if not isinstance(h2_rows, list) or not isinstance(hbase_rows, list):
+        raise ValueError("Hierarchy feature cache must contain h2/hbase lists")
+    if len(h2_rows) != expected or len(hbase_rows) != expected:
+        raise ValueError("Hierarchy feature cache sample count mismatch")
+    hidden = identity["hidden_dim"]
+    for index, (h2, hbase, atoms) in enumerate(zip(
+        h2_rows, hbase_rows, identity["atom_counts"],
+    )):
+        if h2.shape != (atoms, hidden) or h2.dtype != torch.float32:
+            raise ValueError(f"Invalid cached h2 shape/dtype at sample {index}")
+        if hbase.shape != (2 * hidden,) or hbase.dtype != torch.float32:
+            raise ValueError(f"Invalid cached hbase shape/dtype at sample {index}")
+        if h2.requires_grad or hbase.requires_grad or not torch.isfinite(h2).all() or not torch.isfinite(hbase).all():
+            raise ValueError(f"Invalid cached feature values at sample {index}")
+
+
+def load_or_extract_features(legacy, args, source, split_sha, protocol, directory):
+    identity = feature_identity(legacy, args, source, split_sha, protocol)
     path = Path(directory) / (formal.digest(identity) + ".pt")
     if path.exists():
         saved = torch.load(path, map_location="cpu", weights_only=True)
         if saved["identity"] != identity:
             raise ValueError("Hierarchy feature cache identity mismatch")
+        validate_features(saved, identity)
         return saved, dict(
             identity=identity, path=str(path), hit=True,
             file_sha256=legacy.file_identity(path)["sha256"],
@@ -251,6 +326,7 @@ def load_or_extract_features(legacy, args, source, split_sha, directory):
             if start % 512 == 0:
                 print(f"Hierarchy frozen features: {min(start + len(rows), len(source))}/{len(source)}", flush=True)
     saved = dict(identity=identity, h2=h2_rows, hbase=hbase_rows)
+    validate_features(saved, identity)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(".tmp")
     torch.save(saved, temporary)
@@ -259,6 +335,56 @@ def load_or_extract_features(legacy, args, source, split_sha, directory):
         identity=identity, path=str(path), hit=False,
         file_sha256=legacy.file_identity(path)["sha256"],
     )
+
+
+def verify_all_seed_encoders(legacy, args, baseline):
+    pretrained = torch.load(args.checkpoint, map_location="cpu", weights_only=False)["model_state"]
+    reports = {}
+    for seed in SEEDS:
+        path = baseline / f"lipo/pretrained_frozen/seed_{seed}/best.pt"
+        saved = torch.load(path, map_location="cpu", weights_only=False)["model_state"]
+        encoder_keys = {key[len("encoder."):]: value for key, value in saved.items()
+                        if key.startswith("encoder.")}
+        if set(encoder_keys) != set(pretrained):
+            raise ValueError(f"Frozen Base seed {seed} encoder keys differ from pretraining")
+        for key, expected in pretrained.items():
+            if not torch.equal(encoder_keys[key], expected):
+                raise ValueError(f"Frozen Base seed {seed} changed encoder tensor {key}")
+        reports[str(seed)] = legacy.file_identity(path)
+    return dict(all_five_match_pretrained_exactly=True, checkpoints=reports)
+
+
+def base_residual_statistics(legacy, args, baseline, source, splits, features, seeds):
+    report = {}
+    hbase = torch.stack(features["hbase"])
+    for seed in seeds:
+        path = baseline / f"lipo/pretrained_frozen/seed_{seed}/best.pt"
+        saved = torch.load(path, map_location="cpu", weights_only=False)
+        model = legacy.create_property_model(
+            "pretrained_frozen", source.targets.size(1), args.checkpoint,
+            torch.device("cpu"), args.dropout,
+        )
+        model.load_state_dict(saved["model_state"])
+        model.eval()
+        with torch.no_grad():
+            standardized = torch.cat([
+                model.head(hbase[start:start + 256])
+                for start in range(0, len(hbase), 256)
+            ])
+        scaler = saved["target_scaler"]
+        prediction = standardized * scaler["scale"] + scaler["center"]
+        by_split = {}
+        for split in ("train", "valid"):
+            indices = torch.tensor(splits[split], dtype=torch.long)
+            residual = source.targets[indices] - prediction[indices]
+            observed = residual[source.target_mask[indices]]
+            by_split[split] = dict(
+                n=observed.numel(), mean=float(observed.mean()),
+                std=float(observed.std(unbiased=False)),
+                mae=float(observed.abs().mean()),
+            )
+        report[str(seed)] = by_split
+    return report
 
 
 def summarize(output, baseline, seeds):
@@ -290,7 +416,10 @@ def summarize(output, baseline, seeds):
             ))
     lookup = {(row["mode"], row["seed"]): row["validation_rmse"] for row in rows}
     paired = []
-    for before, after in (("base", "full_l1"), ("base", "adaptive"), ("full_l1", "adaptive")):
+    for before, after in (
+        ("base", "base_corr"), ("base_corr", "full_l1"),
+        ("base_corr", "adaptive"), ("full_l1", "adaptive"),
+    ):
         deltas = [
             dict(seed=seed, delta_rmse=lookup[after, seed] - lookup[before, seed])
             for seed in seeds if (before, seed) in lookup and (after, seed) in lookup
@@ -317,7 +446,27 @@ def summarize(output, baseline, seeds):
 
 
 def preflight(legacy, args, data, spec, factory):
-    indices = list(range(min(args.batch_size, len(data))))
+    required = []
+    best_level = 1
+    for index in range(len(data)):
+        topology = data[index][3]
+        used = max(
+            (token.level
+             for component in topology.components
+             for query in range(component.levels[0].num_tokens)
+             for token in component.adaptive_context(query, topology.config.expansion_threshold)),
+            default=1,
+        )
+        if used > best_level:
+            required.append(index)
+            best_level = used
+        if best_level == 3:
+            break
+    if best_level < 2:
+        raise AssertionError("No real sample activates an L2/L3 adaptive context")
+    indices = required + [
+        index for index in range(len(data)) if index not in set(required)
+    ][:max(0, min(args.batch_size, len(data)) - len(required))]
     states, reports = {}, []
     for variant in VARIANTS:
         legacy.seed_everything(0, deterministic=True)
@@ -328,7 +477,9 @@ def preflight(legacy, args, data, spec, factory):
         if not reports:
             raw = legacy.collate_property_batch([data[index][:3] for index in indices]).graph.to(args.device)
             with torch.no_grad():
-                final = model.encoder.encode_nodes(raw.node_features, raw.bonds, raw.node_mask)
+                final, captured = encode_nodes_with_intermediates(
+                    model.encoder, raw.node_features, raw.bonds, raw.node_mask, layers=(2,),
+                )
                 weights = raw.node_mask.unsqueeze(-1).to(final.dtype)
                 summed = (final * weights).sum(1)
                 direct_hbase = torch.cat((summed, summed / weights.sum(1).clamp_min(1)), dim=1)
@@ -338,6 +489,12 @@ def preflight(legacy, args, data, spec, factory):
             # shape; this matches the established frozen-feature tolerance.
             torch.testing.assert_close(direct_hbase, batch.graph.hbase, atol=2e-5, rtol=2e-5)
             torch.testing.assert_close(direct_base, cached_base, atol=2e-5, rtol=2e-5)
+            for row, data_index in enumerate(indices):
+                atoms = data.features["h2"][data_index].size(0)
+                torch.testing.assert_close(
+                    captured[2][row, :atoms], batch.graph.h2[row, :atoms],
+                    atol=2e-5, rtol=2e-5,
+                )
         output = model(batch.graph)
         output.square().mean().backward()
         if not torch.isfinite(output).all():
@@ -349,20 +506,41 @@ def preflight(legacy, args, data, spec, factory):
         if not any(parameter.grad is not None for parameter in model.head.parameters()):
             raise AssertionError("Hierarchy branch received no gradients")
         state = {key: value.detach().cpu() for key, value in model.head.state_dict().items()}
-        if states:
-            for key, value in next(iter(states.values())).items():
-                torch.testing.assert_close(value, state[key], rtol=0, atol=0)
-        states[variant] = state
+        if variant in ("full_l1", "adaptive"):
+            if "full_l1" in states:
+                for key, value in states["full_l1"].items():
+                    torch.testing.assert_close(value, state[key], rtol=0, atol=0)
+            states[variant] = state
+        context_levels = (
+            batch.graph.plan.contexts.context_levels
+            if batch.graph.plan is not None else torch.empty(0, dtype=torch.long)
+        )
+        if variant == "adaptive":
+            if not bool((context_levels > 1).any()):
+                raise AssertionError("Adaptive preflight did not use an L2/L3 context")
+            used_levels = set(context_levels.tolist())
+            for level in sorted(used_levels & {2, 3}):
+                module_index = level - 2
+                modules = (
+                    model.head.gines[module_index],
+                    model.head.parent_mlps[module_index],
+                    model.head.level_projections[level - 1],
+                )
+                if not all(any(parameter.grad is not None and parameter.grad.abs().sum() > 0
+                               for parameter in module.parameters()) for module in modules):
+                    raise AssertionError(f"Adaptive L{level} modules received no gradient")
         reports.append(dict(
             variant=variant, prediction_shape=list(output.shape),
-            contexts=int(batch.graph.plan.contexts.context_indices.numel()),
-            only_l1=bool((batch.graph.plan.contexts.context_levels == 1).all()),
+            contexts=int(context_levels.numel()),
+            context_levels=sorted(set(context_levels.tolist())),
+            only_l1=bool((context_levels == 1).all()) if context_levels.numel() else None,
             trainable_parameters=sum(
                 parameter.numel() for parameter in model.parameters()
                 if parameter.requires_grad
             ),
         ))
-    if not reports[0]["only_l1"]:
+    full_report = next(row for row in reports if row["variant"] == "full_l1")
+    if not full_report["only_l1"]:
         raise AssertionError("Full-L1 preflight used a higher-level context")
     return dict(passed=True, variants=reports, base_frozen=True,
                 identical_hierarchy_initialization=True, test_metrics_used=False)
@@ -406,8 +584,13 @@ def main():
         return
 
     source, splits, spec, inputs = formal.check_inputs(legacy, args, protocol, baseline)
+    encoder_verification = verify_all_seed_encoders(legacy, args, baseline)
     features, feature_report = load_or_extract_features(
-        legacy, args, source, protocol["split_sha256"], output / "_feature_cache",
+        legacy, args, source, protocol["split_sha256"], protocol,
+        output / "_feature_cache",
+    )
+    residual_statistics = base_residual_statistics(
+        legacy, args, baseline, source, splits, features, options.seeds,
     )
     cache = HierarchyCache(output / "_hierarchy_cache", max_memory_entries=8192)
     data = HierarchyFeatureDataset(source, features, cache)
@@ -430,7 +613,16 @@ def main():
             input_dim=128, base_dim=256, hidden_dim=options.hidden_dim,
             output_dim=spec.num_tasks, dropout=args.dropout,
         )),
+        controls=dict(
+            base_corr="frozen Base prediction + trainable MLP(h_global), no hierarchy input",
+            full_l1="all L1 context; unused L2/L3 modules frozen",
+            adaptive="adaptive L1/L2/L3 context",
+        ),
         frozen_base_checkpoints=base_files,
+        encoder_verification=encoder_verification,
+        base_residual_statistics=residual_statistics,
+        frozen_protocol_loader=legacy.file_identity(formal.ROOT / "run_lipo_frozen.py"),
+        frozen_selection_file=selection,
         feature_cache={
             key: feature_report[key] for key in ("identity", "path", "file_sha256")
         },
@@ -443,6 +635,7 @@ def main():
         ),
         source_files={
             **formal.source_identity(legacy),
+            "run_lipo_frozen.py": legacy.file_identity(formal.ROOT / "run_lipo_frozen.py"),
             str(Path(__file__).relative_to(formal.ROOT)): legacy.file_identity(Path(__file__)),
         },
     )
