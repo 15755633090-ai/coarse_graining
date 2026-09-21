@@ -52,6 +52,12 @@ conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.
 # LocalBoundary-GINE 编码前纯拓扑 audit（不运行神经网络）
 conda run --no-capture-output -n polyolefin_ml python -u -m scripts.validation.audit_local_boundary
 
+# Packed LocalBoundary-GINE 训练前诊断（不启动正式训练）
+conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.run_local_boundary_lipo --action prepare --seeds 0 1 --batch-size 32 --micro-batch-size 32
+
+# Packed LocalBoundary-GINE 四组公平对照训练
+conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.run_local_boundary_lipo --action train --variants self_only local_only local_boundary full --seeds 0 1 --batch-size 32 --micro-batch-size 32
+
 # 验证集选择的四组对照：Base 直接复用，训练 Base+Corr / Full-L1 / Adaptive
 conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.run_hierarchy_lipo --action train --variants base_corr full_l1 adaptive --seeds 0 1 --batch-size 32 --micro-batch-size 32
 ```

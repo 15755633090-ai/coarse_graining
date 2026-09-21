@@ -26,6 +26,13 @@ from .local_boundary import (
     split_local_boundary_topology,
     temporal_reachability,
 )
+from .local_boundary_packed import PackedLocalBoundaryPlan, l1_edge_attributes, pack_local_boundary
+from .local_boundary_model import (
+    LOCAL_BOUNDARY_VARIANTS,
+    LocalBoundaryNetworkConfig,
+    LocalBoundaryOutput,
+    LocalBoundaryPredictor,
+)
 
 __all__ = [
     "CoarseningConfig", "NetworkConfig", "CoarseGraphPredictor", "GraphOutput",
@@ -42,4 +49,7 @@ __all__ = [
     "LocalBoundaryComponentPlan", "local_boundary_reachability",
     "split_local_boundary_component", "split_local_boundary_topology",
     "temporal_reachability",
+    "PackedLocalBoundaryPlan", "l1_edge_attributes", "pack_local_boundary",
+    "LOCAL_BOUNDARY_VARIANTS", "LocalBoundaryNetworkConfig",
+    "LocalBoundaryOutput", "LocalBoundaryPredictor",
 ]
