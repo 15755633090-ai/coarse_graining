@@ -19,6 +19,13 @@ from .hierarchy_cache import HierarchyCache
 from .hierarchy_packed import PackedHierarchyLevelPlan, PackedHierarchyPlan, pack_hierarchy
 from .hierarchy_model import HierarchicalPredictor, HierarchyNetworkConfig, HierarchyOutput
 from .batching import AtomCountBucketBatchSampler
+from .local_boundary import (
+    LocalBoundaryComponentPlan,
+    local_boundary_reachability,
+    split_local_boundary_component,
+    split_local_boundary_topology,
+    temporal_reachability,
+)
 
 __all__ = [
     "CoarseningConfig", "NetworkConfig", "CoarseGraphPredictor", "GraphOutput",
@@ -32,4 +39,7 @@ __all__ = [
     "PackedHierarchyLevelPlan", "PackedHierarchyPlan", "pack_hierarchy",
     "HierarchicalPredictor", "HierarchyNetworkConfig", "HierarchyOutput",
     "AtomCountBucketBatchSampler",
+    "LocalBoundaryComponentPlan", "local_boundary_reachability",
+    "split_local_boundary_component", "split_local_boundary_topology",
+    "temporal_reachability",
 ]

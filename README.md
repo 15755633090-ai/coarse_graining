@@ -49,6 +49,9 @@ conda run --no-capture-output -n polyolefin_ml python -m unittest discover -s te
 # 层级模型训练前诊断（不启动正式训练）
 conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.run_hierarchy_lipo --action prepare --seeds 0 1 --batch-size 32 --micro-batch-size 32
 
+# LocalBoundary-GINE 编码前纯拓扑 audit（不运行神经网络）
+conda run --no-capture-output -n polyolefin_ml python -u -m scripts.validation.audit_local_boundary
+
 # 验证集选择的四组对照：Base 直接复用，训练 Base+Corr / Full-L1 / Adaptive
 conda run --no-capture-output -n polyolefin_ml python -u -m scripts.experiments.run_hierarchy_lipo --action train --variants base_corr full_l1 adaptive --seeds 0 1 --batch-size 32 --micro-batch-size 32
 ```
