@@ -422,7 +422,7 @@ def train_property_model(
         base_partition_seed=partition_seed,
         epoch=0,
         training=False,
-        tokenization=model.config.tokenization,
+        tokenization=TokenizationConfig(),
         pin_memory=device_object.type == "cuda",
     )
     test_loader = _make_loader(
@@ -433,7 +433,7 @@ def train_property_model(
         base_partition_seed=partition_seed,
         epoch=0,
         training=False,
-        tokenization=model.config.tokenization,
+        tokenization=TokenizationConfig(),
         pin_memory=device_object.type == "cuda",
     )
 
