@@ -83,3 +83,10 @@ Train the frozen-encoder first version:
 ```powershell
 python scripts/train.py --dataset-root datasets/lipo --task lipo --output-dir runs/lipo/multiscale
 ```
+
+Training writes `history.json`, `history.csv`, `best.pt`, and `last.pt`. Resume
+an interrupted run with the same command plus `--resume`.
+
+The first Lipo seed-0 run is summarized in
+`results/lipo_seed0_v1/summary.json`, with its full per-epoch curve in the same
+directory.

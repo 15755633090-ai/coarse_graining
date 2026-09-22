@@ -1,0 +1,56 @@
+{
+  "experiment": "lipo_v1_seed0",
+  "git_commit": "3592416",
+  "dataset": "lipo",
+  "split": "scaffold",
+  "epochs": 30,
+  "best_epoch_zero_based": 24,
+  "best_epoch_one_based": 25,
+  "selection_metric": "valid_loss",
+  "validation": {
+    "loss": 0.5067416298957098,
+    "rmse": 0.8624441999546585,
+    "mae": 0.6651554703712463,
+    "r2": 0.4981573943852543
+  },
+  "test": {
+    "loss": 0.4991746280874525,
+    "rmse": 0.8559806720365337,
+    "mae": 0.6717200875282288,
+    "r2": 0.3930724975483937
+  },
+  "best_validation_scale_norms": {
+    "q": 6.204197883605957,
+    "h2": 2.460472822189331,
+    "h3": 1.8600987195968628,
+    "h4": 0.4377177059650421
+  },
+  "test_scale_norms": {
+    "q": 6.227715969085693,
+    "h2": 2.6843504905700684,
+    "h3": 1.7453398704528809,
+    "h4": 0.4632393717765808
+  },
+  "test_token_statistics": {
+    "mean_q_tokens": 11.719047546386719,
+    "mean_h2_tokens": 3.6666667461395264,
+    "mean_h3_tokens": 2.0642857551574707,
+    "mean_h4_tokens": 0.4095238149166107,
+    "mean_h2_residual_tokens": 0.9095237851142883,
+    "mean_h3_residual_tokens": 1.4357142448425293,
+    "mean_h4_residual_tokens": 0.39523810148239136,
+    "p_h2_present": 0.988095223903656,
+    "p_h3_present": 0.7404761910438538,
+    "p_h4_present": 0.20952381193637848
+  },
+  "frozen_diffusion_baseline_seed0": {
+    "test_rmse": 0.8796290159688077,
+    "test_mae": 0.6693529486656189,
+    "test_r2": 0.3590738285679729
+  },
+  "delta_vs_frozen_diffusion_baseline": {
+    "rmse": -0.023648343932274,
+    "mae": 0.0023671388626099,
+    "r2": 0.0339986689804208
+  }
+}
