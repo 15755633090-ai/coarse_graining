@@ -668,11 +668,11 @@ def _is_better_validation(
 ) -> tuple[bool, float]:
     if spec.task_type == "regression":
         value = candidate["loss"]
-        return value < best_value, value
+        return (True, value) if value < best_value else (False, best_value)
     value = candidate[spec.primary_metric]
     if not np.isfinite(value):
         return False, best_value
-    return value > best_value, value
+    return (True, value) if value > best_value else (False, best_value)
 
 
 def train_property_model(

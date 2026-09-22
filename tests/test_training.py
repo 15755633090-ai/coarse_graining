@@ -275,6 +275,26 @@ class TrainingTests(unittest.TestCase):
         )
         self.assertFalse(better)
         self.assertEqual(value, 0.6)
+        better, value = _is_better_validation(
+            {"average_precision": 0.5, "roc_auc": 0.9},
+            best_value=0.6,
+            spec=spec,
+        )
+        self.assertFalse(better)
+        self.assertEqual(value, 0.6)
+
+    def test_regression_checkpoint_keeps_global_best(self) -> None:
+        spec = TaskSpec("lipo", "regression", 1)
+        better, value = _is_better_validation(
+            {"loss": 0.4}, best_value=0.5, spec=spec,
+        )
+        self.assertTrue(better)
+        self.assertEqual(value, 0.4)
+        better, value = _is_better_validation(
+            {"loss": 0.45}, best_value=value, spec=spec,
+        )
+        self.assertFalse(better)
+        self.assertEqual(value, 0.4)
 
     def test_masked_loss_ignores_nan_targets(self) -> None:
         prediction = torch.tensor([[0.2, -0.4]], requires_grad=True)

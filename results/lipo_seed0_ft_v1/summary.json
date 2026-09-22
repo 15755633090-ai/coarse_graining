@@ -1,0 +1,59 @@
+{
+  "status": "invalidated_checkpoint_selection",
+  "dataset": "lipo",
+  "split": "scaffold",
+  "seed": 0,
+  "issue": {
+    "description": "Validation candidates were compared with the preceding epoch rather than the global best.",
+    "effect": "best.pt contains the last local-decrease state while best_epoch is computed from the global history minimum.",
+    "recoverable": false,
+    "required_action": "Rerun both arms from the original encoder checkpoint in new output directories."
+  },
+  "arms": {
+    "baseline_finetune": {
+      "epochs_completed": 100,
+      "global_best_validation": {
+        "epoch_one_based": 85,
+        "standardized_mse": 0.35052236148289273,
+        "rmse": 0.7172913054429237,
+        "mae": 0.53715980052948,
+        "r2": 0.652866407220057
+      },
+      "saved_checkpoint": {
+        "actual_epoch_one_based": 97,
+        "validation_rmse": 0.7306379642429558,
+        "test_rmse": 0.7591885137572413,
+        "test_mae": 0.5725482702255249,
+        "test_r2": 0.5225717210333527
+      }
+    },
+    "multiscale_finetune": {
+      "epochs_completed": 100,
+      "global_best_validation": {
+        "epoch_one_based": 58,
+        "standardized_mse": 0.469312242099217,
+        "rmse": 0.8299819352010996,
+        "mae": 0.6249716877937317,
+        "r2": 0.5352249659383179
+      },
+      "saved_checkpoint": {
+        "actual_epoch_one_based": 97,
+        "validation_rmse": 0.8399977431948181,
+        "test_rmse": 0.8022814584414624,
+        "test_mae": 0.624394416809082,
+        "test_r2": 0.466834053412125
+      },
+      "provenance": {
+        "git_commit": "4533a04bb0a2d4459ebd71fae605a1076ec94443",
+        "encoder_sha256": "7f66ef1846be389e22e71b1ebfbd8fe4fc184d34007457a0c1d01864d695785b",
+        "dataset_sha256": "7da33a646ddd5294517b6b77f606c5e0d6cd496840495694e083130504ef2a12"
+      }
+    }
+  },
+  "diagnostic_comparison": {
+    "validation_rmse_baseline_minus_multiscale": -0.1126906297581759,
+    "validation_multiscale_relative_worse_percent": 15.71058075053482,
+    "saved_checkpoint_test_rmse_baseline_minus_multiscale": -0.04309294468422109,
+    "saved_checkpoint_test_multiscale_relative_worse_percent": 5.676185019047921
+  }
+}
