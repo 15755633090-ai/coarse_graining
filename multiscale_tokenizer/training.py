@@ -3,8 +3,11 @@ from __future__ import annotations
 
 import copy
 import csv
+import hashlib
 import json
 import random
+import subprocess
+import warnings
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Sequence
@@ -21,7 +24,7 @@ from diffusion_encoder.data import (
     PropertyRecord,
     collate_property_records,
 )
-from diffusion_encoder.encoder import load_encoder
+from diffusion_encoder.encoder import DEFAULT_CHECKPOINT, load_encoder
 
 from .model import (
     EXPERIMENT_MODES,
@@ -104,6 +107,137 @@ def seed_everything(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _git_identity() -> dict[str, object]:
+    root = Path(__file__).resolve().parents[1]
+    try:
+        commit = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        dirty = bool(subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip())
+    except (OSError, subprocess.CalledProcessError):
+        return {"commit_sha": None, "dirty": None}
+    return {"commit_sha": commit, "dirty": dirty}
+
+
+def _dataset_identity(dataset_root: str | Path) -> dict[str, object]:
+    root = Path(dataset_root)
+    files = []
+    for path in root.rglob("*"):
+        if not path.is_file():
+            continue
+        parts = path.relative_to(root).parts
+        if len(parts) == 1 or parts[0] in {"raw", "split", "mapping"}:
+            files.append(path)
+    manifest = {
+        path.relative_to(root).as_posix(): {
+            "size": path.stat().st_size,
+            "sha256": _file_sha256(path),
+        }
+        for path in sorted(files)
+    }
+    combined = hashlib.sha256()
+    for name, identity in manifest.items():
+        combined.update(name.encode("utf-8"))
+        combined.update(b"\0")
+        combined.update(str(identity["size"]).encode("ascii"))
+        combined.update(b"\0")
+        combined.update(str(identity["sha256"]).encode("ascii"))
+        combined.update(b"\n")
+    return {
+        "dataset_name": root.name,
+        "combined_sha256": combined.hexdigest(),
+        "files": manifest,
+    }
+
+
+def _experiment_provenance(dataset_root: str | Path) -> dict[str, object]:
+    checkpoint = Path(DEFAULT_CHECKPOINT)
+    return {
+        "git": _git_identity(),
+        "encoder_checkpoint": {
+            "name": checkpoint.name,
+            "size": checkpoint.stat().st_size,
+            "sha256": _file_sha256(checkpoint),
+        },
+        "dataset": _dataset_identity(dataset_root),
+    }
+
+
+def _validate_resume_protocol(
+    checkpoint: dict[str, object],
+    *,
+    task_spec: dict[str, object],
+    experiment_mode: str,
+    seeds: dict[str, int],
+    training_protocol: dict[str, object],
+    provenance: dict[str, object],
+) -> None:
+    schema = checkpoint.get("schema_version")
+    if schema not in {2, 3}:
+        raise ValueError("resume requires checkpoint schema 2 or 3")
+    expected_top_level = {
+        "task_spec": task_spec,
+        "experiment_mode": experiment_mode,
+        **seeds,
+    }
+    mismatches = {
+        name: {"checkpoint": checkpoint.get(name), "current": expected}
+        for name, expected in expected_top_level.items()
+        if checkpoint.get(name) != expected
+    }
+    saved_protocol = checkpoint.get("training_protocol", {})
+    if schema == 3:
+        if saved_protocol != training_protocol:
+            mismatches["training_protocol"] = {
+                "checkpoint": saved_protocol,
+                "current": training_protocol,
+            }
+        if checkpoint.get("provenance") != provenance:
+            mismatches["provenance"] = {
+                "checkpoint": checkpoint.get("provenance"),
+                "current": provenance,
+            }
+    else:
+        # Schema 2 is retained only so the already-running development seed 0
+        # can finish. Validate every field it recorded, then upgrade on save.
+        protocol_overlap = {
+            key: training_protocol.get(key) for key in saved_protocol
+        }
+        if saved_protocol != protocol_overlap:
+            mismatches["training_protocol"] = {
+                "checkpoint": saved_protocol,
+                "current_overlap": protocol_overlap,
+            }
+        warnings.warn(
+            "resuming legacy schema-2 checkpoint without complete provenance; "
+            "the next save upgrades it to schema 3",
+            RuntimeWarning,
+        )
+    if mismatches:
+        raise ValueError(
+            "resume checkpoint does not match the current experiment:\n"
+            + json.dumps(mismatches, indent=2, default=str)
+        )
 
 
 def _rng_state(generator: torch.Generator) -> dict[str, object]:
@@ -576,6 +710,8 @@ def train_property_model(
         raise ValueError("scheduler_patience must be nonnegative")
     if not 0.0 < scheduler_factor < 1.0:
         raise ValueError("scheduler_factor must be in (0, 1)")
+    if epochs < 1:
+        raise ValueError("epochs must be positive")
     if learning_rate is not None:
         downstream_learning_rate = learning_rate
     spec = TASK_SPECS[task]
@@ -584,6 +720,23 @@ def train_property_model(
     device_object = torch.device(device)
     if device_object.type == "cuda" and not torch.cuda.is_available():
         device_object = torch.device("cpu")
+
+    training_protocol: dict[str, object] = {
+        "optimizer": "AdamW",
+        "batch_size": batch_size,
+        "max_epochs": epochs,
+        "encoder_learning_rate": encoder_learning_rate,
+        "downstream_learning_rate": downstream_learning_rate,
+        "weight_decay": weight_decay,
+        "scheduler": "ReduceLROnPlateau",
+        "scheduler_patience": scheduler_patience,
+        "scheduler_factor": scheduler_factor,
+        "early_stopping_patience": patience,
+        "dropout": dropout,
+        "num_workers": num_workers,
+        "device_type": device_object.type,
+    }
+    provenance = _experiment_provenance(dataset_root)
 
     train_dataset = OGBMoleculePropertyDataset(dataset_root, split="train")
     valid_dataset = OGBMoleculePropertyDataset(dataset_root, split="valid")
@@ -667,17 +820,26 @@ def train_property_model(
         resume_checkpoint = torch.load(
             last_path, map_location="cpu", weights_only=False,
         )
-        if resume_checkpoint.get("schema_version") != 2:
-            raise ValueError("fine-tuning resume requires checkpoint schema 2")
-        if resume_checkpoint.get("experiment_mode") != experiment_mode:
-            raise ValueError("resume checkpoint experiment mode does not match")
-        for name, expected in (
-            ("model_seed", model_seed),
-            ("partition_seed", partition_seed),
-            ("data_seed", data_seed),
-        ):
-            if resume_checkpoint.get(name) != expected:
-                raise ValueError(f"resume checkpoint {name} does not match")
+        _validate_resume_protocol(
+            resume_checkpoint,
+            task_spec=asdict(spec),
+            experiment_mode=experiment_mode,
+            seeds={
+                "model_seed": model_seed,
+                "partition_seed": partition_seed,
+                "data_seed": data_seed,
+            },
+            training_protocol=training_protocol,
+            provenance=provenance,
+        )
+        best_path = output / "best.pt"
+        if best_path.is_file():
+            completed = torch.load(
+                best_path, map_location="cpu", weights_only=False,
+            )
+            if "test_metrics" in completed:
+                print("training already complete; returning saved result", flush=True)
+                return completed
         model.load_state_dict(resume_checkpoint["last_model_state"], strict=True)
         optimizer.load_state_dict(resume_checkpoint["optimizer_state"])
         scheduler.load_state_dict(resume_checkpoint["scheduler_state"])
@@ -690,6 +852,49 @@ def train_property_model(
         )
         _restore_rng_state(resume_checkpoint["rng_state"], generator)
         print(f"resumed from epoch {start_epoch}", flush=True)
+
+        if start_epoch >= epochs:
+            print("training epochs already complete; finalizing best model", flush=True)
+
+    def checkpoint_payload(current_epoch: int) -> dict[str, object]:
+        selection_metric = (
+            "valid_loss" if spec.task_type == "regression"
+            else f"valid_{spec.primary_metric}"
+        )
+        return {
+            "schema_version": 3,
+            "task_spec": asdict(spec),
+            "model_config": asdict(model.config),
+            "experiment_mode": experiment_mode,
+            "target_scaler": None if scaler is None else {
+                "mean": scaler.mean,
+                "std": scaler.std,
+            },
+            "model_seed": model_seed,
+            "partition_seed": partition_seed,
+            "data_seed": data_seed,
+            "history": history,
+            "selection_metric": selection_metric,
+            "best_selection": best_validation,
+            "best_model_state": best_state,
+            "primary_test_metric": spec.primary_metric,
+            "best_epoch": int(min(
+                history,
+                key=lambda row: row["valid_loss"],
+            )["epoch"]) if spec.task_type == "regression" else int(max(
+                history,
+                key=lambda row: row[f"valid_{spec.primary_metric}"],
+            )["epoch"]),
+            "epochs_without_improvement": epochs_without_improvement,
+            "current_epoch": current_epoch,
+            "encoder_lr": _learning_rates(optimizer)["encoder_lr"],
+            "downstream_lr": _learning_rates(optimizer)["downstream_lr"],
+            "optimizer_state": optimizer.state_dict(),
+            "scheduler_state": scheduler.state_dict(),
+            "rng_state": _rng_state(generator),
+            "training_protocol": training_protocol,
+            "provenance": provenance,
+        }
 
     for epoch in range(start_epoch, epochs):
         _set_loader_epoch(train_loader, epoch)
@@ -749,54 +954,7 @@ def train_property_model(
             else valid_metrics[spec.primary_metric]
         )
         scheduler.step(scheduler_value)
-        selection_metric = (
-            "valid_loss" if spec.task_type == "regression"
-            else f"valid_{spec.primary_metric}"
-        )
-        checkpoint_common = {
-            "schema_version": 2,
-            "task_spec": asdict(spec),
-            "model_config": asdict(model.config),
-            "experiment_mode": experiment_mode,
-            "target_scaler": None if scaler is None else {
-                "mean": scaler.mean,
-                "std": scaler.std,
-            },
-            "model_seed": model_seed,
-            "partition_seed": partition_seed,
-            "data_seed": data_seed,
-            "history": history,
-            "selection_metric": selection_metric,
-            "best_selection": best_validation,
-            "best_model_state": best_state,
-            "primary_test_metric": spec.primary_metric,
-            "best_epoch": int(min(
-                history,
-                key=lambda row: row["valid_loss"],
-            )["epoch"]) if spec.task_type == "regression" else int(max(
-                history,
-                key=lambda row: row[f"valid_{spec.primary_metric}"],
-            )["epoch"]),
-            "epochs_without_improvement": epochs_without_improvement,
-            "current_epoch": epoch,
-            "encoder_lr": _learning_rates(optimizer)["encoder_lr"],
-            "downstream_lr": _learning_rates(optimizer)["downstream_lr"],
-            "optimizer_state": optimizer.state_dict(),
-            "scheduler_state": scheduler.state_dict(),
-            "rng_state": _rng_state(generator),
-            "training_protocol": {
-                "optimizer": "AdamW",
-                "batch_size": batch_size,
-                "max_epochs": epochs,
-                "encoder_learning_rate": encoder_learning_rate,
-                "downstream_learning_rate": downstream_learning_rate,
-                "weight_decay": weight_decay,
-                "scheduler": "ReduceLROnPlateau",
-                "scheduler_patience": scheduler_patience,
-                "scheduler_factor": scheduler_factor,
-                "early_stopping_patience": patience,
-            },
-        }
+        checkpoint_common = checkpoint_payload(epoch)
         torch.save(
             {**checkpoint_common, "model_state": best_state},
             output / "best.pt",
@@ -809,17 +967,27 @@ def train_property_model(
             },
             output / "last.pt",
         )
-        selection_value = (
-            valid_metrics["loss"] if spec.task_type == "regression"
-            else valid_metrics[spec.primary_metric]
-        )
-        print(
-            f"epoch {epoch + 1}/{epochs} "
-            f"train_loss={train_metrics['loss']:.6f} "
-            f"valid_loss={valid_metrics['loss']:.6f} "
-            f"{selection_metric}={selection_value:.6f}",
-            flush=True,
-        )
+        fields = [
+            f"epoch {epoch + 1}/{epochs}",
+            f"train_loss={train_metrics['loss']:.6f}",
+            f"valid_loss={valid_metrics['loss']:.6f}",
+        ]
+        if spec.task_type == "regression":
+            fields.extend([
+                f"valid_rmse={valid_metrics['rmse']:.6f}",
+                f"valid_mae={valid_metrics['mae']:.6f}",
+                f"valid_r2={valid_metrics['r2']:.6f}",
+            ])
+        else:
+            fields.extend([
+                f"valid_roc_auc={valid_metrics['roc_auc']:.6f}",
+                f"valid_average_precision={valid_metrics['average_precision']:.6f}",
+            ])
+        fields.extend([
+            f"encoder_lr={epoch_lrs['encoder_lr']:.3g}",
+            f"downstream_lr={epoch_lrs['downstream_lr']:.3g}",
+        ])
+        print(" ".join(fields), flush=True)
         if patience and epochs_without_improvement >= patience:
             print(
                 f"early stopping after {patience} epochs without improvement",
@@ -827,6 +995,7 @@ def train_property_model(
             )
             break
 
+    checkpoint_common = checkpoint_payload(int(history[-1]["epoch"]))
     model.load_state_dict(best_state)
     test_metrics = _run_epoch(
         model,
@@ -909,7 +1078,7 @@ def load_property_model(
     """Reload the frozen encoder plus a trained tokenization head."""
 
     checkpoint = torch.load(Path(checkpoint_path), map_location="cpu", weights_only=False)
-    if checkpoint.get("schema_version") not in {1, 2}:
+    if checkpoint.get("schema_version") not in {1, 2, 3}:
         raise ValueError("unsupported multiscale checkpoint schema")
     config_payload = dict(checkpoint["model_config"])
     config_payload["tokenization"] = TokenizationConfig(

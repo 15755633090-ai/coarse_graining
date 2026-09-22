@@ -8,6 +8,7 @@ from unittest.mock import patch
 import torch
 from torch import Tensor
 from torch.utils.data import Dataset
+import multiscale_tokenizer.training as training_module
 
 from diffusion_encoder.data import (
     MoleculeBatch,
@@ -33,6 +34,7 @@ from multiscale_tokenizer.training import (
     _prepare_loader_iteration,
     _run_epoch,
     _set_loader_epoch,
+    _validate_resume_protocol,
     build_optimizer,
     train_property_model,
 )
@@ -68,6 +70,39 @@ class _PersistentLoaderDataset(Dataset):
 
     def __getitem__(self, _index):
         return self.record
+
+
+class _TinyPropertyDataset(Dataset):
+    """Small property dataset that is picklable by persistent workers."""
+
+    def __init__(self, _root: str | Path, split: str):
+        sizes = {"train": 4, "valid": 2, "test": 2}
+        offset = {"train": 0, "valid": 10, "test": 20}[split]
+        self.records = []
+        labels = []
+        for index in range(sizes[split]):
+            features = torch.zeros((3, 5), dtype=torch.long)
+            features[:, 0] = torch.tensor([6, 7, 8])
+            features[:, 1] = 5
+            bonds = torch.tensor([
+                [0, 1, 0], [1, 0, 1], [0, 1, 0],
+            ])
+            target = torch.tensor([float(index + offset) / 10.0])
+            labels.append(target)
+            self.records.append(PropertyRecord(
+                MoleculeGraph(features, bonds, "CCO"),
+                target,
+                torch.tensor([True]),
+                index + offset,
+                split,
+            ))
+        self.labels = torch.stack(labels)
+
+    def __len__(self):
+        return len(self.records)
+
+    def __getitem__(self, index):
+        return self.records[index]
 
 
 class TrainingTests(unittest.TestCase):
@@ -318,40 +353,36 @@ class TrainingTests(unittest.TestCase):
             {id(parameter) for parameter in model.parameters() if parameter.requires_grad},
         )
 
-    def test_resume_restores_optimizer_scheduler_and_rng_trajectory(self) -> None:
-        class TinyDataset:
-            def __init__(self, _root: str | Path, split: str):
-                sizes = {"train": 4, "valid": 2, "test": 2}
-                offset = {"train": 0, "valid": 10, "test": 20}[split]
-                self.records = []
-                labels = []
-                for index in range(sizes[split]):
-                    features = torch.zeros((3, 5), dtype=torch.long)
-                    features[:, 0] = torch.tensor([6, 7, 8])
-                    features[:, 1] = 5
-                    bonds = torch.tensor([
-                        [0, 1, 0], [1, 0, 1], [0, 1, 0],
-                    ])
-                    target = torch.tensor([float(index + offset) / 10.0])
-                    labels.append(target)
-                    self.records.append(PropertyRecord(
-                        MoleculeGraph(features, bonds, "CCO"),
-                        target,
-                        torch.tensor([True]),
-                        index + offset,
-                        split,
-                    ))
-                self.labels = torch.stack(labels)
+    def test_schema3_resume_rejects_protocol_mismatch(self) -> None:
+        protocol = {"batch_size": 32, "dropout": 0.1}
+        checkpoint = {
+            "schema_version": 3,
+            "task_spec": {"name": "lipo"},
+            "experiment_mode": "multiscale_finetune",
+            "model_seed": 0,
+            "partition_seed": 100000,
+            "data_seed": 0,
+            "training_protocol": protocol,
+            "provenance": {"encoder": "abc"},
+        }
+        with self.assertRaisesRegex(ValueError, "training_protocol"):
+            _validate_resume_protocol(
+                checkpoint,
+                task_spec={"name": "lipo"},
+                experiment_mode="multiscale_finetune",
+                seeds={
+                    "model_seed": 0,
+                    "partition_seed": 100000,
+                    "data_seed": 0,
+                },
+                training_protocol={"batch_size": 16, "dropout": 0.1},
+                provenance={"encoder": "abc"},
+            )
 
-            def __len__(self):
-                return len(self.records)
-
-            def __getitem__(self, index):
-                return self.records[index]
-
+    def _assert_resume_trajectory(self, num_workers: int) -> None:
         with TemporaryDirectory() as temporary, patch(
             "multiscale_tokenizer.training.OGBMoleculePropertyDataset",
-            TinyDataset,
+            _TinyPropertyDataset,
         ):
             root = Path(temporary)
             common = dict(
@@ -359,7 +390,7 @@ class TrainingTests(unittest.TestCase):
                 task="lipo",
                 device="cpu",
                 batch_size=2,
-                num_workers=0,
+                num_workers=num_workers,
                 experiment_mode="baseline_finetune",
                 model_seed=17,
                 data_seed=23,
@@ -370,9 +401,23 @@ class TrainingTests(unittest.TestCase):
             uninterrupted = train_property_model(
                 **common, output_dir=root / "full", epochs=2,
             )
-            train_property_model(
-                **common, output_dir=root / "resumed", epochs=1,
-            )
+            original_run_epoch = training_module._run_epoch
+            calls = 0
+
+            def interrupt_before_second_epoch(*args, **kwargs):
+                nonlocal calls
+                calls += 1
+                if calls == 3:
+                    raise RuntimeError("simulated interruption")
+                return original_run_epoch(*args, **kwargs)
+
+            with patch(
+                "multiscale_tokenizer.training._run_epoch",
+                side_effect=interrupt_before_second_epoch,
+            ), self.assertRaisesRegex(RuntimeError, "simulated interruption"):
+                train_property_model(
+                    **common, output_dir=root / "resumed", epochs=2,
+                )
             resumed = train_property_model(
                 **common, output_dir=root / "resumed", epochs=2, resume=True,
             )
@@ -381,14 +426,35 @@ class TrainingTests(unittest.TestCase):
                 "best_selection", "best_model_state",
                 "epochs_without_improvement", "encoder_lr", "downstream_lr",
                 "model_seed", "data_seed", "partition_seed", "experiment_mode",
+                "training_protocol", "provenance",
             }
             self.assertTrue(required <= resumed.keys())
             self.assertEqual(resumed["current_epoch"], 1)
+            self.assertEqual(
+                len(resumed["provenance"]["encoder_checkpoint"]["sha256"]),
+                64,
+            )
+            self.assertIn("commit_sha", resumed["provenance"]["git"])
+            self.assertEqual(
+                len(resumed["provenance"]["dataset"]["combined_sha256"]),
+                64,
+            )
             for name, expected in uninterrupted["model_state"].items():
                 torch.testing.assert_close(
                     resumed["model_state"][name], expected, rtol=0, atol=0,
                 )
             self.assertEqual(resumed["history"], uninterrupted["history"])
+            completed = train_property_model(
+                **common, output_dir=root / "resumed", epochs=2, resume=True,
+            )
+            self.assertEqual(completed["history"], resumed["history"])
+            self.assertEqual(completed["test_metrics"], resumed["test_metrics"])
+
+    def test_resume_restores_optimizer_scheduler_and_rng_trajectory(self) -> None:
+        self._assert_resume_trajectory(num_workers=0)
+
+    def test_persistent_workers_resume_matches_uninterrupted_training(self) -> None:
+        self._assert_resume_trajectory(num_workers=1)
 
 
 if __name__ == "__main__":

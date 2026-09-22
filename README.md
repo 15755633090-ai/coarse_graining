@@ -103,6 +103,14 @@ Training writes `history.json`, `history.csv`, `best.pt`, and `last.pt`. Resume
 an interrupted run with the same command plus `--resume`. `--patience`
 controls early stopping on the validation selection metric.
 
+Schema-3 checkpoints record and strictly validate the complete training
+protocol (including batch size, both initial learning rates, dropout, weight
+decay, scheduler, early stopping, worker count, and maximum epochs). They also
+store the Git commit/dirty state, SHA256 of `encoder.pt`, and a SHA256 manifest
+of the dataset source and scaffold-split files. A mismatched `--resume` is
+rejected before any training step. Legacy schema-2 checkpoints remain readable
+only so the existing development seed-0 run can be completed and upgraded.
+
 DataLoader workers are persistent across epochs. A shared epoch value redraws
 training partitions without restarting Windows worker processes, while
 validation/test remain fixed at epoch 0. The loader explicitly preserves the
