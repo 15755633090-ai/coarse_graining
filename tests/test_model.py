@@ -48,6 +48,17 @@ def path_molecule(
 
 
 class ModelTests(unittest.TestCase):
+    @staticmethod
+    def _model(mode: str, *, seed: int = 0) -> MultiscaleMolecularModel:
+        torch.manual_seed(seed)
+        encoder = DiffusionEncoder(ModelConfig(hidden_dim=16, dropout=0.0))
+        return MultiscaleMolecularModel(
+            encoder,
+            config=MultiscaleModelConfig(
+                hidden_dim=16, dropout=0.0, experiment_mode=mode,
+            ),
+        )
+
     def test_forward_and_head_gradients_with_frozen_encoder(self) -> None:
         encoder = DiffusionEncoder(ModelConfig(hidden_dim=16, dropout=0.0))
         model = MultiscaleMolecularModel(
@@ -75,6 +86,36 @@ class ModelTests(unittest.TestCase):
         model.train()
         self.assertTrue(model.training)
         self.assertFalse(model.encoder.training)
+
+    def test_finetune_mode_trains_encoder_and_propagates_gradients(self) -> None:
+        model = self._model("multiscale_finetune")
+        model.train()
+        self.assertTrue(model.encoder.training)
+        features, bonds, mask = line_batch(2, 14)
+        model(features, bonds, mask, partition_seeds=[1, 2]).prediction.sum().backward()
+        gradient = model.encoder.layers[0].message[0].weight.grad
+        self.assertIsNotNone(gradient)
+        self.assertGreater(float(gradient.abs().sum()), 0.0)
+
+    def test_baseline_uses_historical_final_layer_sum_mean(self) -> None:
+        model = self._model("baseline_frozen").eval()
+        features, bonds, mask = path_molecule(8, 12, seed=10)
+        with torch.no_grad():
+            final = model.encoder(features, bonds, mask)[-1][:, :8]
+            expected = torch.cat((final.sum(dim=1), final.mean(dim=1)), dim=-1)
+            actual = model(features, bonds, mask).graph_representation
+        torch.testing.assert_close(actual, expected, rtol=0, atol=1e-6)
+        self.assertEqual(model.prediction_head[0].in_features, 32)
+        self.assertIsInstance(model.prediction_head[1], nn.SiLU)
+
+    def test_seeded_modes_have_identical_encoder_initialization(self) -> None:
+        baseline = self._model("baseline_finetune", seed=31)
+        multiscale = self._model("multiscale_finetune", seed=31)
+        for left, right in zip(
+            baseline.encoder.parameters(), multiscale.encoder.parameters(),
+        ):
+            torch.testing.assert_close(left, right, rtol=0, atol=0)
+        self.assertEqual(len(baseline.region_encoders), 0)
 
     def test_batch_padding_does_not_change_molecule_prediction(self) -> None:
         encoder = DiffusionEncoder(ModelConfig(hidden_dim=16, dropout=0.0))

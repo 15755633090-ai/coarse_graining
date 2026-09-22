@@ -1,6 +1,7 @@
-"""Frozen diffusion encoder plus the four-scale token readout."""
+"""Matched baseline/multiscale models with frozen or trainable encoders."""
 from __future__ import annotations
 
+from contextlib import nullcontext
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence
@@ -19,6 +20,14 @@ from .partition import (
 )
 
 
+EXPERIMENT_MODES = (
+    "baseline_frozen",
+    "multiscale_frozen",
+    "baseline_finetune",
+    "multiscale_finetune",
+)
+
+
 @dataclass(frozen=True)
 class MultiscaleModelConfig:
     hidden_dim: int = 128
@@ -26,6 +35,7 @@ class MultiscaleModelConfig:
     output_dim: int = 1
     default_partition_seed: int = 0
     tokenization: TokenizationConfig = TokenizationConfig()
+    experiment_mode: str = "multiscale_frozen"
 
     def __post_init__(self) -> None:
         if self.hidden_dim < 1 or self.output_dim < 1:
@@ -34,6 +44,18 @@ class MultiscaleModelConfig:
             raise ValueError("dropout must be in [0, 1)")
         if self.default_partition_seed < 0:
             raise ValueError("default_partition_seed must be nonnegative")
+        if self.experiment_mode not in EXPERIMENT_MODES:
+            raise ValueError(
+                f"experiment_mode must be one of {EXPERIMENT_MODES}"
+            )
+
+    @property
+    def uses_multiscale(self) -> bool:
+        return self.experiment_mode.startswith("multiscale_")
+
+    @property
+    def finetunes_encoder(self) -> bool:
+        return self.experiment_mode.endswith("_finetune")
 
 
 @dataclass
@@ -55,7 +77,11 @@ def _region_mlp(hidden_dim: int, dropout: float) -> nn.Sequential:
 
 
 class MultiscaleMolecularModel(nn.Module):
-    """First-version main model; the diffusion encoder remains frozen."""
+    """Unified four-arm property model.
+
+    Multiscale modes preserve the existing near-fine/far-coarse architecture.
+    Baseline modes preserve the historical diffusion Sum/Mean readout.
+    """
 
     def __init__(
         self,
@@ -67,24 +93,42 @@ class MultiscaleMolecularModel(nn.Module):
     ):
         super().__init__()
         self.encoder = encoder or load_frozen_encoder(checkpoint, device=device)
-        self.encoder.requires_grad_(False).eval()
         hidden_dim = self.encoder.config.hidden_dim
         self.config = config or MultiscaleModelConfig(hidden_dim=hidden_dim)
         if self.config.hidden_dim != hidden_dim:
-            raise ValueError("config.hidden_dim must match the frozen encoder")
-        self.region_encoders = nn.ModuleList([
-            _region_mlp(hidden_dim, self.config.dropout) for _ in range(3)
-        ])
-        self.prediction_head = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim),
-            nn.GELU(),
-            nn.Dropout(self.config.dropout),
-            nn.Linear(hidden_dim, self.config.output_dim),
-        )
+            raise ValueError("config.hidden_dim must match the encoder")
+        if self.config.uses_multiscale:
+            # This is intentionally the legacy construction order so existing
+            # frozen multiscale initialization and checkpoints remain unchanged.
+            self.region_encoders = nn.ModuleList([
+                _region_mlp(hidden_dim, self.config.dropout) for _ in range(3)
+            ])
+            self.prediction_head = nn.Sequential(
+                nn.Linear(hidden_dim, hidden_dim),
+                nn.GELU(),
+                nn.Dropout(self.config.dropout),
+                nn.Linear(hidden_dim, self.config.output_dim),
+            )
+        else:
+            self.region_encoders = nn.ModuleList()
+            self.prediction_head = nn.Sequential(
+                nn.Linear(hidden_dim * 2, hidden_dim),
+                nn.SiLU(),
+                nn.Dropout(self.config.dropout),
+                nn.Linear(hidden_dim, self.config.output_dim),
+            )
+        self.set_encoder_frozen(not self.config.finetunes_encoder)
+
+    def set_encoder_frozen(self, frozen: bool) -> None:
+        """Apply the configured encoder policy without touching its weights."""
+
+        self.encoder.requires_grad_(not frozen)
+        self.encoder.train(self.training and not frozen)
 
     def train(self, mode: bool = True) -> "MultiscaleMolecularModel":
         super().train(mode)
-        self.encoder.eval()
+        if not self.config.finetunes_encoder:
+            self.encoder.eval()
         return self
 
     def _partition_seeds(
@@ -119,10 +163,29 @@ class MultiscaleMolecularModel(nn.Module):
         partition_seeds: int | Sequence[int] | Tensor | None = None,
         partitions: Sequence[TokenPartition] | None = None,
     ) -> TokenModelOutput:
-        with torch.no_grad():
+        context = nullcontext() if self.config.finetunes_encoder else torch.no_grad()
+        with context:
             h1, h2, h3, h4 = self.encoder(node_features, bonds, node_mask)
         hidden_states = (h1, h2, h3, h4)
         batch_size = node_features.size(0)
+        if not self.config.uses_multiscale:
+            weights = node_mask.to(h4.dtype).unsqueeze(-1)
+            summed = (h4 * weights).sum(dim=1)
+            averaged = summed / weights.sum(dim=1).clamp_min(1.0)
+            graph_representation = torch.cat((summed, averaged), dim=-1)
+            level_norms = torch.zeros((batch_size, 4), device=h4.device)
+            level_norms[:, 3] = averaged.norm(dim=-1)
+            token_counts = torch.zeros(
+                (batch_size, 4), dtype=torch.long, device=h4.device,
+            )
+            token_counts[:, 3] = node_mask.sum(dim=1)
+            return TokenModelOutput(
+                prediction=self.prediction_head(graph_representation),
+                graph_representation=graph_representation,
+                level_norms=level_norms,
+                token_counts=token_counts,
+                residual_counts=torch.zeros_like(token_counts),
+            )
         if partitions is not None and len(partitions) != batch_size:
             raise ValueError("one partition is required per graph")
         seeds = (

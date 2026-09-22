@@ -1,11 +1,14 @@
 # coarse_graining1
 
-Clean, dataset-independent starting point for studying global structural modules on top of a frozen molecular diffusion encoder.
+Dataset-independent implementation for studying global structural modules on
+top of a pretrained molecular diffusion encoder, with frozen and supervised
+fine-tuning modes.
 
 ## Locked starting point
 
 - `diffusion_encoder/encoder.pt` contains only the original, property-agnostic four-layer diffusion backbone.
-- The encoder is always loaded frozen and one forward returns `h1`, `h2`, `h3`, and `h4`.
+- The untouched pretrained encoder returns `h1`, `h2`, `h3`, and `h4`; the
+  experiment mode determines whether property gradients update it.
 - No property head, property-finetuned checkpoint, coarse-graining method, hierarchy, LocalBoundary module, correction head, result, or training checkpoint is inherited.
 - `datasets/` contains the original OGB molecular-property source files and published scaffold splits. Derived `processed/` caches are deliberately excluded.
 
@@ -18,7 +21,7 @@ SHA256 1358eb1baba19ccbb4463e46907e86e28085cf5b14cd39ccaef99a4fc6f6f1a9
 
 ## Datasets
 
-`bace`, `bbbp`, `clintox`, `esol`, `freesolv`, `hiv`, `lipo`, `muv`, `pcba`, `sider`, `tox21`, and `toxcast` are included. The same frozen encoder and dataset interface apply to every task.
+`bace`, `bbbp`, `clintox`, `esol`, `freesolv`, `hiv`, `lipo`, `muv`, `pcba`, `sider`, `tox21`, and `toxcast` are included. The same pretrained encoder and dataset interface apply to every task.
 
 Run the project in the existing `polyolefin_ml` environment. Dependencies are
 listed in `requirements.txt`; partition canonicalization uses `python-igraph`.
@@ -52,7 +55,7 @@ The first-version method is implemented in `multiscale_tokenizer/`:
 
 - `partition.py` samples the four-scale partition `P(G; omega)`, including the
   iterative level-4 outer rounds and local residual tokens;
-- `model.py` pools the frozen encoder states `h1` through `h4`, applies one MLP
+- `model.py` pools encoder states `h1` through `h4`, applies one MLP
   per scale, and predicts from `z_G = z_Q + z_2 + z_3 + z_4`;
 - `training.py` keeps partition seeds separate from model and data-loader
   seeds. Training redraws partitions by epoch; validation and test use the
@@ -78,15 +81,33 @@ Run the partition/statistical audit before training:
 python scripts/analyze_tokenization.py --dataset-root datasets/lipo --split train --limit 100
 ```
 
-Train the frozen-encoder first version:
+The training entry point supports `baseline_frozen`, `multiscale_frozen`,
+`baseline_finetune`, and `multiscale_finetune`. The baseline preserves the
+historical final-layer Sum/Mean readout; the multiscale architecture is
+unchanged.
+
+Run the two Lipo seed-0 supervised fine-tuning arms:
 
 ```powershell
-python scripts/train.py --dataset-root datasets/lipo --task lipo --output-dir runs/lipo/multiscale
+python scripts/train.py --dataset-root datasets/lipo --task lipo --mode baseline_finetune --output-dir runs/lipo_seed0_ft_baseline
+python scripts/train.py --dataset-root datasets/lipo --task lipo --mode multiscale_finetune --output-dir runs/lipo_seed0_ft_multiscale
 ```
+
+Defaults implement the locked protocol: AdamW, batch size 32, encoder LR
+`1e-5`, downstream LR `1e-3`, at most 100 epochs,
+`ReduceLROnPlateau(patience=10, factor=0.3)`, and early-stopping patience 25.
+Both arms start from `diffusion_encoder/encoder.pt`; no downstream checkpoint
+is used for initialization.
 
 Training writes `history.json`, `history.csv`, `best.pt`, and `last.pt`. Resume
 an interrupted run with the same command plus `--resume`. `--patience`
 controls early stopping on the validation selection metric.
+
+DataLoader workers are persistent across epochs. A shared epoch value redraws
+training partitions without restarting Windows worker processes, while
+validation/test remain fixed at epoch 0. The loader explicitly preserves the
+former per-epoch base-seed consumption, so this performance optimization does
+not shift the sampler or model RNG trajectory when resuming a checkpoint.
 
 Evaluate the saved best checkpoint without retraining:
 

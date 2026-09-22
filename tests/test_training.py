@@ -1,21 +1,73 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 import torch
 from torch import Tensor
+from torch.utils.data import Dataset
 
-from diffusion_encoder.data import MoleculeBatch, MoleculeGraph, PropertyBatch
+from diffusion_encoder.data import (
+    MoleculeBatch,
+    MoleculeGraph,
+    PropertyBatch,
+    PropertyRecord,
+)
 
-from multiscale_tokenizer.model import TokenModelOutput
+from diffusion_encoder.model import DiffusionEncoder, ModelConfig
+from multiscale_tokenizer.model import (
+    MultiscaleModelConfig,
+    MultiscaleMolecularModel,
+    TokenModelOutput,
+)
 from multiscale_tokenizer.training import (
+    _EpochAwareCollator,
     TaskSpec,
     TargetScaler,
     _is_better_validation,
     _loss,
     _metrics,
+    _make_loader,
+    _prepare_loader_iteration,
     _run_epoch,
+    _set_loader_epoch,
+    build_optimizer,
+    train_property_model,
 )
+from multiscale_tokenizer.partition import (
+    TokenizationConfig,
+    derive_partition_seed,
+    partition_molecule,
+)
+
+
+class _PersistentLoaderDataset(Dataset):
+    """Top-level fixture so Windows worker processes can import it."""
+
+    def __init__(self):
+        nodes = 14
+        features = torch.zeros((nodes, 5), dtype=torch.long)
+        features[:, 0] = 6
+        features[:, 1] = 5
+        bonds = torch.zeros((nodes, nodes), dtype=torch.long)
+        indices = torch.arange(nodes - 1)
+        bonds[indices, indices + 1] = 1
+        bonds[indices + 1, indices] = 1
+        self.record = PropertyRecord(
+            MoleculeGraph(features, bonds, "C" * nodes),
+            torch.tensor([0.0]),
+            torch.tensor([True]),
+            7,
+            "train",
+        )
+
+    def __len__(self):
+        return 1
+
+    def __getitem__(self, _index):
+        return self.record
 
 
 class TrainingTests(unittest.TestCase):
@@ -85,6 +137,93 @@ class TrainingTests(unittest.TestCase):
         )
         self.assertAlmostEqual(metrics["loss"], 1.5, places=6)
 
+    def test_epoch_aware_collator_updates_shared_partition_epoch(self) -> None:
+        record = PropertyRecord(
+            MoleculeGraph(
+                torch.zeros((1, 5), dtype=torch.long),
+                torch.zeros((1, 1), dtype=torch.long),
+                "C",
+            ),
+            torch.tensor([0.0]),
+            torch.tensor([True]),
+            7,
+            "train",
+        )
+        collator = _EpochAwareCollator(
+            base_partition_seed=101,
+            epoch=0,
+            training=True,
+            tokenization=TokenizationConfig(),
+            use_partitions=True,
+        )
+        self.assertTrue(collator._epoch.is_shared())
+        with patch(
+            "multiscale_tokenizer.training.partition_molecule",
+            return_value="partition",
+        ) as mocked:
+            collator.set_epoch(3)
+            batch = collator([record])
+        self.assertEqual(collator.epoch, 3)
+        self.assertEqual(batch.partitions, ["partition"])
+        self.assertEqual(
+            mocked.call_args.kwargs["seed"],
+            derive_partition_seed(101, 7, 3),
+        )
+
+    def test_persistent_worker_observes_new_partition_epoch(self) -> None:
+        dataset = _PersistentLoaderDataset()
+        generator = torch.Generator().manual_seed(43)
+        loader = _make_loader(
+            dataset,
+            batch_size=1,
+            shuffle=False,
+            num_workers=1,
+            base_partition_seed=101,
+            epoch=0,
+            training=True,
+            generator=generator,
+            use_partitions=True,
+        )
+        _set_loader_epoch(loader, 0)
+        _prepare_loader_iteration(loader)
+        first = next(iter(loader)).partitions[0]
+        worker_pid = loader._iterator._workers[0].pid
+        _set_loader_epoch(loader, 3)
+        _prepare_loader_iteration(loader)
+        second = next(iter(loader)).partitions[0]
+        self.assertEqual(loader._iterator._workers[0].pid, worker_pid)
+        bonds = dataset.record.graph.bonds
+        expected_first = partition_molecule(
+            bonds,
+            seed=derive_partition_seed(101, 7, 0),
+            include_stats=False,
+        )
+        expected_second = partition_molecule(
+            bonds,
+            seed=derive_partition_seed(101, 7, 3),
+            include_stats=False,
+        )
+        self.assertTrue(first.owner.equal(expected_first.owner))
+        self.assertTrue(second.owner.equal(expected_second.owner))
+        persistent_state = generator.get_state()
+
+        reference_generator = torch.Generator().manual_seed(43)
+        for epoch in (0, 3):
+            reference = _make_loader(
+                dataset,
+                batch_size=1,
+                shuffle=False,
+                num_workers=1,
+                base_partition_seed=101,
+                epoch=epoch,
+                training=True,
+                generator=reference_generator,
+                use_partitions=True,
+            )
+            _prepare_loader_iteration(reference)
+            next(iter(reference))
+        self.assertTrue(persistent_state.equal(reference_generator.get_state()))
+
     def test_classification_checkpoint_uses_primary_metric(self) -> None:
         spec = TaskSpec("pcba", "classification", 2)
         better, value = _is_better_validation(
@@ -150,6 +289,106 @@ class TrainingTests(unittest.TestCase):
         )
         self.assertAlmostEqual(metrics["roc_auc"], 1.0)
         self.assertAlmostEqual(metrics["average_precision"], 1.0)
+
+    def test_finetune_optimizer_has_named_differential_lr_groups(self) -> None:
+        model = MultiscaleMolecularModel(
+            DiffusionEncoder(ModelConfig(hidden_dim=8, dropout=0.0)),
+            config=MultiscaleModelConfig(
+                hidden_dim=8,
+                experiment_mode="multiscale_finetune",
+            ),
+        )
+        optimizer = build_optimizer(
+            model,
+            encoder_learning_rate=1e-5,
+            downstream_learning_rate=1e-3,
+            weight_decay=0.01,
+        )
+        self.assertEqual(
+            [(group["name"], group["lr"]) for group in optimizer.param_groups],
+            [("encoder", 1e-5), ("downstream", 1e-3)],
+        )
+        covered = {
+            id(parameter)
+            for group in optimizer.param_groups
+            for parameter in group["params"]
+        }
+        self.assertEqual(
+            covered,
+            {id(parameter) for parameter in model.parameters() if parameter.requires_grad},
+        )
+
+    def test_resume_restores_optimizer_scheduler_and_rng_trajectory(self) -> None:
+        class TinyDataset:
+            def __init__(self, _root: str | Path, split: str):
+                sizes = {"train": 4, "valid": 2, "test": 2}
+                offset = {"train": 0, "valid": 10, "test": 20}[split]
+                self.records = []
+                labels = []
+                for index in range(sizes[split]):
+                    features = torch.zeros((3, 5), dtype=torch.long)
+                    features[:, 0] = torch.tensor([6, 7, 8])
+                    features[:, 1] = 5
+                    bonds = torch.tensor([
+                        [0, 1, 0], [1, 0, 1], [0, 1, 0],
+                    ])
+                    target = torch.tensor([float(index + offset) / 10.0])
+                    labels.append(target)
+                    self.records.append(PropertyRecord(
+                        MoleculeGraph(features, bonds, "CCO"),
+                        target,
+                        torch.tensor([True]),
+                        index + offset,
+                        split,
+                    ))
+                self.labels = torch.stack(labels)
+
+            def __len__(self):
+                return len(self.records)
+
+            def __getitem__(self, index):
+                return self.records[index]
+
+        with TemporaryDirectory() as temporary, patch(
+            "multiscale_tokenizer.training.OGBMoleculePropertyDataset",
+            TinyDataset,
+        ):
+            root = Path(temporary)
+            common = dict(
+                dataset_root=root,
+                task="lipo",
+                device="cpu",
+                batch_size=2,
+                num_workers=0,
+                experiment_mode="baseline_finetune",
+                model_seed=17,
+                data_seed=23,
+                partition_seed=29,
+                scheduler_patience=0,
+                patience=0,
+            )
+            uninterrupted = train_property_model(
+                **common, output_dir=root / "full", epochs=2,
+            )
+            train_property_model(
+                **common, output_dir=root / "resumed", epochs=1,
+            )
+            resumed = train_property_model(
+                **common, output_dir=root / "resumed", epochs=2, resume=True,
+            )
+            required = {
+                "optimizer_state", "scheduler_state", "current_epoch",
+                "best_selection", "best_model_state",
+                "epochs_without_improvement", "encoder_lr", "downstream_lr",
+                "model_seed", "data_seed", "partition_seed", "experiment_mode",
+            }
+            self.assertTrue(required <= resumed.keys())
+            self.assertEqual(resumed["current_epoch"], 1)
+            for name, expected in uninterrupted["model_state"].items():
+                torch.testing.assert_close(
+                    resumed["model_state"][name], expected, rtol=0, atol=0,
+                )
+            self.assertEqual(resumed["history"], uninterrupted["history"])
 
 
 if __name__ == "__main__":

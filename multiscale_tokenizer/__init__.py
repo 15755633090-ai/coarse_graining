@@ -1,6 +1,7 @@
-"""Near-fine/far-coarse molecular tokenization on frozen diffusion states."""
+"""Matched diffusion-baseline and near-fine/far-coarse property models."""
 
 from .model import (
+    EXPERIMENT_MODES,
     MultiscaleModelConfig,
     MultiscaleMolecularModel,
     TokenModelOutput,
@@ -15,6 +16,7 @@ from .partition import (
 )
 
 __all__ = [
+    "EXPERIMENT_MODES",
     "MultiscaleModelConfig",
     "MultiscaleMolecularModel",
     "TokenModelOutput",

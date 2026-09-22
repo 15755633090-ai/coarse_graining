@@ -6,7 +6,6 @@ import csv
 import json
 import random
 from dataclasses import asdict, dataclass
-from functools import partial
 from pathlib import Path
 from typing import Sequence
 
@@ -22,9 +21,13 @@ from diffusion_encoder.data import (
     PropertyRecord,
     collate_property_records,
 )
-from diffusion_encoder.encoder import load_frozen_encoder
+from diffusion_encoder.encoder import load_encoder
 
-from .model import MultiscaleModelConfig, MultiscaleMolecularModel
+from .model import (
+    EXPERIMENT_MODES,
+    MultiscaleModelConfig,
+    MultiscaleMolecularModel,
+)
 from .partition import (
     TokenizationConfig,
     derive_partition_seed,
@@ -103,6 +106,99 @@ def seed_everything(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
+def _rng_state(generator: torch.Generator) -> dict[str, object]:
+    state: dict[str, object] = {
+        "python": random.getstate(),
+        "numpy": np.random.get_state(),
+        "torch": torch.get_rng_state(),
+        "data_generator": generator.get_state(),
+    }
+    if torch.cuda.is_available():
+        state["cuda"] = torch.cuda.get_rng_state_all()
+    return state
+
+
+def _restore_rng_state(
+    state: dict[str, object], generator: torch.Generator,
+) -> None:
+    random.setstate(state["python"])
+    np.random.set_state(state["numpy"])
+    torch.set_rng_state(state["torch"])
+    generator.set_state(state["data_generator"])
+    if torch.cuda.is_available() and "cuda" in state:
+        torch.cuda.set_rng_state_all(state["cuda"])
+
+
+def build_property_model(
+    *,
+    spec: TaskSpec,
+    experiment_mode: str,
+    model_seed: int,
+    partition_seed: int,
+    dropout: float,
+    device: torch.device,
+) -> MultiscaleMolecularModel:
+    """Construct a mode with explicitly reproducible shared initialization."""
+
+    if experiment_mode not in EXPERIMENT_MODES:
+        raise ValueError(f"unknown experiment mode {experiment_mode!r}")
+    seed_everything(model_seed)
+    encoder = load_encoder(device=device, frozen=experiment_mode.endswith("_frozen"))
+    return MultiscaleMolecularModel(
+        encoder,
+        config=MultiscaleModelConfig(
+            hidden_dim=encoder.config.hidden_dim,
+            dropout=dropout,
+            output_dim=spec.num_tasks,
+            default_partition_seed=partition_seed,
+            experiment_mode=experiment_mode,
+        ),
+    ).to(device)
+
+
+def build_optimizer(
+    model: MultiscaleMolecularModel,
+    *,
+    encoder_learning_rate: float,
+    downstream_learning_rate: float,
+    weight_decay: float,
+) -> torch.optim.AdamW:
+    """Build named differential-LR groups with complete, unique coverage."""
+
+    groups: list[dict[str, object]] = []
+    encoder = [p for p in model.encoder.parameters() if p.requires_grad]
+    downstream = [
+        p for name, p in model.named_parameters()
+        if not name.startswith("encoder.") and p.requires_grad
+    ]
+    if encoder:
+        groups.append({
+            "name": "encoder", "params": encoder,
+            "lr": encoder_learning_rate,
+        })
+    if downstream:
+        groups.append({
+            "name": "downstream", "params": downstream,
+            "lr": downstream_learning_rate,
+        })
+    if not groups:
+        raise RuntimeError("model has no trainable parameters")
+    covered = [id(p) for group in groups for p in group["params"]]
+    expected = [id(p) for p in model.parameters() if p.requires_grad]
+    if len(covered) != len(set(covered)) or set(covered) != set(expected):
+        raise RuntimeError("optimizer parameter groups do not uniquely cover the model")
+    return torch.optim.AdamW(groups, weight_decay=weight_decay)
+
+
+def _learning_rates(optimizer: torch.optim.Optimizer) -> dict[str, float]:
+    values = {str(group.get("name", index)): float(group["lr"])
+              for index, group in enumerate(optimizer.param_groups)}
+    return {
+        "encoder_lr": values.get("encoder", 0.0),
+        "downstream_lr": values["downstream"],
+    }
+
+
 def _partition_seeds(
     sample_ids: Tensor,
     *,
@@ -124,8 +220,11 @@ def _collate_with_partitions(
     epoch: int,
     training: bool,
     tokenization: TokenizationConfig,
+    use_partitions: bool,
 ) -> PropertyBatch:
     batch = collate_property_records(records)
+    if not use_partitions:
+        return batch
     seeds = _partition_seeds(
         batch.sample_ids,
         base_seed=base_partition_seed,
@@ -145,6 +244,47 @@ def _collate_with_partitions(
     return batch
 
 
+class _EpochAwareCollator:
+    """Picklable collator whose epoch remains visible to persistent workers."""
+
+    def __init__(
+        self,
+        *,
+        base_partition_seed: int,
+        epoch: int,
+        training: bool,
+        tokenization: TokenizationConfig,
+        use_partitions: bool,
+    ) -> None:
+        self.base_partition_seed = base_partition_seed
+        self.training = training
+        self.tokenization = tokenization
+        self.use_partitions = use_partitions
+        # Tensor shared memory works with Windows spawn and does not require a
+        # multiprocessing Manager process. Epoch changes happen only between
+        # fully exhausted DataLoader iterations.
+        self._epoch = torch.tensor(epoch, dtype=torch.long).share_memory_()
+
+    @property
+    def epoch(self) -> int:
+        return int(self._epoch.item())
+
+    def set_epoch(self, epoch: int) -> None:
+        if epoch < 0:
+            raise ValueError("epoch must be nonnegative")
+        self._epoch.fill_(epoch)
+
+    def __call__(self, records: Sequence[PropertyRecord]) -> PropertyBatch:
+        return _collate_with_partitions(
+            records,
+            base_partition_seed=self.base_partition_seed,
+            epoch=self.epoch,
+            training=self.training,
+            tokenization=self.tokenization,
+            use_partitions=self.use_partitions,
+        )
+
+
 def _make_loader(
     dataset: OGBMoleculePropertyDataset,
     *,
@@ -157,7 +297,15 @@ def _make_loader(
     generator: torch.Generator | None = None,
     tokenization: TokenizationConfig | None = None,
     pin_memory: bool = False,
+    use_partitions: bool = True,
 ) -> DataLoader[PropertyBatch]:
+    collator = _EpochAwareCollator(
+        base_partition_seed=base_partition_seed,
+        epoch=epoch,
+        training=training,
+        tokenization=tokenization or TokenizationConfig(),
+        use_partitions=use_partitions,
+    )
     return DataLoader(
         dataset,
         batch_size=batch_size,
@@ -165,14 +313,33 @@ def _make_loader(
         num_workers=num_workers,
         generator=generator,
         pin_memory=pin_memory,
-        collate_fn=partial(
-            _collate_with_partitions,
-            base_partition_seed=base_partition_seed,
-            epoch=epoch,
-            training=training,
-            tokenization=tokenization or TokenizationConfig(),
-        ),
+        persistent_workers=num_workers > 0,
+        collate_fn=collator,
     )
+
+
+def _set_loader_epoch(loader: DataLoader[PropertyBatch], epoch: int) -> None:
+    collator = loader.collate_fn
+    if not isinstance(collator, _EpochAwareCollator):
+        raise TypeError("loader does not use the epoch-aware collator")
+    collator.set_epoch(epoch)
+
+
+def _prepare_loader_iteration(loader: DataLoader[PropertyBatch]) -> None:
+    """Preserve the legacy per-iterator RNG trajectory with persistent workers.
+
+    A fresh multiprocessing DataLoader draws one base seed whenever iteration
+    starts. PyTorch's persistent-worker reset omits that draw after its first
+    iteration. Consuming the same value here keeps sampler and model RNG states
+    aligned with the former create-per-epoch implementation.
+    """
+
+    if not isinstance(loader, DataLoader):
+        return
+    iterations = int(getattr(loader, "_protocol_iterations", 0))
+    if iterations and loader.num_workers > 0 and loader.persistent_workers:
+        torch.empty((), dtype=torch.int64).random_(generator=loader.generator)
+    loader._protocol_iterations = iterations + 1
 
 
 def _loss(
@@ -277,6 +444,7 @@ def _run_epoch(
     optimizer: torch.optim.Optimizer | None = None,
 ) -> dict[str, float]:
     model.train(training)
+    _prepare_loader_iteration(loader)
     totals = {"loss_sum": 0.0, "valid_labels": 0.0, "samples": 0.0}
     level_norm_sum = torch.zeros(4)
     token_sum = torch.zeros(4)
@@ -379,23 +547,37 @@ def train_property_model(
     task: str,
     output_dir: str | Path,
     device: str = "cuda",
-    epochs: int = 30,
+    epochs: int = 100,
     batch_size: int = 32,
-    learning_rate: float = 1e-3,
+    learning_rate: float | None = None,
+    encoder_learning_rate: float = 1e-5,
+    downstream_learning_rate: float = 1e-3,
+    weight_decay: float = 0.01,
+    scheduler_patience: int = 10,
+    scheduler_factor: float = 0.3,
     model_seed: int = 0,
     partition_seed: int = 0,
     data_seed: int = 0,
     dropout: float = 0.1,
     num_workers: int = 4,
     resume: bool = False,
-    patience: int = 20,
+    patience: int = 25,
+    experiment_mode: str = "multiscale_frozen",
 ) -> dict[str, object]:
-    """Train only the token readout while the diffusion encoder stays frozen."""
+    """Train one arm of the locked baseline/multiscale protocol."""
 
     if task not in TASK_SPECS:
         raise ValueError(f"unknown task {task!r}")
+    if experiment_mode not in EXPERIMENT_MODES:
+        raise ValueError(f"unknown experiment mode {experiment_mode!r}")
     if patience < 0:
         raise ValueError("patience must be nonnegative")
+    if scheduler_patience < 0:
+        raise ValueError("scheduler_patience must be nonnegative")
+    if not 0.0 < scheduler_factor < 1.0:
+        raise ValueError("scheduler_factor must be in (0, 1)")
+    if learning_rate is not None:
+        downstream_learning_rate = learning_rate
     spec = TASK_SPECS[task]
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
@@ -424,6 +606,7 @@ def train_property_model(
         training=False,
         tokenization=TokenizationConfig(),
         pin_memory=device_object.type == "cuda",
+        use_partitions=experiment_mode.startswith("multiscale_"),
     )
     test_loader = _make_loader(
         test_dataset,
@@ -435,23 +618,42 @@ def train_property_model(
         training=False,
         tokenization=TokenizationConfig(),
         pin_memory=device_object.type == "cuda",
+        use_partitions=experiment_mode.startswith("multiscale_"),
     )
 
-    seed_everything(model_seed)
-    encoder = load_frozen_encoder(device=device_object)
-    model = MultiscaleMolecularModel(
-        encoder,
-        config=MultiscaleModelConfig(
-            hidden_dim=encoder.config.hidden_dim,
-            dropout=dropout,
-            output_dim=spec.num_tasks,
-            default_partition_seed=partition_seed,
-        ),
-    ).to(device_object)
-    trainable = [parameter for parameter in model.parameters() if parameter.requires_grad]
-    if not trainable:
-        raise RuntimeError("model has no trainable parameters")
-    optimizer = torch.optim.AdamW(trainable, lr=learning_rate)
+    model = build_property_model(
+        spec=spec,
+        experiment_mode=experiment_mode,
+        model_seed=model_seed,
+        partition_seed=partition_seed,
+        dropout=dropout,
+        device=device_object,
+    )
+    optimizer = build_optimizer(
+        model,
+        encoder_learning_rate=encoder_learning_rate,
+        downstream_learning_rate=downstream_learning_rate,
+        weight_decay=weight_decay,
+    )
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode="min" if spec.task_type == "regression" else "max",
+        patience=scheduler_patience,
+        factor=scheduler_factor,
+    )
+    train_loader = _make_loader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        base_partition_seed=partition_seed,
+        epoch=0,
+        training=True,
+        generator=generator,
+        tokenization=model.config.tokenization,
+        pin_memory=device_object.type == "cuda",
+        use_partitions=model.config.uses_multiscale,
+    )
 
     history: list[dict[str, float | int]] = []
     start_epoch = 0
@@ -465,38 +667,32 @@ def train_property_model(
         resume_checkpoint = torch.load(
             last_path, map_location="cpu", weights_only=False,
         )
+        if resume_checkpoint.get("schema_version") != 2:
+            raise ValueError("fine-tuning resume requires checkpoint schema 2")
+        if resume_checkpoint.get("experiment_mode") != experiment_mode:
+            raise ValueError("resume checkpoint experiment mode does not match")
+        for name, expected in (
+            ("model_seed", model_seed),
+            ("partition_seed", partition_seed),
+            ("data_seed", data_seed),
+        ):
+            if resume_checkpoint.get(name) != expected:
+                raise ValueError(f"resume checkpoint {name} does not match")
         model.load_state_dict(resume_checkpoint["last_model_state"], strict=True)
         optimizer.load_state_dict(resume_checkpoint["optimizer_state"])
+        scheduler.load_state_dict(resume_checkpoint["scheduler_state"])
         history = list(resume_checkpoint["history"])
-        start_epoch = len(history)
+        start_epoch = int(resume_checkpoint["current_epoch"]) + 1
         best_state = resume_checkpoint["best_model_state"]
         best_validation = float(resume_checkpoint["best_selection"])
-        selection_key = (
-            "valid_loss" if spec.task_type == "regression"
-            else f"valid_{spec.primary_metric}"
+        epochs_without_improvement = int(
+            resume_checkpoint["epochs_without_improvement"]
         )
-        if history:
-            best_row = (
-                min(history, key=lambda row: row["valid_loss"])
-                if spec.task_type == "regression"
-                else max(history, key=lambda row: row[selection_key])
-            )
-            epochs_without_improvement = len(history) - int(best_row["epoch"]) - 1
+        _restore_rng_state(resume_checkpoint["rng_state"], generator)
         print(f"resumed from epoch {start_epoch}", flush=True)
 
     for epoch in range(start_epoch, epochs):
-        train_loader = _make_loader(
-            train_dataset,
-            batch_size=batch_size,
-            shuffle=True,
-            num_workers=num_workers,
-            base_partition_seed=partition_seed,
-            epoch=epoch,
-            training=True,
-            generator=generator,
-            tokenization=model.config.tokenization,
-            pin_memory=device_object.type == "cuda",
-        )
+        _set_loader_epoch(train_loader, epoch)
         train_metrics = _run_epoch(
             model,
             train_loader,
@@ -518,10 +714,12 @@ def train_property_model(
             epoch=epoch,
             training=False,
         )
+        epoch_lrs = _learning_rates(optimizer)
         row = {
             "epoch": epoch,
             "train_loss": train_metrics["loss"],
             "valid_loss": valid_metrics["loss"],
+            **epoch_lrs,
             **{
                 f"train_{name}": value
                 for name, value in train_metrics.items()
@@ -545,14 +743,21 @@ def train_property_model(
             epochs_without_improvement = 0
         else:
             epochs_without_improvement += 1
+        scheduler_value = (
+            valid_metrics["loss"]
+            if spec.task_type == "regression"
+            else valid_metrics[spec.primary_metric]
+        )
+        scheduler.step(scheduler_value)
         selection_metric = (
             "valid_loss" if spec.task_type == "regression"
             else f"valid_{spec.primary_metric}"
         )
         checkpoint_common = {
-            "schema_version": 1,
+            "schema_version": 2,
             "task_spec": asdict(spec),
             "model_config": asdict(model.config),
+            "experiment_mode": experiment_mode,
             "target_scaler": None if scaler is None else {
                 "mean": scaler.mean,
                 "std": scaler.std,
@@ -573,6 +778,24 @@ def train_property_model(
                 key=lambda row: row[f"valid_{spec.primary_metric}"],
             )["epoch"]),
             "epochs_without_improvement": epochs_without_improvement,
+            "current_epoch": epoch,
+            "encoder_lr": _learning_rates(optimizer)["encoder_lr"],
+            "downstream_lr": _learning_rates(optimizer)["downstream_lr"],
+            "optimizer_state": optimizer.state_dict(),
+            "scheduler_state": scheduler.state_dict(),
+            "rng_state": _rng_state(generator),
+            "training_protocol": {
+                "optimizer": "AdamW",
+                "batch_size": batch_size,
+                "max_epochs": epochs,
+                "encoder_learning_rate": encoder_learning_rate,
+                "downstream_learning_rate": downstream_learning_rate,
+                "weight_decay": weight_decay,
+                "scheduler": "ReduceLROnPlateau",
+                "scheduler_patience": scheduler_patience,
+                "scheduler_factor": scheduler_factor,
+                "early_stopping_patience": patience,
+            },
         }
         torch.save(
             {**checkpoint_common, "model_state": best_state},
@@ -583,7 +806,6 @@ def train_property_model(
                 **checkpoint_common,
                 "model_state": model.state_dict(),
                 "last_model_state": model.state_dict(),
-                "optimizer_state": optimizer.state_dict(),
             },
             output / "last.pt",
         )
@@ -665,6 +887,7 @@ def evaluate_property_model(
         training=False,
         tokenization=model.config.tokenization,
         pin_memory=device_object.type == "cuda",
+        use_partitions=model.config.uses_multiscale,
     )
     return _run_epoch(
         model,
@@ -686,14 +909,17 @@ def load_property_model(
     """Reload the frozen encoder plus a trained tokenization head."""
 
     checkpoint = torch.load(Path(checkpoint_path), map_location="cpu", weights_only=False)
-    if checkpoint.get("schema_version") != 1:
+    if checkpoint.get("schema_version") not in {1, 2}:
         raise ValueError("unsupported multiscale checkpoint schema")
     config_payload = dict(checkpoint["model_config"])
     config_payload["tokenization"] = TokenizationConfig(
         **config_payload["tokenization"],
     )
     config = MultiscaleModelConfig(**config_payload)
-    encoder = load_frozen_encoder(device=device)
+    encoder = load_encoder(
+        device=device,
+        frozen=not config.finetunes_encoder,
+    )
     model = MultiscaleMolecularModel(encoder, config=config).to(device)
     model.load_state_dict(checkpoint["model_state"], strict=True)
     model.eval()

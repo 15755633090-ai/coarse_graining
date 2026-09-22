@@ -6,12 +6,17 @@ model. The molecular graph is an undirected, unweighted simple graph
 
 ## 1. Diffusion representation
 
-The full molecular graph is passed through the frozen four-layer diffusion
+The full molecular graph is passed through the four-layer pretrained diffusion
 encoder. The encoder returns one hidden state per atom at every layer:
 
 ```text
 H^(1), H^(2), H^(3), H^(4),    h_v^(l) in R^d.
 ```
+
+In `multiscale_frozen` the encoder is evaluated without gradients. In
+`multiscale_finetune`, the property loss is propagated through all four hidden
+states into the encoder while the multiscale definition below remains exactly
+the same.
 
 No learned graph propagation is added after tokenization. The four scales are
 formed by graph-radius partitioning and by applying a separate token MLP to

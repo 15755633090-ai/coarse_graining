@@ -11,16 +11,29 @@ from .model import DiffusionEncoder, ModelConfig
 DEFAULT_CHECKPOINT = Path(__file__).with_name("encoder.pt")
 
 
-def load_frozen_encoder(
+def load_encoder(
     checkpoint: str | Path = DEFAULT_CHECKPOINT,
     device: str | torch.device = "cpu",
+    *,
+    frozen: bool = True,
 ) -> DiffusionEncoder:
-    """Load h1/h2/h3/h4 backbone weights and prohibit accidental fine-tuning."""
+    """Load the untouched h1/h2/h3/h4 pretrained backbone."""
     payload = torch.load(Path(checkpoint), map_location="cpu", weights_only=False)
     if payload.get("schema_version") != 1:
         raise ValueError("Unsupported clean encoder checkpoint schema")
     config = ModelConfig(**payload["model_config"])
     encoder = DiffusionEncoder(config)
     encoder.load_state_dict(payload["encoder_state"], strict=True)
-    encoder.requires_grad_(False).eval()
+    encoder.requires_grad_(not frozen)
+    if frozen:
+        encoder.eval()
     return encoder.to(device)
+
+
+def load_frozen_encoder(
+    checkpoint: str | Path = DEFAULT_CHECKPOINT,
+    device: str | torch.device = "cpu",
+) -> DiffusionEncoder:
+    """Backward-compatible loader that prohibits accidental fine-tuning."""
+
+    return load_encoder(checkpoint, device, frozen=True)
