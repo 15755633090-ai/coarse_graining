@@ -152,6 +152,15 @@ The implemented random choices are:
 2. uniform selection from legal standard-region centers;
 3. the effect of center order through sequential region removal.
 
+Candidate priorities are generated from canonical graph ranks, not atom
+indices. Therefore a fixed validation/test partition seed is invariant to atom
+renumbering. Training still samples a new partition for every epoch.
+
+Validation and test reports restore regression predictions to the original
+target units before computing RMSE, MAE, and R-squared. Classification reports
+use per-task ROC-AUC and average precision, averaging only tasks with labels
+from both classes.
+
 ## 6. Diagnostics retained for later analysis
 
 Partition statistics are emitted by the implementation but do not alter the

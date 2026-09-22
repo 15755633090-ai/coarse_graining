@@ -8,6 +8,7 @@ from collections import deque
 from dataclasses import dataclass
 from typing import Mapping, Sequence
 
+import igraph as ig
 import torch
 from torch import Tensor
 
@@ -132,6 +133,80 @@ def _validate_adjacency(adjacency: Sequence[Sequence[int]], num_nodes: int) -> N
                 raise ValueError("adjacency must be symmetric")
 
 
+def _induced_edges(
+    adjacency: Sequence[Sequence[int]], nodes: set[int],
+) -> tuple[list[int], list[tuple[int, int]]]:
+    order = sorted(nodes)
+    local = {node: index for index, node in enumerate(order)}
+    edges: list[tuple[int, int]] = []
+    for left, node in enumerate(order):
+        for neighbor in adjacency[node]:
+            right = local.get(neighbor)
+            if right is not None and left < right:
+                edges.append((left, right))
+    return order, edges
+
+
+def _canonical_ranks(
+    adjacency: Sequence[Sequence[int]], nodes: set[int],
+) -> dict[int, int]:
+    order, edges = _induced_edges(adjacency, nodes)
+    if not order:
+        return {}
+    graph = ig.Graph(n=len(order), edges=edges, directed=False)
+    permutation = graph.canonical_permutation()
+    return {order[old]: rank for rank, old in enumerate(permutation)}
+
+
+def _canonical_signature(
+    adjacency: Sequence[Sequence[int]], nodes: set[int],
+) -> str:
+    ranks = _canonical_ranks(adjacency, nodes)
+    size = len(ranks)
+    if size == 0:
+        return hashlib.sha256(b"").hexdigest()
+    bits = bytearray(size * (size - 1) // 2)
+    edge_count = 0
+    for node in nodes:
+        for neighbor in adjacency[node]:
+            if neighbor not in nodes:
+                continue
+            left, right = ranks[node], ranks[neighbor]
+            if left > right:
+                continue
+            edge_count += 1
+            bit = left * (2 * size - left - 1) // 2 + (right - left - 1)
+            bits[bit] = 1
+    payload = struct.pack("<II", size, edge_count) + bytes(bits)
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _derive_seed(seed: int, salt: str) -> int:
+    payload = struct.pack("<Q", seed & ((1 << 64) - 1))
+    digest = hashlib.blake2b(
+        payload + salt.encode("utf-8"),
+        digest_size=8,
+        person=b"mtokense",
+    ).digest()
+    return int.from_bytes(digest, "little")
+
+
+def _choose_canonically(
+    candidates: Sequence[int],
+    ranks: Mapping[int, int],
+    seed: int,
+    salt: str,
+) -> int:
+    if not candidates:
+        raise ValueError("cannot choose from an empty candidate set")
+
+    def priority(node: int) -> tuple[int, int]:
+        score = _derive_seed(seed, f"{salt}:{ranks[node]}")
+        return score, ranks[node]
+
+    return min(candidates, key=priority)
+
+
 def _restricted_components(
     adjacency: Sequence[Sequence[int]], allowed: set[int],
 ) -> list[list[int]]:
@@ -151,6 +226,19 @@ def _restricted_components(
                     queue.append(neighbor)
         components.append(sorted(component))
     return components
+
+
+def _ordered_components(
+    adjacency: Sequence[Sequence[int]], nodes: set[int],
+) -> list[list[int]]:
+    components = _restricted_components(adjacency, nodes)
+    return sorted(
+        components,
+        key=lambda component: (
+            _canonical_signature(adjacency, set(component)),
+            len(component),
+        ),
+    )
 
 
 def _distances_from(
@@ -245,7 +333,7 @@ def _cover_one_round(
     radius: int,
     center_distance: int,
     round_index: int,
-    rng: random.Random,
+    component_seed: int,
     emitter: _Emitter,
 ) -> set[int]:
     """Cover the current outside boundary without changing the fixed internal set."""
@@ -265,7 +353,7 @@ def _cover_one_round(
         if not boundary:
             break
 
-        components = _restricted_components(adjacency, remaining)
+        components = _ordered_components(adjacency, remaining)
         adjacent = [
             members for members in components
             if any(neighbor in fixed_internal for node in members for neighbor in adjacency[node])
@@ -275,7 +363,13 @@ def _cover_one_round(
             if max(distances[node] for node in members) < center_distance
         ]
         if shallow:
-            members = shallow[0]
+            members = min(
+                shallow,
+                key=lambda component: (
+                    _canonical_signature(adjacency, set(component)),
+                    len(component),
+                ),
+            )
             emitter.emit(
                 members,
                 center=-1,
@@ -293,8 +387,13 @@ def _cover_one_round(
         ]
         if not candidates:
             raise RuntimeError("a deep component has no legal standard center")
-        candidates.sort()
-        center = candidates[rng.randrange(len(candidates))]
+        ranks = _canonical_ranks(adjacency, remaining)
+        center = _choose_canonically(
+            candidates,
+            ranks,
+            component_seed,
+            f"level{level}:round{round_index}:standard",
+        )
         region = _induced_ball(adjacency, remaining, center, radius)
         if center not in region:
             raise RuntimeError("induced ball omitted its center")
@@ -314,7 +413,7 @@ def _cover_one_round(
 def _partition_component(
     adjacency: Sequence[Sequence[int]],
     component: list[int],
-    rng: random.Random,
+    component_seed: int,
     config: TokenizationConfig,
     emitter: _Emitter,
 ) -> tuple[set[int], int]:
@@ -324,8 +423,15 @@ def _partition_component(
         distances = _distances_from_node(adjacency, node, len(adjacency))
         eccentricities[node] = max(distances[other] for other in component)
     minimum = min(eccentricities.values())
-    graph_centers = sorted(node for node, value in eccentricities.items() if value == minimum)
-    initial_center = graph_centers[rng.randrange(len(graph_centers))]
+    graph_centers = [
+        node for node, value in eccentricities.items() if value == minimum
+    ]
+    initial_center = _choose_canonically(
+        graph_centers,
+        _canonical_ranks(adjacency, allowed),
+        component_seed,
+        "initial-center",
+    )
     initial_distances = _distances_from_node(
         adjacency, initial_center, len(adjacency),
     )
@@ -344,7 +450,7 @@ def _partition_component(
             radius=radius,
             center_distance=radius + 1,
             round_index=0,
-            rng=rng,
+            component_seed=component_seed,
             emitter=emitter,
         ))
 
@@ -360,7 +466,7 @@ def _partition_component(
             radius=radius,
             center_distance=radius + 1,
             round_index=level4_round,
-            rng=rng,
+            component_seed=component_seed,
             emitter=emitter,
         ))
         if len(internal) <= previous_size:
@@ -385,15 +491,18 @@ def partition_graph(
         raise ValueError("empty graphs are not supported")
     _validate_adjacency(adjacency, num_nodes)
     rng = random.Random(seed) if seed is not None else random.Random()
+    graph_seed = rng.getrandbits(64)
 
     all_nodes = set(range(num_nodes))
-    components = _restricted_components(adjacency, all_nodes)
+    components = _ordered_components(adjacency, all_nodes)
     emitter = _Emitter(num_nodes)
     q_mask = torch.zeros(num_nodes, dtype=torch.bool)
     total_level4_rounds = 0
     for component in components:
+        component_signature = _canonical_signature(adjacency, set(component))
+        component_seed = _derive_seed(graph_seed, component_signature)
         window, level4_rounds = _partition_component(
-            adjacency, component, rng, config, emitter,
+            adjacency, component, component_seed, config, emitter,
         )
         q_mask[torch.tensor(sorted(window), dtype=torch.long)] = True
         total_level4_rounds = max(total_level4_rounds, level4_rounds)
@@ -470,16 +579,26 @@ def partition_molecule(
     node_mask: Tensor | None = None,
     seed: int | None = None,
     config: TokenizationConfig | None = None,
+    include_stats: bool = True,
 ) -> TokenPartition:
     adjacency = adjacency_from_bonds(bonds, node_mask)
     active_nodes = {
-        index for index, valid in enumerate(node_mask.tolist())
+        index for index, valid in enumerate(node_mask.tolist()) if valid
     } if node_mask is not None else set(range(bonds.size(0)))
     if not active_nodes:
         raise ValueError("molecule contains no active nodes")
     kept = sorted(active_nodes)
-    compact = [[kept.index(neighbor) for neighbor in adjacency[node]] for node in kept]
-    local = partition_graph(compact, seed=seed, config=config)
+    compact_index = {node: index for index, node in enumerate(kept)}
+    compact = [
+        [compact_index[neighbor] for neighbor in adjacency[node]]
+        for node in kept
+    ]
+    local = partition_graph(
+        compact,
+        seed=seed,
+        config=config,
+        include_stats=include_stats,
+    )
     lookup = torch.tensor(kept, dtype=torch.long)
     owner = torch.full((bonds.size(0),), -1, dtype=torch.long)
     q_mask = torch.zeros(bonds.size(0), dtype=torch.bool)

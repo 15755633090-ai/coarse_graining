@@ -13,9 +13,8 @@ from diffusion_encoder.model import DiffusionEncoder
 
 from .partition import (
     TokenizationConfig,
-    adjacency_from_bonds,
     derive_partition_seed,
-    partition_graph,
+    partition_molecule,
 )
 
 
@@ -129,12 +128,14 @@ class MultiscaleMolecularModel(nn.Module):
         token_counts: list[Tensor] = []
         residual_counts: list[Tensor] = []
         zero = h1.new_zeros(self.config.hidden_dim)
+        bonds_cpu = bonds.detach().cpu()
+        mask_cpu = node_mask.detach().cpu()
 
         for graph_index in range(batch_size):
-            valid = node_mask[graph_index]
-            adjacency = adjacency_from_bonds(bonds[graph_index], valid)
-            partition = partition_graph(
-                adjacency,
+            valid = mask_cpu[graph_index]
+            partition = partition_molecule(
+                bonds_cpu[graph_index],
+                node_mask=valid,
                 seed=seeds[graph_index],
                 config=self.config.tokenization,
                 include_stats=False,

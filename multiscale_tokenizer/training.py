@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from sklearn.metrics import average_precision_score, roc_auc_score
 from torch import Tensor, nn
 from torch.utils.data import DataLoader
 
@@ -33,6 +34,12 @@ class TaskSpec:
             raise ValueError("task_type must be regression or classification")
         if self.num_tasks < 1:
             raise ValueError("num_tasks must be positive")
+
+    @property
+    def primary_metric(self) -> str:
+        if self.task_type == "regression":
+            return "rmse"
+        return "average_precision" if self.name == "pcba" else "roc_auc"
 
 
 TASK_SPECS: dict[str, TaskSpec] = {
@@ -113,16 +120,81 @@ def _loss(
             f"prediction shape {tuple(prediction.shape)} does not match "
             f"target shape {tuple(targets.shape)}"
         )
+    valid = target_mask.to(torch.bool)
+    if not valid.any():
+        return prediction.sum() * 0.0
+    prediction = prediction[valid]
+    targets = targets[valid]
     if scaler is not None:
         targets = scaler.transform(targets)
     if spec.task_type == "regression":
-        losses = nn.functional.mse_loss(prediction, targets, reduction="none")
-    else:
-        losses = nn.functional.binary_cross_entropy_with_logits(
-            prediction, targets, reduction="none",
-        )
-    losses = losses * target_mask.to(losses.dtype)
-    return losses.sum() / target_mask.sum().clamp_min(1)
+        return nn.functional.mse_loss(prediction, targets)
+    return nn.functional.binary_cross_entropy_with_logits(prediction, targets)
+
+
+def _regression_metrics(
+    prediction: Tensor,
+    targets: Tensor,
+    target_mask: Tensor,
+    scaler: TargetScaler,
+) -> dict[str, float]:
+    valid = target_mask.to(torch.bool)
+    if not valid.any():
+        return {"rmse": float("nan"), "mae": float("nan"), "r2": float("nan")}
+    prediction = scaler.inverse(prediction)[valid].detach().cpu().numpy()
+    targets = targets[valid].detach().cpu().numpy()
+    residual = prediction - targets
+    mse = float(np.mean(residual * residual))
+    denominator = float(np.sum((targets - targets.mean()) ** 2))
+    r2 = float("nan") if denominator == 0 else 1.0 - float(np.sum(residual ** 2)) / denominator
+    return {
+        "rmse": float(np.sqrt(mse)),
+        "mae": float(np.mean(np.abs(residual))),
+        "r2": r2,
+    }
+
+
+def _classification_metrics(
+    prediction: Tensor,
+    targets: Tensor,
+    target_mask: Tensor,
+) -> dict[str, float]:
+    probabilities = prediction.sigmoid().detach().cpu().numpy()
+    targets_np = targets.detach().cpu().numpy()
+    mask = target_mask.detach().cpu().numpy().astype(bool)
+    roc_auc: list[float] = []
+    average_precision: list[float] = []
+    for task in range(targets_np.shape[1]):
+        valid = mask[:, task] & np.isfinite(targets_np[:, task])
+        if not valid.any():
+            continue
+        labels = targets_np[valid, task]
+        scores = probabilities[valid, task]
+        if np.unique(labels).size < 2:
+            continue
+        roc_auc.append(float(roc_auc_score(labels, scores)))
+        average_precision.append(float(average_precision_score(labels, scores)))
+    return {
+        "roc_auc": float(np.mean(roc_auc)) if roc_auc else float("nan"),
+        "average_precision": (
+            float(np.mean(average_precision))
+            if average_precision else float("nan")
+        ),
+    }
+
+
+def _metrics(
+    prediction: Tensor,
+    targets: Tensor,
+    target_mask: Tensor,
+    spec: TaskSpec,
+    scaler: TargetScaler | None,
+) -> dict[str, float]:
+    if spec.task_type == "regression":
+        if scaler is None:
+            raise ValueError("regression metrics require a target scaler")
+        return _regression_metrics(prediction, targets, target_mask, scaler)
+    return _classification_metrics(prediction, targets, target_mask)
 
 
 def _run_epoch(
@@ -139,6 +211,9 @@ def _run_epoch(
 ) -> dict[str, float]:
     model.train(training)
     totals = {"loss": 0.0, "samples": 0.0}
+    all_predictions: list[Tensor] = []
+    all_targets: list[Tensor] = []
+    all_masks: list[Tensor] = []
     for batch in loader:
         batch = batch.to(device)
         seeds = _partition_seeds(
@@ -160,9 +235,22 @@ def _run_epoch(
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             optimizer.step()
+        else:
+            all_predictions.append(output.prediction.detach().cpu())
+            all_targets.append(batch.targets.detach().cpu())
+            all_masks.append(batch.target_mask.detach().cpu())
         totals["loss"] += float(loss.detach()) * batch.targets.size(0)
         totals["samples"] += batch.targets.size(0)
-    return {"loss": totals["loss"] / max(1.0, totals["samples"])}
+    metrics = {"loss": totals["loss"] / max(1.0, totals["samples"])}
+    if not training:
+        metrics.update(_metrics(
+            torch.cat(all_predictions),
+            torch.cat(all_targets),
+            torch.cat(all_masks),
+            spec,
+            scaler,
+        ))
+    return metrics
 
 
 def train_property_model(
@@ -270,6 +358,11 @@ def train_property_model(
             "epoch": epoch,
             "train_loss": train_metrics["loss"],
             "valid_loss": valid_metrics["loss"],
+            **{
+                f"valid_{name}": value
+                for name, value in valid_metrics.items()
+                if name != "loss"
+            },
         }
         history.append(row)
         if valid_metrics["loss"] < best_validation:
@@ -300,6 +393,8 @@ def train_property_model(
         "partition_seed": partition_seed,
         "data_seed": data_seed,
         "history": history,
+        "selection_metric": "valid_loss",
+        "primary_test_metric": spec.primary_metric,
         "test_metrics": test_metrics,
     }
     torch.save(checkpoint, output / "best.pt")

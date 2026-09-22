@@ -5,7 +5,6 @@ import argparse
 import json
 import statistics
 import sys
-from collections import defaultdict
 from pathlib import Path
 
 
@@ -60,9 +59,15 @@ def main() -> None:
         ])
         nodes = [float(row[f"level{level}_nodes"]) for row in rows]
         tokens = [float(row[f"level{level}_tokens"]) for row in rows]
-        summary[f"mean_level{level}_atoms_per_token"] = _mean([
-            node_count / token_count if token_count else 0.0
+        total_nodes = sum(nodes)
+        total_tokens = sum(tokens)
+        summary[f"level{level}_atoms_per_token"] = (
+            total_nodes / total_tokens if total_tokens else 0.0
+        )
+        summary[f"mean_level{level}_atoms_per_token_when_present"] = _mean([
+            node_count / token_count
             for node_count, token_count in zip(nodes, tokens)
+            if token_count > 0
         ])
         summary[f"mean_level{level}_residual_rate"] = _mean([
             float(row[f"level{level}_residual_rate"]) for row in rows

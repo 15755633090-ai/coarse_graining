@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+import random
 
 import torch
 
@@ -104,6 +105,75 @@ class PartitionTests(unittest.TestCase):
         self.assertTrue(residual.any())
         self.assertTrue(partition.centers[standard].ge(0).all())
         self.assertTrue(partition.centers[standard].lt(nodes).all())
+
+    def test_molecule_partition_excludes_padding_nodes(self) -> None:
+        nodes = 40
+        bonds = torch.zeros((nodes, nodes), dtype=torch.long)
+        for left in range(2, 14):
+            right = left + 1
+            bonds[left, right] = bonds[right, left] = 1
+        mask = torch.zeros(nodes, dtype=torch.bool)
+        mask[2:15] = True
+        partition = partition_molecule(
+            bonds,
+            node_mask=mask,
+            seed=4,
+            include_stats=False,
+        )
+        self.assertFalse(partition.q_mask[~mask].any())
+        self.assertTrue(partition.owner[~mask].eq(-1).all())
+        self.assertFalse(any(
+            (~mask[members]).any() for members in partition.members
+        ))
+        self.assertEqual(int(partition.q_mask.sum()), 7)
+
+    def test_fixed_seed_partition_is_equivariant_under_100_relabelings(self) -> None:
+        adjacency = [[] for _ in range(13)]
+        edges = (
+            (0, 1), (1, 2), (2, 3), (3, 4), (3, 5), (5, 6),
+            (2, 7), (7, 8), (8, 9), (9, 10), (10, 11), (8, 12),
+        )
+        for left, right in edges:
+            adjacency[left].append(right)
+            adjacency[right].append(left)
+
+        def signature(partition, inverse: list[int]):
+            q = frozenset(
+                inverse[index]
+                for index in torch.where(partition.q_mask)[0].tolist()
+            )
+            tokens = sorted(
+                (
+                    int(partition.levels[index]),
+                    bool(partition.residual[index]),
+                    int(partition.rounds[index]),
+                    tuple(sorted(
+                        inverse[node]
+                        for node in partition.members[index].tolist()
+                    )),
+                )
+                for index in range(len(partition.members))
+            )
+            return q, tokens
+
+        expected = signature(partition_graph(adjacency, seed=29), list(range(13)))
+        rng = random.Random(5)
+        for _ in range(100):
+            permutation = list(range(13))
+            rng.shuffle(permutation)
+            inverse = [0] * 13
+            for old, new in enumerate(permutation):
+                inverse[new] = old
+            relabeled = [[] for _ in range(13)]
+            for left, right in edges:
+                new_left, new_right = permutation[left], permutation[right]
+                relabeled[new_left].append(new_right)
+                relabeled[new_right].append(new_left)
+            actual = signature(
+                partition_graph(relabeled, seed=29),
+                inverse,
+            )
+            self.assertEqual(actual, expected)
 
 
 if __name__ == "__main__":

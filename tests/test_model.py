@@ -24,6 +24,28 @@ def line_batch(batch_size: int, nodes: int) -> tuple[torch.Tensor, torch.Tensor,
     return features, bonds, torch.ones((batch_size, nodes), dtype=torch.bool)
 
 
+def path_molecule(
+    num_nodes: int,
+    padded_nodes: int,
+    *,
+    seed: int,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    generator = torch.Generator().manual_seed(seed)
+    features = torch.zeros((1, padded_nodes, 5), dtype=torch.long)
+    features[..., 0] = torch.randint(1, 20, (1, padded_nodes), generator=generator)
+    features[..., 1] = 5
+    features[..., 2] = torch.randint(0, 2, (1, padded_nodes), generator=generator)
+    features[..., 3] = torch.randint(0, 5, (1, padded_nodes), generator=generator)
+    features[..., 4] = torch.randint(0, 5, (1, padded_nodes), generator=generator)
+    bonds = torch.zeros((1, padded_nodes, padded_nodes), dtype=torch.long)
+    for node in range(num_nodes - 1):
+        bonds[0, node, node + 1] = 1
+        bonds[0, node + 1, node] = 1
+    mask = torch.zeros((1, padded_nodes), dtype=torch.bool)
+    mask[0, :num_nodes] = True
+    return features, bonds, mask
+
+
 class ModelTests(unittest.TestCase):
     def test_forward_and_head_gradients_with_frozen_encoder(self) -> None:
         encoder = DiffusionEncoder(ModelConfig(hidden_dim=16, dropout=0.0))
@@ -52,6 +74,53 @@ class ModelTests(unittest.TestCase):
         model.train()
         self.assertTrue(model.training)
         self.assertFalse(model.encoder.training)
+
+    def test_batch_padding_does_not_change_molecule_prediction(self) -> None:
+        encoder = DiffusionEncoder(ModelConfig(hidden_dim=16, dropout=0.0))
+        model = MultiscaleMolecularModel(
+            encoder,
+            config=MultiscaleModelConfig(hidden_dim=16, dropout=0.0),
+        ).eval()
+        single_features, single_bonds, single_mask = path_molecule(
+            12, 12, seed=21,
+        )
+        other_features, other_bonds, other_mask = path_molecule(
+            40, 40, seed=22,
+        )
+        features = torch.cat((
+            torch.nn.functional.pad(single_features, (0, 0, 0, 28)),
+            other_features,
+        ), dim=0)
+        bonds = torch.cat((
+            torch.nn.functional.pad(single_bonds, (0, 28, 0, 28)),
+            other_bonds,
+        ), dim=0)
+        mask = torch.cat((
+            torch.nn.functional.pad(single_mask, (0, 28), value=False),
+            other_mask,
+        ), dim=0)
+
+        with torch.no_grad():
+            single = model(
+                single_features, single_bonds, single_mask, partition_seeds=[7],
+            )
+            batched = model(features, bonds, mask, partition_seeds=[7, 8])
+
+        torch.testing.assert_close(
+            batched.graph_representation[0],
+            single.graph_representation[0],
+            rtol=0,
+            atol=1e-6,
+        )
+        torch.testing.assert_close(
+            batched.prediction[0],
+            single.prediction[0],
+            rtol=0,
+            atol=1e-6,
+        )
+        self.assertTrue(
+            batched.token_counts[0].equal(single.token_counts[0]),
+        )
 
 
 if __name__ == "__main__":

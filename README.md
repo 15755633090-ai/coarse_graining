@@ -20,6 +20,9 @@ SHA256 1358eb1baba19ccbb4463e46907e86e28085cf5b14cd39ccaef99a4fc6f6f1a9
 
 `bace`, `bbbp`, `clintox`, `esol`, `freesolv`, `hiv`, `lipo`, `muv`, `pcba`, `sider`, `tox21`, and `toxcast` are included. The same frozen encoder and dataset interface apply to every task.
 
+Run the project in the existing `polyolefin_ml` environment. Dependencies are
+listed in `requirements.txt`; partition canonicalization uses `python-igraph`.
+
 ## Minimal usage
 
 ```python

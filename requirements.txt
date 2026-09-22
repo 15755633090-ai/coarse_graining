@@ -1,0 +1,6 @@
+igraph>=0.11
+numpy
+pandas
+rdkit
+scikit-learn
+torch
