@@ -3,9 +3,11 @@ from __future__ import annotations
 import unittest
 import random
 
+import igraph as ig
 import torch
 
 from multiscale_tokenizer.partition import (
+    _canonical_ranks,
     derive_partition_seed,
     partition_graph,
     partition_molecule,
@@ -21,7 +23,64 @@ def path_graph(num_nodes: int) -> list[list[int]]:
     return adjacency
 
 
+def cycle_graph(num_nodes: int) -> list[list[int]]:
+    adjacency = path_graph(num_nodes)
+    adjacency[0].append(num_nodes - 1)
+    adjacency[-1].append(0)
+    return adjacency
+
+
+def partition_isomorphic(
+    adjacency: list[list[int]],
+    partition,
+    other_adjacency: list[list[int]],
+    other_partition,
+) -> bool:
+    def colored_graph(edges_adjacency, tokenization):
+        num_nodes = len(edges_adjacency)
+        edges = [
+            (left, right)
+            for left in range(num_nodes)
+            for right in edges_adjacency[left]
+            if left < right
+        ]
+        colors = [("q",)] * num_nodes
+        for index in range(len(tokenization.members)):
+            token_node = num_nodes + index
+            scale = (
+                int(tokenization.levels[index]),
+                bool(tokenization.residual[index]),
+                int(tokenization.rounds[index]),
+            )
+            for member in tokenization.members[index].tolist():
+                edges.append((token_node, member))
+                colors[member] = ("member", scale)
+            colors.append(("token", scale))
+        palette = {
+            color: index for index, color in enumerate(sorted(set(colors)))
+        }
+        graph = ig.Graph(n=len(colors), edges=edges, directed=False)
+        return graph, [palette[color] for color in colors]
+
+    left_graph, left_colors = colored_graph(adjacency, partition)
+    right_graph, right_colors = colored_graph(other_adjacency, other_partition)
+    return left_graph.isomorphic_vf2(
+        right_graph,
+        color1=left_colors,
+        color2=right_colors,
+    )
+
+
 class PartitionTests(unittest.TestCase):
+    def test_canonical_ranks_match_igraph_old_to_new_permutation(self) -> None:
+        adjacency = path_graph(3)
+        graph = ig.Graph(n=3, edges=[(0, 1), (1, 2)], directed=False)
+        expected = {
+            old: graph.canonical_permutation()[old]
+            for old in range(3)
+        }
+        self.assertEqual(_canonical_ranks(adjacency, {0, 1, 2}), expected)
+
     def test_partition_is_exclusive_and_complete(self) -> None:
         adjacency = path_graph(30)
         partition = partition_graph(adjacency, seed=7)
@@ -174,6 +233,57 @@ class PartitionTests(unittest.TestCase):
                 inverse,
             )
             self.assertEqual(actual, expected)
+
+    def test_symmetric_graphs_have_isomorphic_fixed_seed_partitions(self) -> None:
+        graphs = [
+            path_graph(20),
+            cycle_graph(12),
+            cycle_graph(6),
+        ]
+        branch = path_graph(13)
+        branch[0] = [1, 2]
+        branch[1] = [0, 3]
+        branch[2] = [0, 4]
+        branch[3] = [1, 5]
+        branch[4] = [2, 6]
+        branch[5] = [3, 7]
+        branch[6] = [4, 8]
+        branch[7] = [5, 9]
+        branch[8] = [6, 10]
+        branch[9] = [7, 11]
+        branch[10] = [8, 12]
+        branch[11] = [9]
+        branch[12] = [10]
+        graphs.append(branch)
+
+        rng = random.Random(17)
+        for adjacency in graphs:
+            expected = partition_graph(adjacency, seed=31)
+            num_nodes = len(adjacency)
+            edges = [
+                (left, right)
+                for left in range(num_nodes)
+                for right in adjacency[left]
+                if left < right
+            ]
+            for _ in range(100):
+                permutation = list(range(num_nodes))
+                rng.shuffle(permutation)
+                relabeled = [[] for _ in range(num_nodes)]
+                for left, right in edges:
+                    new_left, new_right = permutation[left], permutation[right]
+                    relabeled[new_left].append(new_right)
+                    relabeled[new_right].append(new_left)
+                actual = partition_graph(relabeled, seed=31)
+                self.assertTrue(
+                    partition_isomorphic(
+                        adjacency,
+                        expected,
+                        relabeled,
+                        actual,
+                    ),
+                    msg=f"partition changed under relabeling for {num_nodes} nodes",
+                )
 
 
 if __name__ == "__main__":

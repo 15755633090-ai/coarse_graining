@@ -152,9 +152,13 @@ The implemented random choices are:
 2. uniform selection from legal standard-region centers;
 3. the effect of center order through sequential region removal.
 
-Candidate priorities are generated from canonical graph ranks, not atom
-indices. Therefore a fixed validation/test partition seed is invariant to atom
-renumbering. Training still samples a new partition for every epoch.
+Candidate priorities are generated from canonical graph ranks, so their order
+does not follow input atom IDs. The tests cover random relabelings of both
+asymmetric and strongly symmetric graphs, comparing partitions up to graph
+isomorphism. Automorphic vertices are interchangeable under the topology-only
+definition, so the implementation does not claim a unique representative among
+them. Atom and bond labels are not part of this canonicalization. Training
+still samples a new partition for every epoch.
 
 Validation and test reports restore regression predictions to the original
 target units before computing RMSE, MAE, and R-squared. Classification reports

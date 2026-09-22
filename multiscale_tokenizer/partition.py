@@ -155,7 +155,10 @@ def _canonical_ranks(
         return {}
     graph = ig.Graph(n=len(order), edges=edges, directed=False)
     permutation = graph.canonical_permutation()
-    return {order[old]: rank for rank, old in enumerate(permutation)}
+    return {
+        order[old]: permutation[old]
+        for old in range(len(order))
+    }
 
 
 def _canonical_signature(
@@ -544,6 +547,9 @@ def partition_graph(
         residual_counts = {
             level: int(((levels == level) & residual).sum()) for level in (2, 3, 4)
         }
+        standard_counts = {
+            level: int(((levels == level) & ~residual).sum()) for level in (2, 3, 4)
+        }
         q_size = int(q_mask.sum())
         stats = {
             "num_nodes": num_nodes,
@@ -556,6 +562,8 @@ def partition_graph(
         for level in (2, 3, 4):
             stats[f"level{level}_tokens"] = level_counts[level]
             stats[f"level{level}_nodes"] = level_nodes[level]
+            stats[f"standard_level{level}_tokens"] = standard_counts[level]
+            stats[f"residual_level{level}_tokens"] = residual_counts[level]
             stats[f"level{level}_residual_tokens"] = residual_counts[level]
             stats[f"level{level}_residual_rate"] = (
                 residual_counts[level] / level_counts[level]

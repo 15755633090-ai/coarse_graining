@@ -57,6 +57,16 @@ def main() -> None:
         summary[f"mean_level{level}_tokens"] = _mean([
             float(row[f"level{level}_tokens"]) for row in rows
         ])
+        summary[f"standard_level{level}_tokens"] = sum(
+            int(row[f"standard_level{level}_tokens"]) for row in rows
+        )
+        summary[f"residual_level{level}_tokens"] = sum(
+            int(row[f"residual_level{level}_tokens"]) for row in rows
+        )
+        summary[f"p_standard_level{level}_present"] = _mean([
+            float(int(row[f"standard_level{level}_tokens"]) > 0)
+            for row in rows
+        ])
         nodes = [float(row[f"level{level}_nodes"]) for row in rows]
         tokens = [float(row[f"level{level}_tokens"]) for row in rows]
         total_nodes = sum(nodes)

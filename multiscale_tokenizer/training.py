@@ -210,7 +210,7 @@ def _run_epoch(
     optimizer: torch.optim.Optimizer | None = None,
 ) -> dict[str, float]:
     model.train(training)
-    totals = {"loss": 0.0, "samples": 0.0}
+    totals = {"loss_sum": 0.0, "valid_labels": 0.0}
     all_predictions: list[Tensor] = []
     all_targets: list[Tensor] = []
     all_masks: list[Tensor] = []
@@ -239,9 +239,12 @@ def _run_epoch(
             all_predictions.append(output.prediction.detach().cpu())
             all_targets.append(batch.targets.detach().cpu())
             all_masks.append(batch.target_mask.detach().cpu())
-        totals["loss"] += float(loss.detach()) * batch.targets.size(0)
-        totals["samples"] += batch.targets.size(0)
-    metrics = {"loss": totals["loss"] / max(1.0, totals["samples"])}
+        valid_labels = float(batch.target_mask.sum())
+        totals["loss_sum"] += float(loss.detach()) * valid_labels
+        totals["valid_labels"] += valid_labels
+    metrics = {
+        "loss": totals["loss_sum"] / max(1.0, totals["valid_labels"]),
+    }
     if not training:
         metrics.update(_metrics(
             torch.cat(all_predictions),
@@ -251,6 +254,20 @@ def _run_epoch(
             scaler,
         ))
     return metrics
+
+
+def _is_better_validation(
+    candidate: dict[str, float],
+    best_value: float,
+    spec: TaskSpec,
+) -> tuple[bool, float]:
+    if spec.task_type == "regression":
+        value = candidate["loss"]
+        return value < best_value, value
+    value = candidate[spec.primary_metric]
+    if not np.isfinite(value):
+        return False, best_value
+    return value > best_value, value
 
 
 def train_property_model(
@@ -331,7 +348,7 @@ def train_property_model(
 
     history: list[dict[str, float | int]] = []
     best_state = copy.deepcopy(model.state_dict())
-    best_validation = float("inf")
+    best_validation = float("inf") if spec.task_type == "regression" else -float("inf")
     for epoch in range(epochs):
         train_metrics = _run_epoch(
             model,
@@ -365,8 +382,12 @@ def train_property_model(
             },
         }
         history.append(row)
-        if valid_metrics["loss"] < best_validation:
-            best_validation = valid_metrics["loss"]
+        improved, best_validation = _is_better_validation(
+            valid_metrics,
+            best_validation,
+            spec,
+        )
+        if improved:
             best_state = copy.deepcopy(model.state_dict())
 
     model.load_state_dict(best_state)
@@ -393,7 +414,10 @@ def train_property_model(
         "partition_seed": partition_seed,
         "data_seed": data_seed,
         "history": history,
-        "selection_metric": "valid_loss",
+        "selection_metric": (
+            "valid_loss" if spec.task_type == "regression"
+            else f"valid_{spec.primary_metric}"
+        ),
         "primary_test_metric": spec.primary_metric,
         "test_metrics": test_metrics,
     }
