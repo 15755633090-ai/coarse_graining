@@ -155,6 +155,8 @@ def _make_loader(
     epoch: int,
     training: bool,
     generator: torch.Generator | None = None,
+    tokenization: TokenizationConfig | None = None,
+    pin_memory: bool = False,
 ) -> DataLoader[PropertyBatch]:
     return DataLoader(
         dataset,
@@ -162,12 +164,13 @@ def _make_loader(
         shuffle=shuffle,
         num_workers=num_workers,
         generator=generator,
+        pin_memory=pin_memory,
         collate_fn=partial(
             _collate_with_partitions,
             base_partition_seed=base_partition_seed,
             epoch=epoch,
             training=training,
-            tokenization=TokenizationConfig(),
+            tokenization=tokenization or TokenizationConfig(),
         ),
     )
 
@@ -385,11 +388,14 @@ def train_property_model(
     dropout: float = 0.1,
     num_workers: int = 4,
     resume: bool = False,
+    patience: int = 20,
 ) -> dict[str, object]:
     """Train only the token readout while the diffusion encoder stays frozen."""
 
     if task not in TASK_SPECS:
         raise ValueError(f"unknown task {task!r}")
+    if patience < 0:
+        raise ValueError("patience must be nonnegative")
     spec = TASK_SPECS[task]
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
@@ -416,6 +422,8 @@ def train_property_model(
         base_partition_seed=partition_seed,
         epoch=0,
         training=False,
+        tokenization=model.config.tokenization,
+        pin_memory=device_object.type == "cuda",
     )
     test_loader = _make_loader(
         test_dataset,
@@ -425,6 +433,8 @@ def train_property_model(
         base_partition_seed=partition_seed,
         epoch=0,
         training=False,
+        tokenization=model.config.tokenization,
+        pin_memory=device_object.type == "cuda",
     )
 
     seed_everything(model_seed)
@@ -447,6 +457,7 @@ def train_property_model(
     start_epoch = 0
     best_state = copy.deepcopy(model.state_dict())
     best_validation = float("inf") if spec.task_type == "regression" else -float("inf")
+    epochs_without_improvement = 0
     if resume:
         last_path = output / "last.pt"
         if not last_path.is_file():
@@ -460,6 +471,17 @@ def train_property_model(
         start_epoch = len(history)
         best_state = resume_checkpoint["best_model_state"]
         best_validation = float(resume_checkpoint["best_selection"])
+        selection_key = (
+            "valid_loss" if spec.task_type == "regression"
+            else f"valid_{spec.primary_metric}"
+        )
+        if history:
+            best_row = (
+                min(history, key=lambda row: row["valid_loss"])
+                if spec.task_type == "regression"
+                else max(history, key=lambda row: row[selection_key])
+            )
+            epochs_without_improvement = len(history) - int(best_row["epoch"]) - 1
         print(f"resumed from epoch {start_epoch}", flush=True)
 
     for epoch in range(start_epoch, epochs):
@@ -472,6 +494,8 @@ def train_property_model(
             epoch=epoch,
             training=True,
             generator=generator,
+            tokenization=model.config.tokenization,
+            pin_memory=device_object.type == "cuda",
         )
         train_metrics = _run_epoch(
             model,
@@ -518,6 +542,9 @@ def train_property_model(
         )
         if improved:
             best_state = copy.deepcopy(model.state_dict())
+            epochs_without_improvement = 0
+        else:
+            epochs_without_improvement += 1
         selection_metric = (
             "valid_loss" if spec.task_type == "regression"
             else f"valid_{spec.primary_metric}"
@@ -538,6 +565,14 @@ def train_property_model(
             "best_selection": best_validation,
             "best_model_state": best_state,
             "primary_test_metric": spec.primary_metric,
+            "best_epoch": int(min(
+                history,
+                key=lambda row: row["valid_loss"],
+            )["epoch"]) if spec.task_type == "regression" else int(max(
+                history,
+                key=lambda row: row[f"valid_{spec.primary_metric}"],
+            )["epoch"]),
+            "epochs_without_improvement": epochs_without_improvement,
         }
         torch.save(
             {**checkpoint_common, "model_state": best_state},
@@ -563,6 +598,12 @@ def train_property_model(
             f"{selection_metric}={selection_value:.6f}",
             flush=True,
         )
+        if patience and epochs_without_improvement >= patience:
+            print(
+                f"early stopping after {patience} epochs without improvement",
+                flush=True,
+            )
+            break
 
     model.load_state_dict(best_state)
     test_metrics = _run_epoch(
@@ -582,6 +623,59 @@ def train_property_model(
     }
     torch.save(checkpoint, output / "best.pt")
     return checkpoint
+
+
+def evaluate_property_model(
+    checkpoint_path: str | Path,
+    *,
+    dataset_root: str | Path,
+    task: str,
+    split: str = "test",
+    device: str | torch.device = "cuda",
+    batch_size: int = 32,
+    num_workers: int = 4,
+) -> dict[str, float]:
+    """Evaluate the best checkpoint without changing or retraining the model."""
+
+    if split not in {"valid", "test"}:
+        raise ValueError("split must be valid or test")
+    checkpoint = torch.load(
+        Path(checkpoint_path), map_location="cpu", weights_only=False,
+    )
+    if checkpoint.get("task_spec", {}).get("name") != task:
+        raise ValueError("checkpoint task does not match the requested task")
+    device_object = torch.device(device)
+    if device_object.type == "cuda" and not torch.cuda.is_available():
+        device_object = torch.device("cpu")
+    model, scaler, spec = load_property_model(
+        checkpoint_path,
+        device=device_object,
+    )
+    model.eval()
+    dataset = OGBMoleculePropertyDataset(dataset_root, split=split)
+    if dataset.labels.size(1) != spec.num_tasks:
+        raise ValueError("dataset target count does not match the checkpoint")
+    loader = _make_loader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        base_partition_seed=int(checkpoint["partition_seed"]),
+        epoch=0,
+        training=False,
+        tokenization=model.config.tokenization,
+        pin_memory=device_object.type == "cuda",
+    )
+    return _run_epoch(
+        model,
+        loader,
+        device=device_object,
+        spec=spec,
+        scaler=scaler,
+        base_partition_seed=int(checkpoint["partition_seed"]),
+        epoch=0,
+        training=False,
+    )
 
 
 def load_property_model(

@@ -85,7 +85,18 @@ python scripts/train.py --dataset-root datasets/lipo --task lipo --output-dir ru
 ```
 
 Training writes `history.json`, `history.csv`, `best.pt`, and `last.pt`. Resume
-an interrupted run with the same command plus `--resume`.
+an interrupted run with the same command plus `--resume`. `--patience`
+controls early stopping on the validation selection metric.
+
+Evaluate the saved best checkpoint without retraining:
+
+```powershell
+python scripts/evaluate.py `
+  --checkpoint runs/lipo_seed0_stage1/best.pt `
+  --dataset-root datasets/lipo `
+  --task lipo `
+  --split test
+```
 
 The first Lipo seed-0 run is summarized in
 `results/lipo_seed0_v1/summary.json`, with its full per-epoch curve in the same

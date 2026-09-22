@@ -29,6 +29,7 @@ def main() -> None:
     parser.add_argument("--data-seed", type=int, default=0)
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--patience", type=int, default=20)
     args = parser.parse_args()
     result = train_property_model(
         args.dataset_root,
@@ -44,6 +45,7 @@ def main() -> None:
         dropout=args.dropout,
         num_workers=args.num_workers,
         resume=args.resume,
+        patience=args.patience,
     )
     summary = {
         key: result[key]

@@ -1,35 +1,38 @@
 {
   "experiment": "lipo_v1_seed0",
-  "git_commit": "3592416",
   "dataset": "lipo",
   "split": "scaffold",
-  "epochs": 30,
-  "best_epoch_zero_based": 24,
-  "best_epoch_one_based": 25,
+  "training_protocol": {
+    "optimizer": "AdamW",
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "maximum_epochs_requested": 200,
+    "epochs_completed": 122,
+    "stopped_manually": true
+  },
+  "best_epoch_zero_based": 34,
+  "best_epoch_one_based": 35,
+  "epochs_without_improvement_at_stop": 87,
   "selection_metric": "valid_loss",
-  "validation": {
-    "loss": 0.5067416298957098,
-    "rmse": 0.8624441999546585,
-    "mae": 0.6651554703712463,
-    "r2": 0.4981573943852543
+  "validation_at_best_epoch": {
+    "loss": 0.5056018579573859,
+    "rmse": 0.8614737458947169,
+    "mae": 0.6590453386306763,
+    "r2": 0.4992861655840921,
+    "norm_q": 6.204197883605957,
+    "norm_h2": 2.569713830947876,
+    "norm_h3": 2.061676502227783,
+    "norm_h4": 0.4635218381881714
   },
-  "test": {
-    "loss": 0.4991746280874525,
-    "rmse": 0.8559806720365337,
-    "mae": 0.6717200875282288,
-    "r2": 0.3930724975483937
-  },
-  "best_validation_scale_norms": {
-    "q": 6.204197883605957,
-    "h2": 2.460472822189331,
-    "h3": 1.8600987195968628,
-    "h4": 0.4377177059650421
-  },
-  "test_scale_norms": {
-    "q": 6.227715969085693,
-    "h2": 2.6843504905700684,
-    "h3": 1.7453398704528809,
-    "h4": 0.4632393717765808
+  "test_from_best_epoch_checkpoint": {
+    "loss": 0.47235528656414577,
+    "rmse": 0.8326684365550224,
+    "mae": 0.6491828560829163,
+    "r2": 0.4256811336668188,
+    "norm_q": 6.227715969085693,
+    "norm_h2": 2.999682664871216,
+    "norm_h3": 2.0250508785247803,
+    "norm_h4": 0.42238879203796387
   },
   "test_token_statistics": {
     "mean_q_tokens": 11.719047546386719,
@@ -43,14 +46,24 @@
     "p_h3_present": 0.7404761910438538,
     "p_h4_present": 0.20952381193637848
   },
+  "best_epoch_training": {
+    "train_loss": 0.249130009327616,
+    "last_completed_train_loss": 0.13603849425202325,
+    "last_completed_valid_loss": 0.5450456460316976
+  },
   "frozen_diffusion_baseline_seed0": {
     "test_rmse": 0.8796290159688077,
     "test_mae": 0.6693529486656189,
     "test_r2": 0.3590738285679729
   },
   "delta_vs_frozen_diffusion_baseline": {
-    "rmse": -0.023648343932274,
-    "mae": 0.0023671388626099,
-    "r2": 0.0339986689804208
+    "rmse": -0.0469605794137853,
+    "mae": -0.0201700925827026,
+    "r2": 0.0666073050988459
+  },
+  "next_seed_protocol": {
+    "max_epochs": 100,
+    "patience": 20,
+    "learning_rate_decay_experiment": "separate_later"
   }
 }
