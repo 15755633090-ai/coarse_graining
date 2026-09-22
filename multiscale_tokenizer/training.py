@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import copy
+import csv
+import json
 import random
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -210,7 +212,11 @@ def _run_epoch(
     optimizer: torch.optim.Optimizer | None = None,
 ) -> dict[str, float]:
     model.train(training)
-    totals = {"loss_sum": 0.0, "valid_labels": 0.0}
+    totals = {"loss_sum": 0.0, "valid_labels": 0.0, "samples": 0.0}
+    level_norm_sum = torch.zeros(4)
+    token_sum = torch.zeros(4)
+    residual_sum = torch.zeros(4)
+    present_count = torch.zeros(4)
     all_predictions: list[Tensor] = []
     all_targets: list[Tensor] = []
     all_masks: list[Tensor] = []
@@ -239,12 +245,27 @@ def _run_epoch(
             all_predictions.append(output.prediction.detach().cpu())
             all_targets.append(batch.targets.detach().cpu())
             all_masks.append(batch.target_mask.detach().cpu())
+        level_norm_sum += output.level_norms.detach().cpu().sum(dim=0)
+        token_sum += output.token_counts.detach().cpu().sum(dim=0)
+        residual_sum += output.residual_counts.detach().cpu().sum(dim=0)
+        present_count += output.token_counts.detach().cpu().gt(0).sum(dim=0)
         valid_labels = float(batch.target_mask.sum())
         totals["loss_sum"] += float(loss.detach()) * valid_labels
         totals["valid_labels"] += valid_labels
+        totals["samples"] += batch.targets.size(0)
     metrics = {
         "loss": totals["loss_sum"] / max(1.0, totals["valid_labels"]),
     }
+    samples = max(1.0, totals["samples"])
+    names = ("q", "h2", "h3", "h4")
+    for index, name in enumerate(names):
+        metrics[f"norm_{name}"] = float(level_norm_sum[index] / samples)
+        metrics[f"tokens_{name}"] = float(token_sum[index] / samples)
+        metrics[f"residual_{name}"] = float(residual_sum[index] / samples)
+        if index:
+            metrics[f"p_{name}_present"] = float(
+                present_count[index] / samples
+            )
     if not training:
         metrics.update(_metrics(
             torch.cat(all_predictions),
@@ -254,6 +275,19 @@ def _run_epoch(
             scaler,
         ))
     return metrics
+
+
+def _write_history(output: Path, history: list[dict[str, float | int]]) -> None:
+    (output / "history.json").write_text(
+        json.dumps(history, indent=2),
+        encoding="utf-8",
+    )
+    if not history:
+        return
+    with (output / "history.csv").open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(history[0]))
+        writer.writeheader()
+        writer.writerows(history)
 
 
 def _is_better_validation(
@@ -284,6 +318,7 @@ def train_property_model(
     data_seed: int = 0,
     dropout: float = 0.1,
     num_workers: int = 0,
+    resume: bool = False,
 ) -> dict[str, object]:
     """Train only the token readout while the diffusion encoder stays frozen."""
 
@@ -347,9 +382,25 @@ def train_property_model(
     optimizer = torch.optim.AdamW(trainable, lr=learning_rate)
 
     history: list[dict[str, float | int]] = []
+    start_epoch = 0
     best_state = copy.deepcopy(model.state_dict())
     best_validation = float("inf") if spec.task_type == "regression" else -float("inf")
-    for epoch in range(epochs):
+    if resume:
+        last_path = output / "last.pt"
+        if not last_path.is_file():
+            raise FileNotFoundError(f"cannot resume without {last_path}")
+        resume_checkpoint = torch.load(
+            last_path, map_location="cpu", weights_only=False,
+        )
+        model.load_state_dict(resume_checkpoint["last_model_state"], strict=True)
+        optimizer.load_state_dict(resume_checkpoint["optimizer_state"])
+        history = list(resume_checkpoint["history"])
+        start_epoch = len(history)
+        best_state = resume_checkpoint["best_model_state"]
+        best_validation = float(resume_checkpoint["best_selection"])
+        print(f"resumed from epoch {start_epoch}", flush=True)
+
+    for epoch in range(start_epoch, epochs):
         train_metrics = _run_epoch(
             model,
             train_loader,
@@ -376,12 +427,18 @@ def train_property_model(
             "train_loss": train_metrics["loss"],
             "valid_loss": valid_metrics["loss"],
             **{
+                f"train_{name}": value
+                for name, value in train_metrics.items()
+                if name != "loss"
+            },
+            **{
                 f"valid_{name}": value
                 for name, value in valid_metrics.items()
                 if name != "loss"
             },
         }
         history.append(row)
+        _write_history(output, history)
         improved, best_validation = _is_better_validation(
             valid_metrics,
             best_validation,
@@ -389,6 +446,51 @@ def train_property_model(
         )
         if improved:
             best_state = copy.deepcopy(model.state_dict())
+        selection_metric = (
+            "valid_loss" if spec.task_type == "regression"
+            else f"valid_{spec.primary_metric}"
+        )
+        checkpoint_common = {
+            "schema_version": 1,
+            "task_spec": asdict(spec),
+            "model_config": asdict(model.config),
+            "target_scaler": None if scaler is None else {
+                "mean": scaler.mean,
+                "std": scaler.std,
+            },
+            "model_seed": model_seed,
+            "partition_seed": partition_seed,
+            "data_seed": data_seed,
+            "history": history,
+            "selection_metric": selection_metric,
+            "best_selection": best_validation,
+            "best_model_state": best_state,
+            "primary_test_metric": spec.primary_metric,
+        }
+        torch.save(
+            {**checkpoint_common, "model_state": best_state},
+            output / "best.pt",
+        )
+        torch.save(
+            {
+                **checkpoint_common,
+                "model_state": model.state_dict(),
+                "last_model_state": model.state_dict(),
+                "optimizer_state": optimizer.state_dict(),
+            },
+            output / "last.pt",
+        )
+        selection_value = (
+            valid_metrics["loss"] if spec.task_type == "regression"
+            else valid_metrics[spec.primary_metric]
+        )
+        print(
+            f"epoch {epoch + 1}/{epochs} "
+            f"train_loss={train_metrics['loss']:.6f} "
+            f"valid_loss={valid_metrics['loss']:.6f} "
+            f"{selection_metric}={selection_value:.6f}",
+            flush=True,
+        )
 
     model.load_state_dict(best_state)
     test_metrics = _run_epoch(
@@ -402,23 +504,8 @@ def train_property_model(
         training=False,
     )
     checkpoint = {
-        "schema_version": 1,
-        "task_spec": asdict(spec),
-        "model_config": asdict(model.config),
-        "model_state": model.state_dict(),
-        "target_scaler": None if scaler is None else {
-            "mean": scaler.mean,
-            "std": scaler.std,
-        },
-        "model_seed": model_seed,
-        "partition_seed": partition_seed,
-        "data_seed": data_seed,
-        "history": history,
-        "selection_metric": (
-            "valid_loss" if spec.task_type == "regression"
-            else f"valid_{spec.primary_metric}"
-        ),
-        "primary_test_metric": spec.primary_metric,
+        **checkpoint_common,
+        "model_state": best_state,
         "test_metrics": test_metrics,
     }
     torch.save(checkpoint, output / "best.pt")
