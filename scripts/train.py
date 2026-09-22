@@ -27,7 +27,7 @@ def main() -> None:
     parser.add_argument("--model-seed", type=int, default=0)
     parser.add_argument("--partition-seed", type=int, default=100_000)
     parser.add_argument("--data-seed", type=int, default=0)
-    parser.add_argument("--num-workers", type=int, default=0)
+    parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     result = train_property_model(

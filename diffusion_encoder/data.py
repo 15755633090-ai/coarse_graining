@@ -5,7 +5,7 @@ import csv
 import gzip
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 import pandas as pd
 import torch
@@ -61,11 +61,13 @@ class PropertyBatch:
     targets: Tensor
     target_mask: Tensor
     sample_ids: Tensor
+    partitions: list[Any] | None = None
 
     def to(self, device: str | torch.device) -> "PropertyBatch":
         return type(self)(
             self.graph.to(device), self.targets.to(device),
             self.target_mask.to(device), self.sample_ids.to(device),
+            self.partitions,
         )
 
 

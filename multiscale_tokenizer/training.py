@@ -6,7 +6,9 @@ import csv
 import json
 import random
 from dataclasses import asdict, dataclass
+from functools import partial
 from pathlib import Path
+from typing import Sequence
 
 import numpy as np
 import torch
@@ -17,12 +19,17 @@ from torch.utils.data import DataLoader
 from diffusion_encoder.data import (
     OGBMoleculePropertyDataset,
     PropertyBatch,
+    PropertyRecord,
     collate_property_records,
 )
 from diffusion_encoder.encoder import load_frozen_encoder
 
 from .model import MultiscaleModelConfig, MultiscaleMolecularModel
-from .partition import TokenizationConfig, derive_partition_seed
+from .partition import (
+    TokenizationConfig,
+    derive_partition_seed,
+    partition_molecule,
+)
 
 
 @dataclass(frozen=True)
@@ -108,6 +115,61 @@ def _partition_seeds(
         derive_partition_seed(base_seed, int(sample_id), partition_epoch)
         for sample_id in sample_ids
     ]
+
+
+def _collate_with_partitions(
+    records: Sequence[PropertyRecord],
+    *,
+    base_partition_seed: int,
+    epoch: int,
+    training: bool,
+    tokenization: TokenizationConfig,
+) -> PropertyBatch:
+    batch = collate_property_records(records)
+    seeds = _partition_seeds(
+        batch.sample_ids,
+        base_seed=base_partition_seed,
+        epoch=epoch,
+        training=training,
+    )
+    batch.partitions = [
+        partition_molecule(
+            record.graph.bonds,
+            node_mask=None,
+            seed=seed,
+            config=tokenization,
+            include_stats=False,
+        )
+        for record, seed in zip(records, seeds)
+    ]
+    return batch
+
+
+def _make_loader(
+    dataset: OGBMoleculePropertyDataset,
+    *,
+    batch_size: int,
+    shuffle: bool,
+    num_workers: int,
+    base_partition_seed: int,
+    epoch: int,
+    training: bool,
+    generator: torch.Generator | None = None,
+) -> DataLoader[PropertyBatch]:
+    return DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        num_workers=num_workers,
+        generator=generator,
+        collate_fn=partial(
+            _collate_with_partitions,
+            base_partition_seed=base_partition_seed,
+            epoch=epoch,
+            training=training,
+            tokenization=TokenizationConfig(),
+        ),
+    )
 
 
 def _loss(
@@ -222,17 +284,21 @@ def _run_epoch(
     all_masks: list[Tensor] = []
     for batch in loader:
         batch = batch.to(device)
-        seeds = _partition_seeds(
-            batch.sample_ids,
-            base_seed=base_partition_seed,
-            epoch=epoch,
-            training=training,
+        seeds = (
+            None if batch.partitions is not None
+            else _partition_seeds(
+                batch.sample_ids,
+                base_seed=base_partition_seed,
+                epoch=epoch,
+                training=training,
+            )
         )
         output = model(
             batch.graph.node_features,
             batch.graph.bonds,
             batch.graph.node_mask,
             seeds,
+            batch.partitions,
         )
         loss = _loss(output.prediction, batch.targets, batch.target_mask, spec, scaler)
         if training:
@@ -317,7 +383,7 @@ def train_property_model(
     partition_seed: int = 0,
     data_seed: int = 0,
     dropout: float = 0.1,
-    num_workers: int = 0,
+    num_workers: int = 4,
     resume: bool = False,
 ) -> dict[str, object]:
     """Train only the token readout while the diffusion encoder stays frozen."""
@@ -342,27 +408,23 @@ def train_property_model(
     scaler = TargetScaler.fit(train_dataset) if spec.task_type == "regression" else None
 
     generator = torch.Generator().manual_seed(data_seed)
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        collate_fn=collate_property_records,
-        num_workers=num_workers,
-        generator=generator,
-    )
-    valid_loader = DataLoader(
+    valid_loader = _make_loader(
         valid_dataset,
         batch_size=batch_size,
         shuffle=False,
-        collate_fn=collate_property_records,
         num_workers=num_workers,
+        base_partition_seed=partition_seed,
+        epoch=0,
+        training=False,
     )
-    test_loader = DataLoader(
+    test_loader = _make_loader(
         test_dataset,
         batch_size=batch_size,
         shuffle=False,
-        collate_fn=collate_property_records,
         num_workers=num_workers,
+        base_partition_seed=partition_seed,
+        epoch=0,
+        training=False,
     )
 
     seed_everything(model_seed)
@@ -401,6 +463,16 @@ def train_property_model(
         print(f"resumed from epoch {start_epoch}", flush=True)
 
     for epoch in range(start_epoch, epochs):
+        train_loader = _make_loader(
+            train_dataset,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=num_workers,
+            base_partition_seed=partition_seed,
+            epoch=epoch,
+            training=True,
+            generator=generator,
+        )
         train_metrics = _run_epoch(
             model,
             train_loader,

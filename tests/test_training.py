@@ -52,6 +52,7 @@ class TrainingTests(unittest.TestCase):
                 bonds: Tensor,
                 node_mask: Tensor,
                 partition_seeds,
+                partitions,
             ) -> TokenModelOutput:
                 batch_size = node_features.size(0)
                 prediction = torch.zeros((batch_size, 1))

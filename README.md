@@ -90,3 +90,8 @@ an interrupted run with the same command plus `--resume`.
 The first Lipo seed-0 run is summarized in
 `results/lipo_seed0_v1/summary.json`, with its full per-epoch curve in the same
 directory.
+
+Stochastic partitions are computed in DataLoader workers and the GPU pools all
+tokens for the batch with batched `index_add` operations. The measured Lipo
+pipeline improvement is recorded in
+`results/performance/lipo_training_pipeline.json`.

@@ -7,6 +7,7 @@ from torch import nn
 
 from diffusion_encoder.model import DiffusionEncoder, ModelConfig
 from multiscale_tokenizer.model import MultiscaleModelConfig, MultiscaleMolecularModel
+from multiscale_tokenizer.partition import partition_molecule
 
 
 def line_batch(batch_size: int, nodes: int) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -120,6 +121,45 @@ class ModelTests(unittest.TestCase):
         )
         self.assertTrue(
             batched.token_counts[0].equal(single.token_counts[0]),
+        )
+
+    def test_precomputed_partitions_match_forward_partitioning(self) -> None:
+        encoder = DiffusionEncoder(ModelConfig(hidden_dim=16, dropout=0.0))
+        model = MultiscaleMolecularModel(
+            encoder,
+            config=MultiscaleModelConfig(hidden_dim=16, dropout=0.0),
+        ).eval()
+        features, bonds, mask = line_batch(2, 14)
+        seeds = [5, 6]
+        partitions = [
+            partition_molecule(
+                bonds[index],
+                node_mask=mask[index],
+                seed=seed,
+                include_stats=False,
+            )
+            for index, seed in enumerate(seeds)
+        ]
+        with torch.no_grad():
+            expected = model(features, bonds, mask, seeds)
+            actual = model(
+                features,
+                bonds,
+                mask,
+                partition_seeds=None,
+                partitions=partitions,
+            )
+        torch.testing.assert_close(
+            actual.graph_representation,
+            expected.graph_representation,
+            rtol=0,
+            atol=1e-6,
+        )
+        torch.testing.assert_close(
+            actual.prediction,
+            expected.prediction,
+            rtol=0,
+            atol=1e-6,
         )
 
 

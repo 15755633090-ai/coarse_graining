@@ -12,6 +12,7 @@ from diffusion_encoder.encoder import DEFAULT_CHECKPOINT, load_frozen_encoder
 from diffusion_encoder.model import DiffusionEncoder
 
 from .partition import (
+    TokenPartition,
     TokenizationConfig,
     derive_partition_seed,
     partition_molecule,
@@ -116,72 +117,133 @@ class MultiscaleMolecularModel(nn.Module):
         bonds: Tensor,
         node_mask: Tensor,
         partition_seeds: int | Sequence[int] | Tensor | None = None,
+        partitions: Sequence[TokenPartition] | None = None,
     ) -> TokenModelOutput:
         with torch.no_grad():
             h1, h2, h3, h4 = self.encoder(node_features, bonds, node_mask)
         hidden_states = (h1, h2, h3, h4)
         batch_size = node_features.size(0)
-        seeds = self._partition_seeds(partition_seeds, batch_size)
+        if partitions is not None and len(partitions) != batch_size:
+            raise ValueError("one partition is required per graph")
+        seeds = (
+            None if partitions is not None
+            else self._partition_seeds(partition_seeds, batch_size)
+        )
 
-        graph_representations: list[Tensor] = []
-        level_norms: list[Tensor] = []
-        token_counts: list[Tensor] = []
-        residual_counts: list[Tensor] = []
-        zero = h1.new_zeros(self.config.hidden_dim)
-        bonds_cpu = bonds.detach().cpu()
-        mask_cpu = node_mask.detach().cpu()
+        bonds_cpu = bonds.detach().cpu() if partitions is None else None
+        mask_cpu = node_mask.detach().cpu() if partitions is None else None
 
-        for graph_index in range(batch_size):
-            valid = mask_cpu[graph_index]
-            partition = partition_molecule(
-                bonds_cpu[graph_index],
-                node_mask=valid,
-                seed=seeds[graph_index],
-                config=self.config.tokenization,
-                include_stats=False,
+        if partitions is None:
+            partitions = [
+                partition_molecule(
+                    bonds_cpu[graph_index],
+                    node_mask=mask_cpu[graph_index],
+                    seed=seeds[graph_index],
+                    config=self.config.tokenization,
+                    include_stats=False,
+                )
+                for graph_index in range(batch_size)
+            ]
+
+        node_count = node_features.size(1)
+        device = h1.device
+        graph_index_cpu: list[Tensor] = []
+        q_index_cpu: list[Tensor] = []
+        for graph_index, partition in enumerate(partitions):
+            q_indices = torch.where(partition.q_mask)[0] + graph_index * node_count
+            q_index_cpu.append(q_indices)
+            graph_index_cpu.append(torch.full_like(q_indices, graph_index))
+        q_index = torch.cat(q_index_cpu).to(device)
+        q_graph = torch.cat(graph_index_cpu).to(device)
+        q_count = torch.bincount(q_graph, minlength=batch_size)
+        zq = h1.reshape(-1, self.config.hidden_dim).index_select(0, q_index)
+        zq = torch.zeros((batch_size, self.config.hidden_dim), device=device).index_add_(
+            0, q_graph, zq,
+        )
+        zq = zq / q_count.clamp_min(1).unsqueeze(-1)
+
+        scale_vectors = [zq]
+        token_count_columns = [q_count]
+        residual_count_columns = [torch.zeros_like(q_count)]
+        for encoder_level, scale_index in ((2, 0), (3, 1), (4, 2)):
+            hidden = hidden_states[encoder_level - 1].reshape(
+                -1, self.config.hidden_dim,
             )
-            q_indices = torch.where(partition.q_mask)[0].to(h1.device)
-            zq = h1[graph_index, q_indices].mean(dim=0)
-            scale_vectors = [zq]
-            graph_token_counts = [int(q_indices.numel())]
-            graph_residual_counts = [0]
-
-            for encoder_level, scale_index in ((2, 0), (3, 1), (4, 2)):
-                hidden = hidden_states[encoder_level - 1][graph_index]
-                token_indices = partition.level_tokens(encoder_level)
-                if token_indices:
-                    pooled = torch.stack([
-                        hidden[partition.members[index].to(h1.device)].mean(dim=0)
-                        for index in token_indices
-                    ])
-                    encoded = self.region_encoders[scale_index](pooled)
-                    sizes = torch.tensor(
-                        [partition.members[index].numel() for index in token_indices],
-                        dtype=encoded.dtype,
-                        device=encoded.device,
+            member_index_cpu: list[Tensor] = []
+            member_token_cpu: list[Tensor] = []
+            token_graph_cpu: list[Tensor] = []
+            token_size_cpu: list[int] = []
+            token_residual_cpu: list[bool] = []
+            token_id = 0
+            for graph_index, partition in enumerate(partitions):
+                for local_index in partition.level_tokens(encoder_level):
+                    members = (
+                        partition.members[local_index] + graph_index * node_count
                     )
-                    scale_vectors.append((encoded * (sizes / sizes.sum()).unsqueeze(-1)).sum(dim=0))
-                    graph_token_counts.append(len(token_indices))
-                    graph_residual_counts.append(
-                        int(partition.residual[list(token_indices)].sum())
+                    member_index_cpu.append(members)
+                    member_token_cpu.append(
+                        torch.full_like(members, token_id)
                     )
-                else:
-                    scale_vectors.append(zero)
-                    graph_token_counts.append(0)
-                    graph_residual_counts.append(0)
+                    token_graph_cpu.append(
+                        torch.full((1,), graph_index, dtype=torch.long)
+                    )
+                    token_size_cpu.append(int(members.numel()))
+                    token_residual_cpu.append(
+                        bool(partition.residual[local_index])
+                    )
+                    token_id += 1
 
-            graph_representations.append(torch.stack(scale_vectors).sum(dim=0))
-            level_norms.append(
-                torch.stack([vector.norm() for vector in scale_vectors])
+            if token_id == 0:
+                scale_vectors.append(
+                    torch.zeros(
+                        (batch_size, self.config.hidden_dim),
+                        device=device,
+                    )
+                )
+                token_count_columns.append(torch.zeros_like(q_count))
+                residual_count_columns.append(torch.zeros_like(q_count))
+                continue
+
+            member_index = torch.cat(member_index_cpu).to(device)
+            member_token = torch.cat(member_token_cpu).to(device)
+            token_graph = torch.cat(token_graph_cpu).to(device)
+            token_size = torch.tensor(
+                token_size_cpu, dtype=torch.float32, device=device,
             )
-            token_counts.append(torch.tensor(graph_token_counts))
-            residual_counts.append(torch.tensor(graph_residual_counts))
+            pooled = torch.zeros(
+                (token_id, self.config.hidden_dim), device=device,
+            ).index_add_(
+                0, member_token, hidden.index_select(0, member_index),
+            )
+            pooled = pooled / token_size.unsqueeze(-1)
+            encoded = self.region_encoders[scale_index](pooled)
+            graph_size = torch.zeros(batch_size, device=device).index_add_(
+                0, token_graph, token_size,
+            )
+            weights = token_size / graph_size[token_graph].clamp_min(1.0)
+            scale = torch.zeros(
+                (batch_size, self.config.hidden_dim), device=device,
+            ).index_add_(
+                0, token_graph, encoded * weights.unsqueeze(-1),
+            )
+            scale_vectors.append(scale)
+            token_count_columns.append(
+                torch.bincount(token_graph, minlength=batch_size)
+            )
+            residual_count_columns.append(torch.bincount(
+                token_graph[torch.tensor(
+                    token_residual_cpu, dtype=torch.bool, device=device,
+                )],
+                minlength=batch_size,
+            ))
 
-        graph_representation = torch.stack(graph_representations)
+        scale_tensor = torch.stack(scale_vectors, dim=1)
+        graph_representation = scale_tensor.sum(dim=1)
+        level_norms = scale_tensor.norm(dim=-1)
         return TokenModelOutput(
             prediction=self.prediction_head(graph_representation),
             graph_representation=graph_representation,
-            level_norms=torch.stack(level_norms),
-            token_counts=torch.stack(token_counts).to(h1.device),
-            residual_counts=torch.stack(residual_counts).to(h1.device),
+            level_norms=level_norms,
+            token_counts=torch.stack(token_count_columns, dim=1),
+            residual_counts=torch.stack(residual_count_columns, dim=1),
         )

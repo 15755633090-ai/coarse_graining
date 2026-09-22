@@ -1,0 +1,21 @@
+{
+  "dataset": "lipo",
+  "device": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "batch_size": 32,
+  "timing_seconds_per_epoch": {
+    "serial_partition_in_forward": 300.0,
+    "partition_in_4_dataloader_workers": 214.63,
+    "partition_in_8_dataloader_workers": 214.48,
+    "precomputed_partitions_plus_batched_gpu_pooling": 73.3
+  },
+  "speedup": {
+    "precompute_only_vs_serial": 1.4,
+    "batched_pooling_vs_serial": 4.09,
+    "batched_pooling_vs_precompute_only": 2.93
+  },
+  "changes": [
+    "Move stochastic partition construction into DataLoader worker collate functions.",
+    "Keep validation and test partitions fixed at epoch 0.",
+    "Replace per-graph GPU pooling kernels with batch-level index_add and bincount operations."
+  ]
+}
