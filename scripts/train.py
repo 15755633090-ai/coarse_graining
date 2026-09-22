@@ -1,0 +1,54 @@
+"""CLI entry point for frozen-encoder multiscale property training."""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from multiscale_tokenizer.training import train_property_model
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset-root", required=True)
+    parser.add_argument("--task", required=True)
+    parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--device", default="cuda")
+    parser.add_argument("--epochs", type=int, default=30)
+    parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument("--learning-rate", type=float, default=1e-3)
+    parser.add_argument("--dropout", type=float, default=0.1)
+    parser.add_argument("--model-seed", type=int, default=0)
+    parser.add_argument("--partition-seed", type=int, default=100_000)
+    parser.add_argument("--data-seed", type=int, default=0)
+    parser.add_argument("--num-workers", type=int, default=0)
+    args = parser.parse_args()
+    result = train_property_model(
+        args.dataset_root,
+        task=args.task,
+        output_dir=args.output_dir,
+        device=args.device,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        learning_rate=args.learning_rate,
+        model_seed=args.model_seed,
+        partition_seed=args.partition_seed,
+        data_seed=args.data_seed,
+        dropout=args.dropout,
+        num_workers=args.num_workers,
+    )
+    summary = {
+        key: result[key]
+        for key in ("task_spec", "model_seed", "partition_seed", "data_seed", "test_metrics")
+    }
+    print(json.dumps(summary, indent=2))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,0 @@
-torch>=2.1
-numpy>=1.24
-pandas>=1.5
-scikit-learn>=1.2
-# Optional, only required for CSV/SMI SMILES input:
-# rdkit>=2023.9

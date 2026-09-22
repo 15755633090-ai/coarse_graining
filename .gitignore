@@ -1,19 +1,10 @@
-# Python caches and local environments
 __pycache__/
 *.py[cod]
 .pytest_cache/
-# Rebuildable per-graph topology cache (not model checkpoints or audit reports).
-outputs/topology_cache/
+.mypy_cache/
+.ruff_cache/
 .venv/
 venv/
 
-# Reproducible source assets are tracked; locally generated experiment outputs
-# and portable bundles are not.
-outputs/
-tmp/
-
-# Upload copies and local credentials
-github_upload/
-.env
-.env.*
-!.env.example
+# Local training runs and generated checkpoints are reproducible artifacts.
+runs/

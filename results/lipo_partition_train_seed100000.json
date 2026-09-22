@@ -1,0 +1,21 @@
+{
+  "dataset": "lipo",
+  "split": "train",
+  "partition_seed": 100000,
+  "molecules": 3360,
+  "mean_diameter": 13.833333333333334,
+  "mean_q_fraction": 0.4749758808829651,
+  "p_level2_present": 0.9809523809523809,
+  "mean_level2_tokens": 3.626190476190476,
+  "mean_level2_atoms_per_token": 2.4979055650037796,
+  "mean_level2_residual_rate": 0.2466583994708995,
+  "p_level3_present": 0.7440476190476191,
+  "mean_level3_tokens": 2.0044642857142856,
+  "mean_level3_atoms_per_token": 2.084934452947846,
+  "mean_level3_residual_rate": 0.5419802295918364,
+  "p_level4_present": 0.20148809523809524,
+  "mean_level4_tokens": 0.3517857142857143,
+  "mean_level4_atoms_per_token": 0.29494047619047615,
+  "mean_level4_residual_rate": 0.20023561507936508,
+  "mean_level4_rounds": 0.2017857142857143
+}
