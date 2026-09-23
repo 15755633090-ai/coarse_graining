@@ -1,4 +1,4 @@
-"""CLI entry point for the four-arm property-training protocol."""
+"""CLI entry point for property-training and frozen Stage-2 comparisons."""
 from __future__ import annotations
 
 import argparse
@@ -22,6 +22,13 @@ def main() -> None:
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--mode", choices=EXPERIMENT_MODES, required=True)
+    parser.add_argument(
+        "--encoder-init-checkpoint",
+        help=(
+            "baseline_finetune checkpoint supplying the frozen encoder for "
+            "a stage2_frozen mode; its downstream head is never loaded"
+        ),
+    )
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--encoder-learning-rate", type=float, default=1e-5)
@@ -57,6 +64,7 @@ def main() -> None:
         resume=args.resume,
         patience=args.patience,
         experiment_mode=args.mode,
+        encoder_init_checkpoint=args.encoder_init_checkpoint,
     )
     summary = {
         key: result[key]

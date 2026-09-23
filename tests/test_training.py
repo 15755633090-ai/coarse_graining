@@ -35,6 +35,7 @@ from multiscale_tokenizer.training import (
     _run_epoch,
     _set_loader_epoch,
     _validate_resume_protocol,
+    build_property_model,
     build_optimizer,
     train_property_model,
 )
@@ -372,6 +373,99 @@ class TrainingTests(unittest.TestCase):
             covered,
             {id(parameter) for parameter in model.parameters() if parameter.requires_grad},
         )
+
+    def test_stage2_arms_share_and_keep_stage1_encoder_frozen(self) -> None:
+        spec = TaskSpec("lipo", "regression", 1)
+        stage1 = build_property_model(
+            spec=spec,
+            experiment_mode="baseline_finetune",
+            model_seed=5,
+            partition_seed=11,
+            dropout=0.1,
+            device=torch.device("cpu"),
+        )
+        with torch.no_grad():
+            next(stage1.encoder.parameters()).add_(0.25)
+        with TemporaryDirectory() as temporary:
+            checkpoint = Path(temporary) / "stage1.pt"
+            torch.save({
+                "schema_version": 3,
+                "experiment_mode": "baseline_finetune",
+                "task_spec": {
+                    "name": "lipo", "task_type": "regression", "num_tasks": 1,
+                },
+                "model_state": stage1.state_dict(),
+                "best_epoch": 0,
+                "history": [{"epoch": 0, "valid_loss": 1.0}],
+            }, checkpoint)
+            stage2_arms = [
+                build_property_model(
+                    spec=spec,
+                    experiment_mode=mode,
+                    model_seed=7,
+                    partition_seed=11,
+                    dropout=0.1,
+                    device=torch.device("cpu"),
+                    encoder_init_checkpoint=checkpoint,
+                )
+                for mode in (
+                    "baseline_stage2_frozen",
+                    "multiscale_stage2_frozen",
+                )
+            ]
+        expected_state = stage1.encoder.state_dict()
+        for stage2 in stage2_arms:
+            for name, actual in stage2.encoder.state_dict().items():
+                torch.testing.assert_close(
+                    actual, expected_state[name], rtol=0, atol=0,
+                )
+            self.assertTrue(all(
+                not parameter.requires_grad
+                for parameter in stage2.encoder.parameters()
+            ))
+        for name, baseline_value in stage2_arms[0].encoder.state_dict().items():
+            torch.testing.assert_close(
+                baseline_value,
+                stage2_arms[1].encoder.state_dict()[name],
+                rtol=0,
+                atol=0,
+            )
+
+        nodes = 14
+        features = torch.zeros((1, nodes, 5), dtype=torch.long)
+        features[..., 0] = 6
+        features[..., 1] = 5
+        bonds = torch.zeros((1, nodes, nodes), dtype=torch.long)
+        indices = torch.arange(nodes - 1)
+        bonds[0, indices, indices + 1] = 1
+        bonds[0, indices + 1, indices] = 1
+        mask = torch.ones((1, nodes), dtype=torch.bool)
+        for stage2 in stage2_arms:
+            optimizer = build_optimizer(
+                stage2,
+                encoder_learning_rate=0.0,
+                downstream_learning_rate=1e-3,
+                weight_decay=0.01,
+            )
+            self.assertEqual(
+                [group["name"] for group in optimizer.param_groups],
+                ["downstream"],
+            )
+            before = {
+                name: value.detach().clone()
+                for name, value in stage2.encoder.state_dict().items()
+            }
+            loss = stage2(
+                features, bonds, mask, partition_seeds=[13],
+            ).prediction.square().mean()
+            loss.backward()
+            optimizer.step()
+            self.assertTrue(all(
+                parameter.grad is None
+                for parameter in stage2.encoder.parameters()
+            ))
+            for name, value in stage2.encoder.state_dict().items():
+                torch.testing.assert_close(value, before[name], rtol=0, atol=0)
 
     def test_schema3_resume_rejects_protocol_mismatch(self) -> None:
         protocol = {"batch_size": 32, "dropout": 0.1}

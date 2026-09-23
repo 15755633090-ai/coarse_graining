@@ -82,9 +82,9 @@ python scripts/analyze_tokenization.py --dataset-root datasets/lipo --split trai
 ```
 
 The training entry point supports `baseline_frozen`, `multiscale_frozen`,
-`baseline_finetune`, and `multiscale_finetune`. The baseline preserves the
-historical final-layer Sum/Mean readout; the multiscale architecture is
-unchanged.
+`baseline_finetune`, `multiscale_finetune`, `baseline_stage2_frozen`, and
+`multiscale_stage2_frozen`. The baseline preserves the historical final-layer
+Sum/Mean readout; the multiscale architecture is unchanged.
 
 Run the two Lipo seed-0 supervised fine-tuning arms:
 
@@ -98,6 +98,19 @@ Defaults implement the locked protocol: AdamW, batch size 32, encoder LR
 `ReduceLROnPlateau(patience=10, factor=0.3)`, and early-stopping patience 25.
 Both arms start from `diffusion_encoder/encoder.pt`; no downstream checkpoint
 is used for initialization.
+
+Run the paired frozen task-finetuned encoder comparison with one shared Stage-1
+checkpoint:
+
+```powershell
+python scripts/train.py --dataset-root datasets/lipo --task lipo --mode baseline_stage2_frozen --encoder-init-checkpoint runs/lipo_seed0_ft_baseline/best.pt --encoder-learning-rate 0 --output-dir runs/lipo_seed0_stage2_baseline_frozen
+python scripts/train.py --dataset-root datasets/lipo --task lipo --mode multiscale_stage2_frozen --encoder-init-checkpoint runs/lipo_seed0_ft_baseline/best.pt --encoder-learning-rate 0 --output-dir runs/lipo_seed0_stage2_multiscale_frozen
+```
+
+These commands load only the Stage-1 checkpoint's `encoder.*` tensors. They
+freeze that encoder and initialize a new downstream readout at epoch 1; they
+do not resume Stage 1 or reuse its prediction head. The source checkpoint hash
+and its actual saved model-state epoch are recorded in Stage-2 provenance.
 
 Training writes `history.json`, `history.csv`, `best.pt`, and `last.pt`. Resume
 an interrupted run with the same command plus `--resume`. `--patience`

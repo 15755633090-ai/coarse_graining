@@ -25,6 +25,8 @@ EXPERIMENT_MODES = (
     "multiscale_frozen",
     "baseline_finetune",
     "multiscale_finetune",
+    "baseline_stage2_frozen",
+    "multiscale_stage2_frozen",
 )
 
 

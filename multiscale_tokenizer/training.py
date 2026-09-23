@@ -170,9 +170,41 @@ def _dataset_identity(dataset_root: str | Path) -> dict[str, object]:
     }
 
 
-def _experiment_provenance(dataset_root: str | Path) -> dict[str, object]:
-    checkpoint = Path(DEFAULT_CHECKPOINT)
+def _stage1_source_identity(path: str | Path) -> dict[str, object]:
+    source = Path(path)
+    payload = torch.load(source, map_location="cpu", weights_only=False)
+    history = list(payload.get("history", []))
+    actual_epoch = None
+    if history:
+        if payload.get("schema_version") == 2:
+            local_improvements = [
+                row for previous, row in zip(history, history[1:])
+                if row["valid_loss"] < previous["valid_loss"]
+            ]
+            actual_epoch = (
+                local_improvements[-1]["epoch"] if local_improvements
+                else history[0]["epoch"]
+            )
+        else:
+            actual_epoch = payload.get("best_epoch")
     return {
+        "name": source.name,
+        "size": source.stat().st_size,
+        "sha256": _file_sha256(source),
+        "schema_version": payload.get("schema_version"),
+        "experiment_mode": payload.get("experiment_mode"),
+        "task": payload.get("task_spec", {}).get("name"),
+        "reported_best_epoch_zero_based": payload.get("best_epoch"),
+        "actual_model_state_epoch_zero_based": actual_epoch,
+    }
+
+
+def _experiment_provenance(
+    dataset_root: str | Path,
+    encoder_init_checkpoint: str | Path | None = None,
+) -> dict[str, object]:
+    checkpoint = Path(DEFAULT_CHECKPOINT)
+    result = {
         "git": _git_identity(),
         "encoder_checkpoint": {
             "name": checkpoint.name,
@@ -181,6 +213,43 @@ def _experiment_provenance(dataset_root: str | Path) -> dict[str, object]:
         },
         "dataset": _dataset_identity(dataset_root),
     }
+    if encoder_init_checkpoint is not None:
+        result["stage1_encoder_source"] = _stage1_source_identity(
+            encoder_init_checkpoint,
+        )
+    return result
+
+
+def _load_stage1_encoder(
+    checkpoint_path: str | Path,
+    *,
+    spec: TaskSpec,
+    device: torch.device,
+) -> nn.Module:
+    checkpoint = torch.load(
+        Path(checkpoint_path), map_location="cpu", weights_only=False,
+    )
+    if checkpoint.get("experiment_mode") != "baseline_finetune":
+        raise ValueError(
+            "Stage 2 requires a baseline_finetune property checkpoint"
+        )
+    if checkpoint.get("task_spec") != asdict(spec):
+        raise ValueError("Stage 1 checkpoint task does not match Stage 2")
+    model_state = checkpoint.get("model_state")
+    if not isinstance(model_state, dict):
+        raise ValueError("Stage 1 checkpoint has no model_state")
+    prefix = "encoder."
+    encoder_state = {
+        name[len(prefix):]: value
+        for name, value in model_state.items()
+        if name.startswith(prefix)
+    }
+    encoder = load_encoder(device="cpu", frozen=True)
+    if set(encoder_state) != set(encoder.state_dict()):
+        raise ValueError("Stage 1 checkpoint encoder state is incomplete")
+    encoder.load_state_dict(encoder_state, strict=True)
+    encoder.requires_grad_(False).eval()
+    return encoder.to(device)
 
 
 def _validate_resume_protocol(
@@ -271,13 +340,31 @@ def build_property_model(
     partition_seed: int,
     dropout: float,
     device: torch.device,
+    encoder_init_checkpoint: str | Path | None = None,
 ) -> MultiscaleMolecularModel:
     """Construct a mode with explicitly reproducible shared initialization."""
 
     if experiment_mode not in EXPERIMENT_MODES:
         raise ValueError(f"unknown experiment mode {experiment_mode!r}")
     seed_everything(model_seed)
-    encoder = load_encoder(device=device, frozen=experiment_mode.endswith("_frozen"))
+    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen"}
+    if experiment_mode in stage2_modes:
+        if encoder_init_checkpoint is None:
+            raise ValueError(
+                f"{experiment_mode} requires encoder_init_checkpoint"
+            )
+        encoder = _load_stage1_encoder(
+            encoder_init_checkpoint, spec=spec, device=device,
+        )
+    else:
+        if encoder_init_checkpoint is not None:
+            raise ValueError(
+                "encoder_init_checkpoint is only valid for "
+                "a stage2_frozen mode"
+            )
+        encoder = load_encoder(
+            device=device, frozen=experiment_mode.endswith("_frozen"),
+        )
     return MultiscaleMolecularModel(
         encoder,
         config=MultiscaleModelConfig(
@@ -697,6 +784,7 @@ def train_property_model(
     resume: bool = False,
     patience: int = 25,
     experiment_mode: str = "multiscale_frozen",
+    encoder_init_checkpoint: str | Path | None = None,
 ) -> dict[str, object]:
     """Train one arm of the locked baseline/multiscale protocol."""
 
@@ -704,6 +792,16 @@ def train_property_model(
         raise ValueError(f"unknown task {task!r}")
     if experiment_mode not in EXPERIMENT_MODES:
         raise ValueError(f"unknown experiment mode {experiment_mode!r}")
+    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen"}
+    if experiment_mode in stage2_modes:
+        if encoder_init_checkpoint is None:
+            raise ValueError(
+                f"{experiment_mode} requires encoder_init_checkpoint"
+            )
+    elif encoder_init_checkpoint is not None:
+        raise ValueError(
+            "encoder_init_checkpoint is only valid for a stage2_frozen mode"
+        )
     if patience < 0:
         raise ValueError("patience must be nonnegative")
     if scheduler_patience < 0:
@@ -736,7 +834,9 @@ def train_property_model(
         "num_workers": num_workers,
         "device_type": device_object.type,
     }
-    provenance = _experiment_provenance(dataset_root)
+    provenance = _experiment_provenance(
+        dataset_root, encoder_init_checkpoint,
+    )
 
     train_dataset = OGBMoleculePropertyDataset(dataset_root, split="train")
     valid_dataset = OGBMoleculePropertyDataset(dataset_root, split="valid")
@@ -781,6 +881,7 @@ def train_property_model(
         partition_seed=partition_seed,
         dropout=dropout,
         device=device_object,
+        encoder_init_checkpoint=encoder_init_checkpoint,
     )
     optimizer = build_optimizer(
         model,
