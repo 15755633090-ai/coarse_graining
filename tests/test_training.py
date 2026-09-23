@@ -33,6 +33,7 @@ from multiscale_tokenizer.training import (
     _make_loader,
     _prepare_loader_iteration,
     _run_epoch,
+    _saved_model_epoch,
     _set_loader_epoch,
     _validate_resume_protocol,
     build_property_model,
@@ -396,6 +397,7 @@ class TrainingTests(unittest.TestCase):
                 },
                 "model_state": stage1.state_dict(),
                 "best_epoch": 0,
+                "model_state_epoch": 0,
                 "history": [{"epoch": 0, "valid_loss": 1.0}],
             }, checkpoint)
             stage2_arms = [
@@ -466,6 +468,72 @@ class TrainingTests(unittest.TestCase):
             ))
             for name, value in stage2.encoder.state_dict().items():
                 torch.testing.assert_close(value, before[name], rtol=0, atol=0)
+
+    def test_saved_model_epoch_handles_legacy_schema3_bug(self) -> None:
+        checkpoint = {
+            "schema_version": 3,
+            "selection_metric": "valid_loss",
+            "best_epoch": 0,
+            "provenance": {"git": {"commit": "pre-fix"}},
+            "history": [
+                {"epoch": 0, "valid_loss": 0.5},
+                {"epoch": 1, "valid_loss": 0.8},
+                {"epoch": 2, "valid_loss": 0.7},
+            ],
+        }
+        with patch(
+            "multiscale_tokenizer.training._commit_contains_global_best_fix",
+            return_value=False,
+        ):
+            self.assertEqual(
+                _saved_model_epoch(checkpoint),
+                (2, "pre_fix_local_improvement_inference"),
+            )
+        checkpoint["model_state_epoch"] = 1
+        self.assertEqual(
+            _saved_model_epoch(checkpoint),
+            (1, "explicit_checkpoint_field"),
+        )
+
+    def test_stage2_rejects_non_best_stage1_model_state(self) -> None:
+        spec = TaskSpec("lipo", "regression", 1)
+        stage1 = build_property_model(
+            spec=spec,
+            experiment_mode="baseline_finetune",
+            model_seed=5,
+            partition_seed=11,
+            dropout=0.1,
+            device=torch.device("cpu"),
+        )
+        with TemporaryDirectory() as temporary:
+            checkpoint = Path(temporary) / "last.pt"
+            torch.save({
+                "schema_version": 3,
+                "experiment_mode": "baseline_finetune",
+                "task_spec": {
+                    "name": "lipo", "task_type": "regression", "num_tasks": 1,
+                },
+                "model_state": stage1.state_dict(),
+                "best_epoch": 0,
+                "model_state_epoch": 2,
+                "history": [
+                    {"epoch": 0, "valid_loss": 0.5},
+                    {"epoch": 1, "valid_loss": 0.8},
+                    {"epoch": 2, "valid_loss": 0.7},
+                ],
+            }, checkpoint)
+            with self.assertRaisesRegex(
+                ValueError, "validation-best Stage 1 encoder",
+            ):
+                build_property_model(
+                    spec=spec,
+                    experiment_mode="baseline_stage2_frozen",
+                    model_seed=7,
+                    partition_seed=11,
+                    dropout=0.1,
+                    device=torch.device("cpu"),
+                    encoder_init_checkpoint=checkpoint,
+                )
 
     def test_schema3_resume_rejects_protocol_mismatch(self) -> None:
         protocol = {"batch_size": 32, "dropout": 0.1}
@@ -538,6 +606,7 @@ class TrainingTests(unittest.TestCase):
             required = {
                 "optimizer_state", "scheduler_state", "current_epoch",
                 "best_selection", "best_model_state",
+                "best_model_state_epoch", "model_state_epoch",
                 "epochs_without_improvement", "encoder_lr", "downstream_lr",
                 "model_seed", "data_seed", "partition_seed", "experiment_mode",
                 "training_protocol", "provenance",

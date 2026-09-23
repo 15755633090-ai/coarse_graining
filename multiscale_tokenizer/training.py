@@ -170,23 +170,85 @@ def _dataset_identity(dataset_root: str | Path) -> dict[str, object]:
     }
 
 
+GLOBAL_BEST_FIX_COMMIT = "416c297"
+
+
+def _legacy_saved_model_epoch(payload: dict[str, object]) -> int | None:
+    history = list(payload.get("history", []))
+    if not history:
+        return None
+    metric = str(payload.get("selection_metric", "valid_loss"))
+    minimize = metric == "valid_loss"
+    local_improvements = [
+        row for previous, row in zip(history, history[1:])
+        if (
+            row[metric] < previous[metric]
+            if minimize else row[metric] > previous[metric]
+        )
+    ]
+    return int(
+        local_improvements[-1]["epoch"] if local_improvements
+        else history[0]["epoch"]
+    )
+
+
+def _commit_contains_global_best_fix(commit: object) -> bool | None:
+    if not isinstance(commit, str) or not commit:
+        return None
+    try:
+        result = subprocess.run(
+            [
+                "git", "merge-base", "--is-ancestor",
+                GLOBAL_BEST_FIX_COMMIT, commit,
+            ],
+            cwd=Path(__file__).resolve().parents[1],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return None
+    if result.returncode == 0:
+        return True
+    if result.returncode == 1:
+        return False
+    return None
+
+
+def _saved_model_epoch(
+    payload: dict[str, object],
+) -> tuple[int | None, str]:
+    explicit = payload.get("model_state_epoch")
+    if explicit is not None:
+        return int(explicit), "explicit_checkpoint_field"
+    if payload.get("schema_version") == 2:
+        return _legacy_saved_model_epoch(payload), "legacy_schema2_inference"
+    provenance = payload.get("provenance")
+    git_identity = (
+        provenance.get("git") if isinstance(provenance, dict) else None
+    )
+    producer_commit = (
+        git_identity.get("commit") if isinstance(git_identity, dict) else None
+    )
+    contains_fix = _commit_contains_global_best_fix(producer_commit)
+    if contains_fix is True:
+        best_epoch = payload.get("best_epoch")
+        return (
+            None if best_epoch is None else int(best_epoch),
+            "producer_contains_global_best_fix",
+        )
+    if contains_fix is False:
+        return (
+            _legacy_saved_model_epoch(payload),
+            "pre_fix_local_improvement_inference",
+        )
+    return None, "ambiguous_legacy_checkpoint"
+
+
 def _stage1_source_identity(path: str | Path) -> dict[str, object]:
     source = Path(path)
     payload = torch.load(source, map_location="cpu", weights_only=False)
-    history = list(payload.get("history", []))
-    actual_epoch = None
-    if history:
-        if payload.get("schema_version") == 2:
-            local_improvements = [
-                row for previous, row in zip(history, history[1:])
-                if row["valid_loss"] < previous["valid_loss"]
-            ]
-            actual_epoch = (
-                local_improvements[-1]["epoch"] if local_improvements
-                else history[0]["epoch"]
-            )
-        else:
-            actual_epoch = payload.get("best_epoch")
+    actual_epoch, epoch_basis = _saved_model_epoch(payload)
     return {
         "name": source.name,
         "size": source.stat().st_size,
@@ -196,6 +258,7 @@ def _stage1_source_identity(path: str | Path) -> dict[str, object]:
         "task": payload.get("task_spec", {}).get("name"),
         "reported_best_epoch_zero_based": payload.get("best_epoch"),
         "actual_model_state_epoch_zero_based": actual_epoch,
+        "actual_model_state_epoch_basis": epoch_basis,
     }
 
 
@@ -235,6 +298,19 @@ def _load_stage1_encoder(
         )
     if checkpoint.get("task_spec") != asdict(spec):
         raise ValueError("Stage 1 checkpoint task does not match Stage 2")
+    actual_epoch, epoch_basis = _saved_model_epoch(checkpoint)
+    best_epoch = checkpoint.get("best_epoch")
+    if actual_epoch is None:
+        raise ValueError(
+            "cannot verify which epoch the Stage 1 model_state represents "
+            f"({epoch_basis}); use a newly generated checkpoint"
+        )
+    if best_epoch is None or actual_epoch != int(best_epoch):
+        raise ValueError(
+            "Stage 2 requires the validation-best Stage 1 encoder, but the "
+            f"checkpoint model_state is epoch {actual_epoch + 1} and its "
+            f"reported best is epoch {None if best_epoch is None else int(best_epoch) + 1}"
+        )
     model_state = checkpoint.get("model_state")
     if not isinstance(model_state, dict):
         raise ValueError("Stage 1 checkpoint has no model_state")
@@ -962,6 +1038,13 @@ def train_property_model(
             "valid_loss" if spec.task_type == "regression"
             else f"valid_{spec.primary_metric}"
         )
+        best_epoch = int(min(
+            history,
+            key=lambda row: row["valid_loss"],
+        )["epoch"]) if spec.task_type == "regression" else int(max(
+            history,
+            key=lambda row: row[f"valid_{spec.primary_metric}"],
+        )["epoch"])
         return {
             "schema_version": 3,
             "task_spec": asdict(spec),
@@ -978,14 +1061,9 @@ def train_property_model(
             "selection_metric": selection_metric,
             "best_selection": best_validation,
             "best_model_state": best_state,
+            "best_model_state_epoch": best_epoch,
             "primary_test_metric": spec.primary_metric,
-            "best_epoch": int(min(
-                history,
-                key=lambda row: row["valid_loss"],
-            )["epoch"]) if spec.task_type == "regression" else int(max(
-                history,
-                key=lambda row: row[f"valid_{spec.primary_metric}"],
-            )["epoch"]),
+            "best_epoch": best_epoch,
             "epochs_without_improvement": epochs_without_improvement,
             "current_epoch": current_epoch,
             "encoder_lr": _learning_rates(optimizer)["encoder_lr"],
@@ -1057,14 +1135,20 @@ def train_property_model(
         scheduler.step(scheduler_value)
         checkpoint_common = checkpoint_payload(epoch)
         torch.save(
-            {**checkpoint_common, "model_state": best_state},
+            {
+                **checkpoint_common,
+                "model_state": best_state,
+                "model_state_epoch": checkpoint_common["best_epoch"],
+            },
             output / "best.pt",
         )
         torch.save(
             {
                 **checkpoint_common,
                 "model_state": model.state_dict(),
+                "model_state_epoch": epoch,
                 "last_model_state": model.state_dict(),
+                "last_model_state_epoch": epoch,
             },
             output / "last.pt",
         )
@@ -1111,6 +1195,7 @@ def train_property_model(
     checkpoint = {
         **checkpoint_common,
         "model_state": best_state,
+        "model_state_epoch": checkpoint_common["best_epoch"],
         "test_metrics": test_metrics,
     }
     torch.save(checkpoint, output / "best.pt")

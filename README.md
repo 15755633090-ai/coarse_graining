@@ -111,6 +111,10 @@ These commands load only the Stage-1 checkpoint's `encoder.*` tensors. They
 freeze that encoder and initialize a new downstream readout at epoch 1; they
 do not resume Stage 1 or reuse its prediction head. The source checkpoint hash
 and its actual saved model-state epoch are recorded in Stage-2 provenance.
+New checkpoints explicitly record `model_state_epoch`. Legacy checkpoints are
+audited against their producer commit and old local-improvement behavior; an
+ambiguous checkpoint or one whose saved state is not the reported validation
+best is rejected as a Stage-2 source.
 
 Training writes `history.json`, `history.csv`, `best.pt`, and `last.pt`. Resume
 an interrupted run with the same command plus `--resume`. `--patience`
