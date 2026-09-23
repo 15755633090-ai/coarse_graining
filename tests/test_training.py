@@ -25,6 +25,7 @@ from multiscale_tokenizer.model import (
 )
 from multiscale_tokenizer.training import (
     _EpochAwareCollator,
+    _git_identity,
     TaskSpec,
     TargetScaler,
     _is_better_validation,
@@ -474,7 +475,7 @@ class TrainingTests(unittest.TestCase):
             "schema_version": 3,
             "selection_metric": "valid_loss",
             "best_epoch": 0,
-            "provenance": {"git": {"commit": "pre-fix"}},
+            "provenance": {"git": {"commit_sha": "pre-fix"}},
             "history": [
                 {"epoch": 0, "valid_loss": 0.5},
                 {"epoch": 1, "valid_loss": 0.8},
@@ -484,16 +485,38 @@ class TrainingTests(unittest.TestCase):
         with patch(
             "multiscale_tokenizer.training._commit_contains_global_best_fix",
             return_value=False,
-        ):
+        ) as contains_fix:
             self.assertEqual(
                 _saved_model_epoch(checkpoint),
                 (2, "pre_fix_local_improvement_inference"),
             )
+        contains_fix.assert_called_once_with("pre-fix")
         checkpoint["model_state_epoch"] = 1
         self.assertEqual(
             _saved_model_epoch(checkpoint),
             (1, "explicit_checkpoint_field"),
         )
+
+    def test_saved_model_epoch_reads_real_commit_sha_field(self) -> None:
+        identity = _git_identity()
+        self.assertIn("commit_sha", identity)
+        self.assertNotIn("commit", identity)
+        checkpoint = {
+            "schema_version": 3,
+            "selection_metric": "valid_loss",
+            "best_epoch": 4,
+            "provenance": {"git": {"commit_sha": "fixed-commit"}},
+            "history": [{"epoch": 4, "valid_loss": 0.5}],
+        }
+        with patch(
+            "multiscale_tokenizer.training._commit_contains_global_best_fix",
+            return_value=True,
+        ) as contains_fix:
+            self.assertEqual(
+                _saved_model_epoch(checkpoint),
+                (4, "producer_contains_global_best_fix"),
+            )
+        contains_fix.assert_called_once_with("fixed-commit")
 
     def test_stage2_rejects_non_best_stage1_model_state(self) -> None:
         spec = TaskSpec("lipo", "regression", 1)

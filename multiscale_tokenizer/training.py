@@ -228,7 +228,11 @@ def _saved_model_epoch(
         provenance.get("git") if isinstance(provenance, dict) else None
     )
     producer_commit = (
-        git_identity.get("commit") if isinstance(git_identity, dict) else None
+        (
+            git_identity.get("commit_sha")
+            or git_identity.get("commit")
+        )
+        if isinstance(git_identity, dict) else None
     )
     contains_fix = _commit_contains_global_best_fix(producer_commit)
     if contains_fix is True:
