@@ -1,0 +1,669 @@
+[
+  {
+    "path": "runs\\lipo_formal_stage1_encoder_seed0_v2\\best.pt",
+    "experiment_mode": "baseline_finetune",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 84,
+    "model_state_epoch": 84,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "max_epochs": 100,
+      "encoder_learning_rate": 1e-05,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "scheduler": "ReduceLROnPlateau",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 25,
+      "dropout": 0.1,
+      "num_workers": 4,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "baseline_finetune"
+    },
+    "epochs": 100,
+    "val": 0.7172913054429237,
+    "test": 0.7482194427562229,
+    "source": null,
+    "git": {
+      "commit_sha": "52897c17b502a756430b212ca268173b9540663b",
+      "dirty": false
+    }
+  },
+  {
+    "path": "runs\\lipo_formal_stage1_seed0\\best.pt",
+    "experiment_mode": "baseline_finetune",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 7,
+    "model_state_epoch": 7,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 64,
+      "micro_batch_size": 8,
+      "max_epochs": 200,
+      "encoder_learning_rate": 0.0001,
+      "downstream_learning_rate": 0.0005,
+      "weight_decay": 1e-05,
+      "scheduler": "none",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 30,
+      "early_stopping_metric": "valid_rmse",
+      "grad_clip": 5.0,
+      "amp_dtype": "bf16",
+      "dropout": 0.3,
+      "num_workers": 0,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.3,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "baseline_finetune"
+    },
+    "epochs": 8,
+    "val": 0.7783939800555022,
+    "test": null,
+    "source": null,
+    "git": {
+      "commit_sha": "52897c17b502a756430b212ca268173b9540663b",
+      "dirty": true
+    }
+  },
+  {
+    "path": "runs\\lipo_formal_stage1_seed0_legacyexec\\best.pt",
+    "experiment_mode": "baseline_finetune",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 97,
+    "model_state_epoch": 97,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 64,
+      "micro_batch_size": 8,
+      "max_epochs": 200,
+      "encoder_learning_rate": 0.0001,
+      "downstream_learning_rate": 0.0005,
+      "weight_decay": 1e-05,
+      "scheduler": "none",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 30,
+      "early_stopping_metric": "valid_rmse",
+      "grad_clip": 5.0,
+      "amp_dtype": "bf16",
+      "train_diagnostics": false,
+      "eval_no_grad": true,
+      "dropout": 0.3,
+      "num_workers": 0,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.3,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "baseline_finetune"
+    },
+    "epochs": 128,
+    "val": 0.6829030934866887,
+    "test": 0.7204538550044023,
+    "source": null,
+    "git": {
+      "commit_sha": "52897c17b502a756430b212ca268173b9540663b",
+      "dirty": true
+    }
+  },
+  {
+    "path": "runs\\lipo_formal_stage2_seed0_baseline\\best.pt",
+    "experiment_mode": "baseline_stage2_frozen",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 37,
+    "model_state_epoch": 37,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "max_epochs": 100,
+      "encoder_learning_rate": 0.0,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "scheduler": "ReduceLROnPlateau",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 25,
+      "dropout": 0.1,
+      "num_workers": 4,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "baseline_stage2_frozen"
+    },
+    "epochs": 63,
+    "val": 0.7196320636052072,
+    "test": 0.7498493043185489,
+    "source": {
+      "name": "best.pt",
+      "size": 12985468,
+      "sha256": "67224edac0ace0d2a585918007716ae0384b04376f8b66f1e4d1b5d5314dea1a",
+      "schema_version": 3,
+      "experiment_mode": "baseline_finetune",
+      "task": "lipo",
+      "reported_best_epoch_zero_based": 84,
+      "actual_model_state_epoch_zero_based": 84,
+      "actual_model_state_epoch_basis": "explicit_checkpoint_field"
+    },
+    "git": {
+      "commit_sha": "52897c17b502a756430b212ca268173b9540663b",
+      "dirty": false
+    }
+  },
+  {
+    "path": "runs\\lipo_formal_stage2_seed0_baseline_legacyexec\\best.pt",
+    "experiment_mode": "baseline_stage2_frozen",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 1,
+    "model_state_epoch": 1,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "micro_batch_size": 8,
+      "max_epochs": 200,
+      "encoder_learning_rate": 0.0,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 1e-05,
+      "scheduler": "none",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 30,
+      "early_stopping_metric": "valid_rmse",
+      "grad_clip": 5.0,
+      "amp_dtype": "bf16",
+      "train_diagnostics": false,
+      "eval_no_grad": true,
+      "dropout": 0.1,
+      "num_workers": 0,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "baseline_stage2_frozen"
+    },
+    "epochs": 32,
+    "val": 0.7014939994759296,
+    "test": 0.7226985609710331,
+    "source": {
+      "name": "best.pt",
+      "size": 12947452,
+      "sha256": "c964d2ac5d071ab1d1f19a916f002b781383cea25302087b32b2f8f6c1ecba35",
+      "schema_version": 4,
+      "experiment_mode": "baseline_finetune",
+      "task": "lipo",
+      "reported_best_epoch_zero_based": 97,
+      "actual_model_state_epoch_zero_based": 97,
+      "actual_model_state_epoch_basis": "explicit_checkpoint_field"
+    },
+    "git": {
+      "commit_sha": "52897c17b502a756430b212ca268173b9540663b",
+      "dirty": true
+    }
+  },
+  {
+    "path": "runs\\lipo_formal_stage2_seed0_multiscale\\best.pt",
+    "experiment_mode": "multiscale_stage2_frozen",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 25,
+    "model_state_epoch": 25,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "max_epochs": 100,
+      "encoder_learning_rate": 0.0,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "scheduler": "ReduceLROnPlateau",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 25,
+      "dropout": 0.1,
+      "num_workers": 4,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "multiscale_stage2_frozen"
+    },
+    "epochs": 51,
+    "val": 0.8116370900762213,
+    "test": 0.8232673831220018,
+    "source": {
+      "name": "best.pt",
+      "size": 12985468,
+      "sha256": "67224edac0ace0d2a585918007716ae0384b04376f8b66f1e4d1b5d5314dea1a",
+      "schema_version": 3,
+      "experiment_mode": "baseline_finetune",
+      "task": "lipo",
+      "reported_best_epoch_zero_based": 84,
+      "actual_model_state_epoch_zero_based": 84,
+      "actual_model_state_epoch_basis": "explicit_checkpoint_field"
+    },
+    "git": {
+      "commit_sha": "52897c17b502a756430b212ca268173b9540663b",
+      "dirty": false
+    }
+  },
+  {
+    "path": "runs\\lipo_formal_stage2_seed0_multiscale_legacyexec\\best.pt",
+    "experiment_mode": "multiscale_stage2_frozen",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 25,
+    "model_state_epoch": 25,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "micro_batch_size": 8,
+      "max_epochs": 200,
+      "encoder_learning_rate": 0.0,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 1e-05,
+      "scheduler": "none",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 30,
+      "early_stopping_metric": "valid_rmse",
+      "grad_clip": 5.0,
+      "amp_dtype": "bf16",
+      "train_diagnostics": false,
+      "eval_no_grad": true,
+      "dropout": 0.1,
+      "num_workers": 0,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "multiscale_stage2_frozen"
+    },
+    "epochs": 56,
+    "val": 0.8083293685291494,
+    "test": 0.813562615320661,
+    "source": {
+      "name": "best.pt",
+      "size": 12947452,
+      "sha256": "c964d2ac5d071ab1d1f19a916f002b781383cea25302087b32b2f8f6c1ecba35",
+      "schema_version": 4,
+      "experiment_mode": "baseline_finetune",
+      "task": "lipo",
+      "reported_best_epoch_zero_based": 97,
+      "actual_model_state_epoch_zero_based": 97,
+      "actual_model_state_epoch_basis": "explicit_checkpoint_field"
+    },
+    "git": {
+      "commit_sha": "52897c17b502a756430b212ca268173b9540663b",
+      "dirty": true
+    }
+  },
+  {
+    "path": "runs\\lipo_seed0_formal_stage1_encoder_ft\\best.pt",
+    "experiment_mode": "baseline_finetune",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 21,
+    "model_state_epoch": 21,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "max_epochs": 100,
+      "encoder_learning_rate": 1e-05,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "scheduler": "ReduceLROnPlateau",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 25,
+      "dropout": 0.1,
+      "num_workers": 4,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "baseline_finetune"
+    },
+    "epochs": 30,
+    "val": 0.7893100388014539,
+    "test": null,
+    "source": null,
+    "git": {
+      "commit_sha": "8e965b3375290ac06f3ad7d62f5b0fc113d03cc2",
+      "dirty": false
+    }
+  },
+  {
+    "path": "runs\\lipo_seed0_ft_baseline\\best.pt",
+    "experiment_mode": "baseline_finetune",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 84,
+    "model_state_epoch": null,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "max_epochs": 100,
+      "encoder_learning_rate": 1e-05,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "scheduler": "ReduceLROnPlateau",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 25
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "baseline_finetune"
+    },
+    "epochs": 100,
+    "val": 0.7172913054429237,
+    "test": 0.7591885137572413,
+    "source": null,
+    "git": null
+  },
+  {
+    "path": "runs\\lipo_seed0_ft_multiscale\\best.pt",
+    "experiment_mode": "multiscale_finetune",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 57,
+    "model_state_epoch": null,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "max_epochs": 100,
+      "encoder_learning_rate": 1e-05,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "scheduler": "ReduceLROnPlateau",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 25,
+      "dropout": 0.1,
+      "num_workers": 4,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "multiscale_finetune"
+    },
+    "epochs": 100,
+    "val": 0.8299819352010996,
+    "test": 0.8022814584414624,
+    "source": null,
+    "git": {
+      "commit_sha": "4533a04bb0a2d4459ebd71fae605a1076ec94443",
+      "dirty": false
+    }
+  },
+  {
+    "path": "runs\\lipo_seed0_stage1\\best.pt",
+    "experiment_mode": null,
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": null,
+    "model_state_epoch": null,
+    "training_protocol": null,
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    "epochs": 122,
+    "val": 0.8614737458947169,
+    "test": null,
+    "source": null,
+    "git": null
+  },
+  {
+    "path": "runs\\lipo_seed0_stage2_baseline_frozen\\best.pt",
+    "experiment_mode": "baseline_stage2_frozen",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 42,
+    "model_state_epoch": null,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "max_epochs": 100,
+      "encoder_learning_rate": 0.0,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "scheduler": "ReduceLROnPlateau",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 25,
+      "dropout": 0.1,
+      "num_workers": 4,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "baseline_stage2_frozen"
+    },
+    "epochs": 68,
+    "val": 0.732106255237778,
+    "test": 0.7612683260486033,
+    "source": {
+      "name": "best.pt",
+      "size": 12984956,
+      "sha256": "53c225346c423ae5f869e1f911a4d01974f99f119bfaadfe271c32d3ace20589",
+      "schema_version": 2,
+      "experiment_mode": "baseline_finetune",
+      "task": "lipo",
+      "reported_best_epoch_zero_based": 84,
+      "actual_model_state_epoch_zero_based": 96
+    },
+    "git": {
+      "commit_sha": "9e3c779788eac0787cbf2e0b706f98d6284639b0",
+      "dirty": false
+    }
+  },
+  {
+    "path": "runs\\lipo_seed0_stage2_multiscale_frozen\\best.pt",
+    "experiment_mode": "multiscale_stage2_frozen",
+    "model_seed": 0,
+    "data_seed": 0,
+    "partition_seed": 100000,
+    "best_epoch": 17,
+    "model_state_epoch": null,
+    "training_protocol": {
+      "optimizer": "AdamW",
+      "batch_size": 32,
+      "max_epochs": 100,
+      "encoder_learning_rate": 0.0,
+      "downstream_learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "scheduler": "ReduceLROnPlateau",
+      "scheduler_patience": 10,
+      "scheduler_factor": 0.3,
+      "early_stopping_patience": 25,
+      "dropout": 0.1,
+      "num_workers": 4,
+      "device_type": "cuda"
+    },
+    "model_config": {
+      "hidden_dim": 128,
+      "dropout": 0.1,
+      "output_dim": 1,
+      "default_partition_seed": 100000,
+      "tokenization": {
+        "center_radius": 3,
+        "scale_radii": [
+          1,
+          2,
+          3
+        ]
+      },
+      "experiment_mode": "multiscale_stage2_frozen"
+    },
+    "epochs": 19,
+    "val": 0.8478720254104942,
+    "test": null,
+    "source": {
+      "name": "best.pt",
+      "size": 12984956,
+      "sha256": "53c225346c423ae5f869e1f911a4d01974f99f119bfaadfe271c32d3ace20589",
+      "schema_version": 2,
+      "experiment_mode": "baseline_finetune",
+      "task": "lipo",
+      "reported_best_epoch_zero_based": 84,
+      "actual_model_state_epoch_zero_based": 96
+    },
+    "git": {
+      "commit_sha": "9e3c779788eac0787cbf2e0b706f98d6284639b0",
+      "dirty": false
+    }
+  }
+]

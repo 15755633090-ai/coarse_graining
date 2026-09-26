@@ -18,15 +18,19 @@ from .partition import (
     derive_partition_seed,
     partition_molecule,
 )
+from .random_regions import RandomRegionBranch
 
 
 EXPERIMENT_MODES = (
+    "random_region_stage2_frozen",
     "baseline_frozen",
     "multiscale_frozen",
     "baseline_finetune",
     "multiscale_finetune",
     "baseline_stage2_frozen",
     "multiscale_stage2_frozen",
+    "multiscale_residual_frozen",
+    "baseline_residual_frozen",
 )
 
 
@@ -38,8 +42,14 @@ class MultiscaleModelConfig:
     default_partition_seed: int = 0
     tokenization: TokenizationConfig = TokenizationConfig()
     experiment_mode: str = "multiscale_frozen"
+    region_radius: int = 2
+    atoms_per_center: int = 8
+    max_centers: int = 8
+    eval_views: int = 5
 
     def __post_init__(self) -> None:
+        if self.region_radius < 0 or min(self.atoms_per_center, self.max_centers, self.eval_views) < 1:
+            raise ValueError("invalid random region configuration")
         if self.hidden_dim < 1 or self.output_dim < 1:
             raise ValueError("hidden_dim and output_dim must be positive")
         if not 0 <= self.dropout < 1:
@@ -58,6 +68,10 @@ class MultiscaleModelConfig:
     @property
     def finetunes_encoder(self) -> bool:
         return self.experiment_mode.endswith("_finetune")
+
+    @property
+    def is_residual(self) -> bool:
+        return self.experiment_mode.endswith("_residual_frozen")
 
 
 @dataclass
@@ -99,7 +113,14 @@ class MultiscaleMolecularModel(nn.Module):
         self.config = config or MultiscaleModelConfig(hidden_dim=hidden_dim)
         if self.config.hidden_dim != hidden_dim:
             raise ValueError("config.hidden_dim must match the encoder")
-        if self.config.uses_multiscale:
+        if self.config.experiment_mode.startswith("random_region_"):
+            self.region_encoders = nn.ModuleList()
+            self.random_regions = RandomRegionBranch(hidden_dim, self.config.dropout)
+            self.prediction_head = nn.Sequential(
+                nn.Linear(hidden_dim * 4, hidden_dim), nn.SiLU(),
+                nn.Dropout(self.config.dropout), nn.Linear(hidden_dim, self.config.output_dim),
+            )
+        elif self.config.uses_multiscale:
             # This is intentionally the legacy construction order so existing
             # frozen multiscale initialization and checkpoints remain unchanged.
             self.region_encoders = nn.ModuleList([
@@ -119,6 +140,14 @@ class MultiscaleMolecularModel(nn.Module):
                 nn.Dropout(self.config.dropout),
                 nn.Linear(hidden_dim, self.config.output_dim),
             )
+        if self.config.is_residual:
+            self.base_head = nn.Sequential(
+                nn.Linear(hidden_dim * 2, hidden_dim), nn.SiLU(),
+                nn.Dropout(self.config.dropout), nn.Linear(hidden_dim, self.config.output_dim),
+            )
+            self.base_head.requires_grad_(False).eval()
+            nn.init.zeros_(self.prediction_head[-1].weight)
+            nn.init.zeros_(self.prediction_head[-1].bias)
         self.set_encoder_frozen(not self.config.finetunes_encoder)
 
     def set_encoder_frozen(self, frozen: bool) -> None:
@@ -131,6 +160,8 @@ class MultiscaleMolecularModel(nn.Module):
         super().train(mode)
         if not self.config.finetunes_encoder:
             self.encoder.eval()
+        if self.config.is_residual:
+            self.base_head.eval()
         return self
 
     def _partition_seeds(
@@ -166,10 +197,46 @@ class MultiscaleMolecularModel(nn.Module):
         partitions: Sequence[TokenPartition] | None = None,
     ) -> TokenModelOutput:
         context = nullcontext() if self.config.finetunes_encoder else torch.no_grad()
-        with context:
+        # Keep the complete frozen Base in FP32 even inside training autocast.
+        precision = torch.autocast(device_type=node_features.device.type, enabled=False) if self.config.is_residual else nullcontext()
+        with context, precision:
             h1, h2, h3, h4 = self.encoder(node_features, bonds, node_mask)
+            base_prediction = None
+            if self.config.is_residual:
+                weights = node_mask.to(h4.dtype).unsqueeze(-1)
+                summed = (h4 * weights).sum(dim=1)
+                averaged = summed / weights.sum(dim=1).clamp_min(1.0)
+                base_prediction = self.base_head(torch.cat((summed, averaged), dim=-1))
         hidden_states = (h1, h2, h3, h4)
         batch_size = node_features.size(0)
+        if self.config.experiment_mode.startswith("random_region_"):
+            if partitions is not None:
+                raise ValueError("random regions do not use multiscale partitions")
+            weights = node_mask.to(h4.dtype).unsqueeze(-1)
+            summed = (h4 * weights).sum(1)
+            base = torch.cat((summed, summed / weights.sum(1).clamp_min(1)), -1)
+            seeds = self._partition_seeds(partition_seeds, batch_size)
+            predictions, representations = [], []
+            for view in range(1 if self.training else self.config.eval_views):
+                view_seeds = [derive_partition_seed(seed, view) for seed in seeds]
+                coarse, counts = self.random_regions(
+                    h4, bonds, node_mask, view_seeds,
+                    radius=self.config.region_radius,
+                    atoms_per_center=self.config.atoms_per_center,
+                    max_centers=self.config.max_centers,
+                )
+                representation = torch.cat((base, coarse), -1)
+                predictions.append(self.prediction_head(representation))
+                representations.append(representation)
+            token_counts = torch.zeros((batch_size, 4), dtype=torch.long, device=h4.device)
+            token_counts[:, 3] = counts
+            return TokenModelOutput(
+                prediction=torch.stack(predictions).mean(0),
+                graph_representation=torch.stack(representations).mean(0),
+                level_norms=torch.zeros((batch_size, 4), device=h4.device),
+                token_counts=token_counts,
+                residual_counts=torch.zeros_like(token_counts),
+            )
         if not self.config.uses_multiscale:
             weights = node_mask.to(h4.dtype).unsqueeze(-1)
             summed = (h4 * weights).sum(dim=1)
@@ -182,7 +249,7 @@ class MultiscaleMolecularModel(nn.Module):
             )
             token_counts[:, 3] = node_mask.sum(dim=1)
             return TokenModelOutput(
-                prediction=self.prediction_head(graph_representation),
+                prediction=self.prediction_head(graph_representation) + (base_prediction if base_prediction is not None else 0),
                 graph_representation=graph_representation,
                 level_norms=level_norms,
                 token_counts=token_counts,
@@ -306,7 +373,7 @@ class MultiscaleMolecularModel(nn.Module):
         graph_representation = scale_tensor.sum(dim=1)
         level_norms = scale_tensor.norm(dim=-1)
         return TokenModelOutput(
-            prediction=self.prediction_head(graph_representation),
+            prediction=self.prediction_head(graph_representation) + (base_prediction if base_prediction is not None else 0),
             graph_representation=graph_representation,
             level_norms=level_norms,
             token_counts=torch.stack(token_count_columns, dim=1),

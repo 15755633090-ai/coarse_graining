@@ -1,0 +1,46 @@
+{
+  "reference_property_source_hash_matches": true,
+  "pretrained_encoder_tensors_equal": true,
+  "rng_after_construction_equal": true,
+  "head_initialization": {
+    "0.weight": {
+      "equal": true,
+      "max_abs_difference": 0.0
+    },
+    "0.bias": {
+      "equal": true,
+      "max_abs_difference": 0.0
+    },
+    "3.weight": {
+      "equal": true,
+      "max_abs_difference": 0.0
+    },
+    "3.bias": {
+      "equal": true,
+      "max_abs_difference": 0.0
+    }
+  },
+  "limitations": "Short training replay only; complete training and final test not run.",
+  "first_batch_equal": true,
+  "scaler_equal": true,
+  "device": "cuda",
+  "training_predictions_equal": true,
+  "clipped_gradients_equal": true,
+  "parameters_after_step_equal": true,
+  "fp32_eval_predictions_equal": true,
+  "replay": [
+    {
+      "epoch_one_based": 1,
+      "reference_rmse": 1.0450265992352208,
+      "actual_rmse": 1.0450265992352208,
+      "absolute_difference": 0.0
+    },
+    {
+      "epoch_one_based": 2,
+      "reference_rmse": 1.0034064447711122,
+      "actual_rmse": 1.0034064447711122,
+      "absolute_difference": 0.0
+    }
+  ],
+  "replay_matches_within_1e_6": true
+}

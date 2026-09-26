@@ -1,10 +1,10 @@
 """Seed-separated training loop for property prediction."""
 from __future__ import annotations
 
-import copy
 import csv
 import hashlib
 import json
+import os
 import random
 import subprocess
 import warnings
@@ -19,6 +19,7 @@ from torch import Tensor, nn
 from torch.utils.data import DataLoader
 
 from diffusion_encoder.data import (
+    MoleculeBatch,
     OGBMoleculePropertyDataset,
     PropertyBatch,
     PropertyRecord,
@@ -73,6 +74,76 @@ TASK_SPECS: dict[str, TaskSpec] = {
 }
 
 
+@dataclass(frozen=True)
+class FormalProtocol:
+    """Locked benchmark protocol shared with the earlier formal experiments."""
+
+    batch_size: int
+    micro_batch_size: int
+    encoder_learning_rate: float
+    downstream_learning_rate: float
+    weight_decay: float
+    dropout: float
+    grad_clip: float
+    max_epochs: int = 200
+    early_stopping_patience: int = 30
+    amp_dtype: str = "bf16"
+
+
+# Lipo selected configurations from model/results_formal/04_diffusion:
+#   pretrained_finetune: dropout 0.3, batch 64, encoder 1e-4, head 5e-4
+#   pretrained_frozen:   dropout 0.1, batch 32, head 1e-3
+# Both used AdamW with weight_decay 1e-5, grad_clip 5.0, BF16 AMP,
+# 200 epochs, early-stopping patience 30, micro_batch_size 8 and no LR schedule.
+STAGE1_MODES = frozenset({"baseline_finetune", "multiscale_finetune"})
+# Execution semantics copied from the earlier formal benchmark training loop.
+# The old loop recorded no per-batch level/token diagnostics, ran validation
+# and test under torch.no_grad(), and kept the selected state on the host.
+LEGACY_EXECUTION = {
+    "train_diagnostics": False,
+    "eval_no_grad": True,
+    "best_state_on_cpu": True,
+    "micro_padding": "tighten_to_micro_batch",
+    "amp_dtype": "bf16",
+    "micro_batch_size": 8,
+}
+FORMAL_PROTOCOLS: dict[str, FormalProtocol] = {
+    "stage1": FormalProtocol(
+        batch_size=64,
+        micro_batch_size=8,
+        encoder_learning_rate=1e-4,
+        downstream_learning_rate=5e-4,
+        weight_decay=1e-5,
+        dropout=0.3,
+        grad_clip=5.0,
+    ),
+    "downstream": FormalProtocol(
+        batch_size=32,
+        micro_batch_size=8,
+        encoder_learning_rate=0.0,
+        downstream_learning_rate=1e-3,
+        weight_decay=1e-5,
+        dropout=0.1,
+        grad_clip=5.0,
+    ),
+}
+
+
+def formal_protocol(experiment_mode: str) -> FormalProtocol:
+    """Return the locked protocol preset for an experiment mode."""
+
+    if experiment_mode not in EXPERIMENT_MODES:
+        raise ValueError(f"unknown experiment mode {experiment_mode!r}")
+    group = "stage1" if experiment_mode in STAGE1_MODES else "downstream"
+    return FORMAL_PROTOCOLS[group]
+
+
+def _selection_metric(spec: TaskSpec) -> str:
+    if spec.task_type == "regression":
+        return "valid_rmse"
+    return f"valid_{spec.primary_metric}"
+
+
 @dataclass
 class TargetScaler:
     mean: Tensor
@@ -102,6 +173,10 @@ class TargetScaler:
 
 
 def seed_everything(seed: int) -> None:
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
+    torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -178,7 +253,7 @@ def _legacy_saved_model_epoch(payload: dict[str, object]) -> int | None:
     if not history:
         return None
     metric = str(payload.get("selection_metric", "valid_loss"))
-    minimize = metric == "valid_loss"
+    minimize = metric in {"valid_loss", "valid_rmse", "valid_mae"}
     local_improvements = [
         row for previous, row in zip(history, history[1:])
         if (
@@ -342,8 +417,8 @@ def _validate_resume_protocol(
     provenance: dict[str, object],
 ) -> None:
     schema = checkpoint.get("schema_version")
-    if schema not in {2, 3}:
-        raise ValueError("resume requires checkpoint schema 2 or 3")
+    if schema not in {2, 3, 4}:
+        raise ValueError("resume requires checkpoint schema 2, 3 or 4")
     expected_top_level = {
         "task_spec": task_spec,
         "experiment_mode": experiment_mode,
@@ -355,7 +430,12 @@ def _validate_resume_protocol(
         if checkpoint.get(name) != expected
     }
     saved_protocol = checkpoint.get("training_protocol", {})
-    if schema == 3:
+    if training_protocol.get("execution_revision") != saved_protocol.get("execution_revision"):
+        mismatches["execution_revision"] = {
+            "checkpoint": saved_protocol.get("execution_revision"),
+            "current": training_protocol.get("execution_revision"),
+        }
+    if schema in {3, 4}:
         if saved_protocol != training_protocol:
             mismatches["training_protocol"] = {
                 "checkpoint": saved_protocol,
@@ -412,6 +492,23 @@ def _restore_rng_state(
         torch.cuda.set_rng_state_all(state["cuda"])
 
 
+def _advance_legacy_decoder_initialization(config) -> None:
+    """Replay discarded pretraining modules' CPU RNG draws before the head.
+
+    The original Base constructed these modules before its property head.
+    They are temporary here: no decoder weights enter the downstream model.
+    Keep dimensions and construction order aligned with BondAwareDiffusionModel.
+    """
+    for size in (config.atom_vocab_size, config.charge_vocab_size,
+                 config.aromatic_vocab_size, config.hybrid_vocab_size,
+                 config.degree_vocab_size):
+        nn.Linear(config.hidden_dim, size - 1, device="cpu")
+    nn.Linear(config.hidden_dim * 6, config.hidden_dim * 2, device="cpu")
+    nn.Linear(config.hidden_dim * 2, config.hidden_dim, device="cpu")
+    nn.Linear(config.hidden_dim, config.bond_vocab_size - 1, device="cpu")
+    nn.Linear(config.hidden_dim * 2, config.graph_dim, device="cpu")
+
+
 def build_property_model(
     *,
     spec: TaskSpec,
@@ -421,13 +518,32 @@ def build_property_model(
     dropout: float,
     device: torch.device,
     encoder_init_checkpoint: str | Path | None = None,
+    base_init_checkpoint: str | Path | None = None,
+    region_radius: int = 2,
+    atoms_per_center: int = 8,
+    max_centers: int = 8,
+    eval_views: int = 5,
 ) -> MultiscaleMolecularModel:
     """Construct a mode with explicitly reproducible shared initialization."""
 
     if experiment_mode not in EXPERIMENT_MODES:
         raise ValueError(f"unknown experiment mode {experiment_mode!r}")
     seed_everything(model_seed)
-    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen"}
+    if experiment_mode.endswith("_residual_frozen"):
+        if base_init_checkpoint is None or encoder_init_checkpoint is not None:
+            raise ValueError("residual modes require base_init_checkpoint only")
+        saved = _validated_residual_source(base_init_checkpoint, spec)
+        base, _, _ = load_property_model(base_init_checkpoint, device=device)
+        model = MultiscaleMolecularModel(base.encoder, config=MultiscaleModelConfig(
+            hidden_dim=base.config.hidden_dim, output_dim=spec.num_tasks,
+            dropout=dropout, default_partition_seed=partition_seed,
+            experiment_mode=experiment_mode,
+        )).to(device)
+        model.base_head.load_state_dict(base.prediction_head.state_dict(), strict=True)
+        return model
+    if base_init_checkpoint is not None:
+        raise ValueError("base_init_checkpoint is only valid for residual modes")
+    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -445,6 +561,7 @@ def build_property_model(
         encoder = load_encoder(
             device=device, frozen=experiment_mode.endswith("_frozen"),
         )
+    _advance_legacy_decoder_initialization(encoder.config)
     return MultiscaleMolecularModel(
         encoder,
         config=MultiscaleModelConfig(
@@ -453,8 +570,24 @@ def build_property_model(
             output_dim=spec.num_tasks,
             default_partition_seed=partition_seed,
             experiment_mode=experiment_mode,
+            region_radius=region_radius, atoms_per_center=atoms_per_center,
+            max_centers=max_centers, eval_views=eval_views,
         ),
     ).to(device)
+
+
+def _validated_residual_source(path, spec):
+    saved = torch.load(Path(path), map_location="cpu", weights_only=False)
+    if saved.get("experiment_mode") != "baseline_stage2_frozen" or saved.get("task_spec") != asdict(spec):
+        raise ValueError("residual source must be a matching Stage-2 Base checkpoint")
+    actual, _ = _saved_model_epoch(saved)
+    history = saved.get("history", [])
+    if (actual is None or actual != saved.get("best_epoch") or not history
+            or actual != min(history, key=lambda r: r["valid_rmse"])["epoch"]):
+        raise ValueError("residual source must contain the validation-best Base state")
+    if spec.task_type != "regression":
+        raise ValueError("residual experiments currently support regression only")
+    return saved
 
 
 def build_optimizer(
@@ -472,15 +605,15 @@ def build_optimizer(
         p for name, p in model.named_parameters()
         if not name.startswith("encoder.") and p.requires_grad
     ]
-    if encoder:
-        groups.append({
-            "name": "encoder", "params": encoder,
-            "lr": encoder_learning_rate,
-        })
     if downstream:
         groups.append({
             "name": "downstream", "params": downstream,
             "lr": downstream_learning_rate,
+        })
+    if encoder:
+        groups.append({
+            "name": "encoder", "params": encoder,
+            "lr": encoder_learning_rate,
         })
     if not groups:
         raise RuntimeError("model has no trainable parameters")
@@ -732,6 +865,45 @@ def _metrics(
     return _classification_metrics(prediction, targets, target_mask)
 
 
+def _slice_property_batch(
+    batch: PropertyBatch,
+    start: int,
+    end: int,
+) -> PropertyBatch:
+    """Slice one collated batch the way the old benchmark loop did.
+
+    The old ``_slice_property_batch`` re-tightened padding to the largest
+    molecule inside the micro-batch, so dense [N, N] message passing never ran
+    on the wider padding of the full batch.
+    """
+
+    node_mask = batch.graph.node_mask[start:end]
+    max_nodes = int(node_mask.sum(dim=1).max().item())
+    graph = MoleculeBatch(
+        batch.graph.node_features[start:end, :max_nodes],
+        batch.graph.bonds[start:end, :max_nodes, :max_nodes],
+        node_mask[:, :max_nodes],
+        list(batch.graph.smiles[start:end]),
+    )
+    partitions = (
+        None if batch.partitions is None
+        else list(batch.partitions[start:end])
+    )
+    return PropertyBatch(
+        graph,
+        batch.targets[start:end],
+        batch.target_mask[start:end],
+        batch.sample_ids[start:end],
+        partitions,
+    )
+
+
+def _autocast_dtype(amp_dtype: str) -> torch.dtype:
+    if amp_dtype == "bf16":
+        return torch.bfloat16
+    raise ValueError("amp_dtype must be one of 'none', 'bf16'")
+
+
 def _run_epoch(
     model: MultiscaleMolecularModel,
     loader: DataLoader[PropertyBatch],
@@ -743,9 +915,17 @@ def _run_epoch(
     epoch: int,
     training: bool,
     optimizer: torch.optim.Optimizer | None = None,
+    micro_batch_size: int = 0,
+    grad_clip: float = 0.0,
+    amp_dtype: str = "none",
+    collect_diagnostics: bool = True,
 ) -> dict[str, float]:
     model.train(training)
     _prepare_loader_iteration(loader)
+    if amp_dtype != "none":
+        _autocast_dtype(amp_dtype)
+    # Original benchmark used AMP for training only; validation selects in FP32.
+    amp_enabled = training and amp_dtype != "none" and device.type == "cuda"
     totals = {"loss_sum": 0.0, "valid_labels": 0.0, "samples": 0.0}
     level_norm_sum = torch.zeros(4)
     token_sum = torch.zeros(4)
@@ -756,54 +936,129 @@ def _run_epoch(
     all_masks: list[Tensor] = []
     for batch in loader:
         batch = batch.to(device)
-        seeds = (
-            None if batch.partitions is not None
-            else _partition_seeds(
-                batch.sample_ids,
-                base_seed=base_partition_seed,
-                epoch=epoch,
-                training=training,
-            )
-        )
-        output = model(
-            batch.graph.node_features,
-            batch.graph.bonds,
-            batch.graph.node_mask,
-            seeds,
-            batch.partitions,
-        )
-        loss = _loss(output.prediction, batch.targets, batch.target_mask, spec, scaler)
         if training:
             if optimizer is None:
                 raise ValueError("optimizer is required in training mode")
             optimizer.zero_grad(set_to_none=True)
-            loss.backward()
+            total_weight = max(1.0, float(batch.target_mask.sum()))
+            micro_size = micro_batch_size or batch.targets.size(0)
+            micro_size = min(micro_size, batch.targets.size(0))
+            batch_loss = 0.0
+            for start in range(0, batch.targets.size(0), micro_size):
+                micro = _slice_property_batch(
+                    batch, start, min(batch.targets.size(0), start + micro_size),
+                )
+                seeds = (
+                    None if micro.partitions is not None
+                    else _partition_seeds(
+                        micro.sample_ids,
+                        base_seed=base_partition_seed,
+                        epoch=epoch,
+                        training=training,
+                    )
+                )
+                with torch.autocast(
+                    device_type=device.type,
+                    dtype=_autocast_dtype(amp_dtype) if amp_enabled else None,
+                    enabled=amp_enabled,
+                ):
+                    output = model(
+                        micro.graph.node_features,
+                        micro.graph.bonds,
+                        micro.graph.node_mask,
+                        seeds,
+                        micro.partitions,
+                    )
+                    loss = _loss(
+                        output.prediction,
+                        micro.targets,
+                        micro.target_mask,
+                        spec,
+                        scaler,
+                    )
+                    micro_weight = float(micro.target_mask.sum()) / total_weight
+                    weighted_loss = loss * micro_weight
+                weighted_loss.backward()
+                batch_loss += float(weighted_loss.detach())
+                if collect_diagnostics:
+                    level_norm_sum += (
+                        output.level_norms.detach().cpu().sum(dim=0)
+                    )
+                    token_sum += (
+                        output.token_counts.detach().cpu().sum(dim=0)
+                    )
+                    residual_sum += (
+                        output.residual_counts.detach().cpu().sum(dim=0)
+                    )
+                    present_count += (
+                        output.token_counts.detach().cpu().gt(0).sum(dim=0)
+                    )
+            if grad_clip > 0:
+                nn.utils.clip_grad_norm_(
+                    [
+                        parameter for parameter in model.parameters()
+                        if parameter.requires_grad
+                    ],
+                    grad_clip,
+                )
             optimizer.step()
+            loss_value = batch_loss
         else:
+            seeds = (
+                None if batch.partitions is not None
+                else _partition_seeds(
+                    batch.sample_ids,
+                    base_seed=base_partition_seed,
+                    epoch=epoch,
+                    training=training,
+                )
+            )
+            with torch.no_grad():
+                with torch.autocast(
+                    device_type=device.type,
+                    dtype=_autocast_dtype(amp_dtype) if amp_enabled else None,
+                    enabled=amp_enabled,
+                ):
+                    output = model(
+                        batch.graph.node_features,
+                        batch.graph.bonds,
+                        batch.graph.node_mask,
+                        seeds,
+                        batch.partitions,
+                    )
+                    loss = _loss(
+                        output.prediction,
+                        batch.targets,
+                        batch.target_mask,
+                        spec,
+                        scaler,
+                    )
             all_predictions.append(output.prediction.detach().cpu())
             all_targets.append(batch.targets.detach().cpu())
             all_masks.append(batch.target_mask.detach().cpu())
-        level_norm_sum += output.level_norms.detach().cpu().sum(dim=0)
-        token_sum += output.token_counts.detach().cpu().sum(dim=0)
-        residual_sum += output.residual_counts.detach().cpu().sum(dim=0)
-        present_count += output.token_counts.detach().cpu().gt(0).sum(dim=0)
+            level_norm_sum += output.level_norms.detach().cpu().sum(dim=0)
+            token_sum += output.token_counts.detach().cpu().sum(dim=0)
+            residual_sum += output.residual_counts.detach().cpu().sum(dim=0)
+            present_count += output.token_counts.detach().cpu().gt(0).sum(dim=0)
+            loss_value = float(loss.detach())
         valid_labels = float(batch.target_mask.sum())
-        totals["loss_sum"] += float(loss.detach()) * valid_labels
+        totals["loss_sum"] += loss_value * valid_labels
         totals["valid_labels"] += valid_labels
         totals["samples"] += batch.targets.size(0)
     metrics = {
         "loss": totals["loss_sum"] / max(1.0, totals["valid_labels"]),
     }
-    samples = max(1.0, totals["samples"])
-    names = ("q", "h2", "h3", "h4")
-    for index, name in enumerate(names):
-        metrics[f"norm_{name}"] = float(level_norm_sum[index] / samples)
-        metrics[f"tokens_{name}"] = float(token_sum[index] / samples)
-        metrics[f"residual_{name}"] = float(residual_sum[index] / samples)
-        if index:
-            metrics[f"p_{name}_present"] = float(
-                present_count[index] / samples
-            )
+    if collect_diagnostics:
+        samples = max(1.0, totals["samples"])
+        names = ("q", "h2", "h3", "h4")
+        for index, name in enumerate(names):
+            metrics[f"norm_{name}"] = float(level_norm_sum[index] / samples)
+            metrics[f"tokens_{name}"] = float(token_sum[index] / samples)
+            metrics[f"residual_{name}"] = float(residual_sum[index] / samples)
+            if index:
+                metrics[f"p_{name}_present"] = float(
+                    present_count[index] / samples
+                )
     if not training:
         metrics.update(_metrics(
             torch.cat(all_predictions),
@@ -823,7 +1078,7 @@ def _write_history(output: Path, history: list[dict[str, float | int]]) -> None:
     if not history:
         return
     with (output / "history.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(history[0]))
+        writer = csv.DictWriter(handle, fieldnames=list(dict.fromkeys(k for row in history for k in row)))
         writer.writeheader()
         writer.writerows(history)
 
@@ -834,7 +1089,9 @@ def _is_better_validation(
     spec: TaskSpec,
 ) -> tuple[bool, float]:
     if spec.task_type == "regression":
-        value = candidate["loss"]
+        value = candidate["rmse"]
+        if not np.isfinite(value):
+            return False, best_value
         return (True, value) if value < best_value else (False, best_value)
     value = candidate[spec.primary_metric]
     if not np.isfinite(value):
@@ -848,31 +1105,64 @@ def train_property_model(
     task: str,
     output_dir: str | Path,
     device: str = "cuda",
-    epochs: int = 100,
-    batch_size: int = 32,
+    epochs: int | None = None,
+    batch_size: int | None = None,
+    micro_batch_size: int | None = None,
     learning_rate: float | None = None,
-    encoder_learning_rate: float = 1e-5,
-    downstream_learning_rate: float = 1e-3,
-    weight_decay: float = 0.01,
+    encoder_learning_rate: float | None = None,
+    downstream_learning_rate: float | None = None,
+    weight_decay: float | None = None,
+    dropout: float | None = None,
+    grad_clip: float | None = None,
+    amp_dtype: str | None = None,
+    scheduler: str | None = None,
     scheduler_patience: int = 10,
     scheduler_factor: float = 0.3,
     model_seed: int = 0,
     partition_seed: int = 0,
     data_seed: int = 0,
-    dropout: float = 0.1,
-    num_workers: int = 4,
+    num_workers: int = 0,
     resume: bool = False,
-    patience: int = 25,
+    patience: int | None = None,
+    train_diagnostics: bool = False,
     experiment_mode: str = "multiscale_frozen",
     encoder_init_checkpoint: str | Path | None = None,
+    base_init_checkpoint: str | Path | None = None,
+    region_radius: int = 2,
+    atoms_per_center: int = 8,
+    max_centers: int = 8,
+    eval_views: int = 5,
 ) -> dict[str, object]:
-    """Train one arm of the locked baseline/multiscale protocol."""
+    """Train one arm of the locked formal benchmark protocol."""
 
     if task not in TASK_SPECS:
         raise ValueError(f"unknown task {task!r}")
     if experiment_mode not in EXPERIMENT_MODES:
         raise ValueError(f"unknown experiment mode {experiment_mode!r}")
-    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen"}
+    preset = formal_protocol(experiment_mode)
+    epochs = preset.max_epochs if epochs is None else epochs
+    batch_size = preset.batch_size if batch_size is None else batch_size
+    micro_batch_size = (
+        preset.micro_batch_size if micro_batch_size is None
+        else micro_batch_size
+    )
+    encoder_learning_rate = (
+        preset.encoder_learning_rate if encoder_learning_rate is None
+        else encoder_learning_rate
+    )
+    downstream_learning_rate = (
+        preset.downstream_learning_rate
+        if downstream_learning_rate is None else downstream_learning_rate
+    )
+    weight_decay = preset.weight_decay if weight_decay is None else weight_decay
+    dropout = preset.dropout if dropout is None else dropout
+    grad_clip = preset.grad_clip if grad_clip is None else grad_clip
+    amp_dtype = preset.amp_dtype if amp_dtype is None else amp_dtype
+    patience = (
+        preset.early_stopping_patience if patience is None else patience
+    )
+    scheduler = "none" if scheduler is None else scheduler
+    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -884,6 +1174,14 @@ def train_property_model(
         )
     if patience < 0:
         raise ValueError("patience must be nonnegative")
+    if micro_batch_size < 0:
+        raise ValueError("micro_batch_size must be nonnegative")
+    if grad_clip < 0:
+        raise ValueError("grad_clip must be nonnegative")
+    if amp_dtype not in {"none", "bf16"}:
+        raise ValueError("amp_dtype must be one of 'none', 'bf16'")
+    if scheduler not in {"none", "plateau"}:
+        raise ValueError("scheduler must be one of 'none', 'plateau'")
     if scheduler_patience < 0:
         raise ValueError("scheduler_patience must be nonnegative")
     if not 0.0 < scheduler_factor < 1.0:
@@ -893,6 +1191,16 @@ def train_property_model(
     if learning_rate is not None:
         downstream_learning_rate = learning_rate
     spec = TASK_SPECS[task]
+    if experiment_mode.startswith("random_region_") and spec.task_type != "regression":
+        raise ValueError("random region v1 supports regression prediction averaging only")
+    residual = experiment_mode.endswith("_residual_frozen")
+    source = None
+    if residual:
+        if base_init_checkpoint is None or encoder_learning_rate != 0:
+            raise ValueError("residual mode requires Base checkpoint and encoder LR zero")
+        source = _validated_residual_source(base_init_checkpoint, spec)
+    elif base_init_checkpoint is not None:
+        raise ValueError("base_init_checkpoint is only valid for residual modes")
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
     device_object = torch.device(device)
@@ -902,21 +1210,47 @@ def train_property_model(
     training_protocol: dict[str, object] = {
         "optimizer": "AdamW",
         "batch_size": batch_size,
+        "micro_batch_size": micro_batch_size,
         "max_epochs": epochs,
         "encoder_learning_rate": encoder_learning_rate,
         "downstream_learning_rate": downstream_learning_rate,
         "weight_decay": weight_decay,
-        "scheduler": "ReduceLROnPlateau",
+        "scheduler": scheduler,
         "scheduler_patience": scheduler_patience,
         "scheduler_factor": scheduler_factor,
         "early_stopping_patience": patience,
+        "early_stopping_metric": _selection_metric(spec),
+        "grad_clip": grad_clip,
+        "amp_dtype": amp_dtype,
+        "train_diagnostics": bool(train_diagnostics),
+        "eval_no_grad": True,
+        "execution_revision": "legacy_base_replay_v1",
+        "head_initialization": "legacy_decoder_rng_replay",
+        "eval_amp_dtype": "none",
+        "deterministic": True,
+        "cublas_workspace_config": ":4096:8",
+        "evaluation_generator_offsets": [10000, 20000],
         "dropout": dropout,
         "num_workers": num_workers,
         "device_type": device_object.type,
     }
+    if experiment_mode.startswith("random_region_"):
+        training_protocol["random_regions"] = {
+            "version": 1, "radius": region_radius, "atoms_per_center": atoms_per_center,
+            "max_centers": max_centers, "eval_views": eval_views,
+            "heads": 4, "distance_buckets": "0..8,9..12,13+,disconnected",
+            "training_views": 1, "fusion": "concat",
+        }
     provenance = _experiment_provenance(
         dataset_root, encoder_init_checkpoint,
     )
+    if residual:
+        training_protocol.update(residual_version=1, initial_candidate_epoch=-1,
+                                 base_precision="fp32", correction_init="zero_last_linear")
+        provenance["base_source"] = {"sha256": _file_sha256(Path(base_init_checkpoint)),
+                                     "model_state_epoch": source["model_state_epoch"]}
+        if source.get("provenance", {}).get("dataset") != provenance["dataset"]:
+            raise ValueError("residual source dataset/split provenance mismatch")
 
     train_dataset = OGBMoleculePropertyDataset(dataset_root, split="train")
     valid_dataset = OGBMoleculePropertyDataset(dataset_root, split="valid")
@@ -927,6 +1261,9 @@ def train_property_model(
             f"but the dataset has {train_dataset.labels.size(1)}"
         )
     scaler = TargetScaler.fit(train_dataset) if spec.task_type == "regression" else None
+    if residual:
+        if not all(torch.equal(value, source["target_scaler"][key]) for key, value in (("mean", scaler.mean), ("std", scaler.std))):
+            raise ValueError("residual source target scaler mismatch")
 
     generator = torch.Generator().manual_seed(data_seed)
     valid_loader = _make_loader(
@@ -937,6 +1274,7 @@ def train_property_model(
         base_partition_seed=partition_seed,
         epoch=0,
         training=False,
+        generator=torch.Generator().manual_seed(data_seed + 10000),
         tokenization=TokenizationConfig(),
         pin_memory=device_object.type == "cuda",
         use_partitions=experiment_mode.startswith("multiscale_"),
@@ -949,6 +1287,7 @@ def train_property_model(
         base_partition_seed=partition_seed,
         epoch=0,
         training=False,
+        generator=torch.Generator().manual_seed(data_seed + 20000),
         tokenization=TokenizationConfig(),
         pin_memory=device_object.type == "cuda",
         use_partitions=experiment_mode.startswith("multiscale_"),
@@ -962,6 +1301,9 @@ def train_property_model(
         dropout=dropout,
         device=device_object,
         encoder_init_checkpoint=encoder_init_checkpoint,
+        base_init_checkpoint=base_init_checkpoint,
+        region_radius=region_radius, atoms_per_center=atoms_per_center,
+        max_centers=max_centers, eval_views=eval_views,
     )
     optimizer = build_optimizer(
         model,
@@ -969,11 +1311,14 @@ def train_property_model(
         downstream_learning_rate=downstream_learning_rate,
         weight_decay=weight_decay,
     )
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer,
-        mode="min" if spec.task_type == "regression" else "max",
-        patience=scheduler_patience,
-        factor=scheduler_factor,
+    scheduler = (
+        torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer,
+            mode="min" if spec.task_type == "regression" else "max",
+            patience=scheduler_patience,
+            factor=scheduler_factor,
+        )
+        if training_protocol["scheduler"] == "plateau" else None
     )
     train_loader = _make_loader(
         train_dataset,
@@ -991,9 +1336,25 @@ def train_property_model(
 
     history: list[dict[str, float | int]] = []
     start_epoch = 0
-    best_state = copy.deepcopy(model.state_dict())
+    # The old benchmark keeps the selected state on the host, not in VRAM.
+    best_state = {
+        name: value.detach().cpu().clone()
+        for name, value in model.state_dict().items()
+    }
     best_validation = float("inf") if spec.task_type == "regression" else -float("inf")
     epochs_without_improvement = 0
+    if residual and not resume:
+        initial = _run_epoch(model, valid_loader, device=device_object, spec=spec,
+                             scaler=scaler, base_partition_seed=partition_seed,
+                             epoch=0, training=False, amp_dtype="none")
+        _, best_validation = _is_better_validation(initial, best_validation, spec)
+        if not np.isfinite(best_validation):
+            raise ValueError("initial residual validation metric is nonfinite")
+        history.append({"epoch": -1, "train_loss": None,
+                        **{f"valid_{k}": v for k, v in initial.items()},
+                        **_learning_rates(optimizer)})
+        _write_history(output, history)
+        print(f"initial Base candidate (epoch -1): valid_rmse={best_validation:.8f}", flush=True)
     if resume:
         last_path = output / "last.pt"
         if not last_path.is_file():
@@ -1023,7 +1384,8 @@ def train_property_model(
                 return completed
         model.load_state_dict(resume_checkpoint["last_model_state"], strict=True)
         optimizer.load_state_dict(resume_checkpoint["optimizer_state"])
-        scheduler.load_state_dict(resume_checkpoint["scheduler_state"])
+        if scheduler is not None:
+            scheduler.load_state_dict(resume_checkpoint["scheduler_state"])
         history = list(resume_checkpoint["history"])
         start_epoch = int(resume_checkpoint["current_epoch"]) + 1
         best_state = resume_checkpoint["best_model_state"]
@@ -1038,19 +1400,15 @@ def train_property_model(
             print("training epochs already complete; finalizing best model", flush=True)
 
     def checkpoint_payload(current_epoch: int) -> dict[str, object]:
-        selection_metric = (
-            "valid_loss" if spec.task_type == "regression"
-            else f"valid_{spec.primary_metric}"
-        )
-        best_epoch = int(min(
+        selection_metric = _selection_metric(spec)
+        minimize = selection_metric in {"valid_loss", "valid_rmse", "valid_mae"}
+        selector = min if minimize else max
+        best_epoch = int(selector(
             history,
-            key=lambda row: row["valid_loss"],
-        )["epoch"]) if spec.task_type == "regression" else int(max(
-            history,
-            key=lambda row: row[f"valid_{spec.primary_metric}"],
+            key=lambda row: row[selection_metric],
         )["epoch"])
         return {
-            "schema_version": 3,
+            "schema_version": 4,
             "task_spec": asdict(spec),
             "model_config": asdict(model.config),
             "experiment_mode": experiment_mode,
@@ -1073,7 +1431,9 @@ def train_property_model(
             "encoder_lr": _learning_rates(optimizer)["encoder_lr"],
             "downstream_lr": _learning_rates(optimizer)["downstream_lr"],
             "optimizer_state": optimizer.state_dict(),
-            "scheduler_state": scheduler.state_dict(),
+            "scheduler_state": (
+                None if scheduler is None else scheduler.state_dict()
+            ),
             "rng_state": _rng_state(generator),
             "training_protocol": training_protocol,
             "provenance": provenance,
@@ -1091,6 +1451,10 @@ def train_property_model(
             epoch=epoch,
             training=True,
             optimizer=optimizer,
+            micro_batch_size=micro_batch_size,
+            grad_clip=grad_clip,
+            amp_dtype=amp_dtype,
+            collect_diagnostics=train_diagnostics,
         )
         valid_metrics = _run_epoch(
             model,
@@ -1101,6 +1465,9 @@ def train_property_model(
             base_partition_seed=partition_seed,
             epoch=epoch,
             training=False,
+            micro_batch_size=micro_batch_size,
+            grad_clip=grad_clip,
+            amp_dtype=amp_dtype,
         )
         epoch_lrs = _learning_rates(optimizer)
         row = {
@@ -1127,16 +1494,15 @@ def train_property_model(
             spec,
         )
         if improved:
-            best_state = copy.deepcopy(model.state_dict())
+            best_state = {
+                name: value.detach().cpu().clone()
+                for name, value in model.state_dict().items()
+            }
             epochs_without_improvement = 0
         else:
             epochs_without_improvement += 1
-        scheduler_value = (
-            valid_metrics["loss"]
-            if spec.task_type == "regression"
-            else valid_metrics[spec.primary_metric]
-        )
-        scheduler.step(scheduler_value)
+        if scheduler is not None:
+            scheduler.step(valid_metrics[spec.primary_metric])
         checkpoint_common = checkpoint_payload(epoch)
         torch.save(
             {
@@ -1195,6 +1561,9 @@ def train_property_model(
         base_partition_seed=partition_seed,
         epoch=0,
         training=False,
+        micro_batch_size=micro_batch_size,
+        grad_clip=grad_clip,
+        amp_dtype=amp_dtype,
     )
     checkpoint = {
         **checkpoint_common,
@@ -1268,7 +1637,7 @@ def load_property_model(
     """Reload the frozen encoder plus a trained tokenization head."""
 
     checkpoint = torch.load(Path(checkpoint_path), map_location="cpu", weights_only=False)
-    if checkpoint.get("schema_version") not in {1, 2, 3}:
+    if checkpoint.get("schema_version") not in {1, 2, 3, 4}:
         raise ValueError("unsupported multiscale checkpoint schema")
     config_payload = dict(checkpoint["model_config"])
     config_payload["tokenization"] = TokenizationConfig(

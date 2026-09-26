@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import asdict
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -109,6 +110,31 @@ class _TinyPropertyDataset(Dataset):
 
 
 class TrainingTests(unittest.TestCase):
+    def test_load_schema4_preserves_weights_and_frozen_eval(self) -> None:
+        config = MultiscaleModelConfig(hidden_dim=8, experiment_mode="baseline_stage2_frozen")
+        model = MultiscaleMolecularModel(
+            DiffusionEncoder(ModelConfig(hidden_dim=8)), config=config,
+        )
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "best.pt"
+            torch.save({
+                "schema_version": 4,
+                "model_config": asdict(config),
+                "model_state": model.state_dict(),
+                "task_spec": asdict(TaskSpec("lipo", "regression", 1)),
+                "target_scaler": {"mean": torch.tensor([2.0]), "std": torch.tensor([1.5])},
+            }, path)
+            with patch("multiscale_tokenizer.training.load_encoder", return_value=DiffusionEncoder(ModelConfig(hidden_dim=8))):
+                loaded, scaler, spec = training_module.load_property_model(path)
+        for name, value in model.state_dict().items():
+            torch.testing.assert_close(value, loaded.state_dict()[name], rtol=0, atol=0)
+        self.assertEqual(spec.name, "lipo")
+        torch.testing.assert_close(scaler.mean, torch.tensor([2.0]))
+        self.assertFalse(loaded.training)
+        loaded.train()
+        self.assertFalse(loaded.encoder.training)
+        self.assertTrue(all(not p.requires_grad for p in loaded.encoder.parameters()))
+
     @staticmethod
     def _batch(targets: list[list[float]], valid: list[list[bool]]) -> PropertyBatch:
         graphs = [
@@ -174,6 +200,97 @@ class TrainingTests(unittest.TestCase):
             training=False,
         )
         self.assertAlmostEqual(metrics["loss"], 1.5, places=6)
+
+    def test_formal_protocol_presets_match_locked_benchmark(self) -> None:
+        stage1 = training_module.formal_protocol("baseline_finetune")
+        self.assertEqual(stage1.max_epochs, 200)
+        self.assertEqual(stage1.early_stopping_patience, 30)
+        self.assertEqual(stage1.batch_size, 64)
+        self.assertEqual(stage1.micro_batch_size, 8)
+        self.assertEqual(stage1.encoder_learning_rate, 1e-4)
+        self.assertEqual(stage1.downstream_learning_rate, 5e-4)
+        self.assertEqual(stage1.weight_decay, 1e-5)
+        self.assertEqual(stage1.dropout, 0.3)
+        self.assertEqual(stage1.grad_clip, 5.0)
+        self.assertEqual(stage1.amp_dtype, "bf16")
+
+        frozen = training_module.formal_protocol("baseline_stage2_frozen")
+        self.assertEqual(frozen.batch_size, 32)
+        self.assertEqual(frozen.micro_batch_size, 8)
+        self.assertEqual(frozen.encoder_learning_rate, 0.0)
+        self.assertEqual(frozen.downstream_learning_rate, 1e-3)
+        self.assertEqual(frozen.weight_decay, 1e-5)
+        self.assertEqual(frozen.dropout, 0.1)
+        self.assertEqual(frozen.max_epochs, 200)
+        self.assertEqual(frozen.early_stopping_patience, 30)
+        self.assertEqual(
+            training_module.formal_protocol("multiscale_finetune"),
+            stage1,
+        )
+        self.assertEqual(
+            training_module.formal_protocol("multiscale_stage2_frozen"),
+            frozen,
+        )
+
+    def test_micro_batch_accumulation_matches_full_batch_update(self) -> None:
+        class ScaledStub(torch.nn.Module):
+            def __init__(self) -> None:
+                super().__init__()
+                self.weight = torch.nn.Parameter(torch.tensor(0.25))
+
+            def forward(
+                self,
+                node_features: Tensor,
+                bonds: Tensor,
+                node_mask: Tensor,
+                partition_seeds,
+                partitions,
+            ) -> TokenModelOutput:
+                batch_size = node_features.size(0)
+                base = node_features[:, 0, 0].to(torch.float32).unsqueeze(1)
+                return TokenModelOutput(
+                    prediction=self.weight * base,
+                    graph_representation=self.weight.expand(batch_size, 8),
+                    level_norms=torch.zeros((batch_size, 4)),
+                    token_counts=torch.zeros((batch_size, 4), dtype=torch.long),
+                    residual_counts=torch.zeros((batch_size, 4), dtype=torch.long),
+                )
+
+        batch = self._batch(
+            [[0.0], [1.0], [2.0], [3.0]],
+            [[True], [True], [False], [True]],
+        )
+        batch.graph.node_features[:, 0, 0] = torch.tensor([1, 2, 3, 4])
+        scaler = TargetScaler(mean=torch.tensor([0.0]), std=torch.tensor([1.0]))
+        spec = TaskSpec("lipo", "regression", 1)
+        baseline = ScaledStub()
+        split = ScaledStub()
+        split.load_state_dict(baseline.state_dict())
+        baseline_optimizer = torch.optim.AdamW(baseline.parameters(), lr=0.1)
+        split_optimizer = torch.optim.AdamW(split.parameters(), lr=0.1)
+
+        for model, optimizer, micro in (
+            (baseline, baseline_optimizer, 0),
+            (split, split_optimizer, 2),
+        ):
+            metrics = _run_epoch(
+                model,
+                [batch],
+                device=torch.device("cpu"),
+                spec=spec,
+                scaler=scaler,
+                base_partition_seed=0,
+                epoch=0,
+                training=True,
+                optimizer=optimizer,
+                micro_batch_size=micro,
+                grad_clip=0.0,
+                amp_dtype="none",
+            )
+            self.assertAlmostEqual(metrics["loss"], 1.4375, places=6)
+        torch.testing.assert_close(
+            split.weight, baseline.weight, rtol=1e-6, atol=1e-7,
+        )
 
     def test_epoch_aware_collator_updates_shared_partition_epoch(self) -> None:
         record = PropertyRecord(
@@ -289,12 +406,12 @@ class TrainingTests(unittest.TestCase):
     def test_regression_checkpoint_keeps_global_best(self) -> None:
         spec = TaskSpec("lipo", "regression", 1)
         better, value = _is_better_validation(
-            {"loss": 0.4}, best_value=0.5, spec=spec,
+            {"loss": 99.0, "rmse": 0.4}, best_value=0.5, spec=spec,
         )
         self.assertTrue(better)
         self.assertEqual(value, 0.4)
         better, value = _is_better_validation(
-            {"loss": 0.45}, best_value=value, spec=spec,
+            {"loss": 0.01, "rmse": 0.45}, best_value=value, spec=spec,
         )
         self.assertFalse(better)
         self.assertEqual(value, 0.4)
@@ -364,7 +481,7 @@ class TrainingTests(unittest.TestCase):
         )
         self.assertEqual(
             [(group["name"], group["lr"]) for group in optimizer.param_groups],
-            [("encoder", 1e-5), ("downstream", 1e-3)],
+            [("downstream", 1e-3), ("encoder", 1e-5)],
         )
         covered = {
             id(parameter)
@@ -583,6 +700,18 @@ class TrainingTests(unittest.TestCase):
                 training_protocol={"batch_size": 16, "dropout": 0.1},
                 provenance={"encoder": "abc"},
             )
+
+    def test_resume_rejects_pre_replay_execution_revision(self) -> None:
+        for schema in (2, 3, 4):
+            with self.subTest(schema=schema), self.assertRaisesRegex(ValueError, "execution_revision"):
+                _validate_resume_protocol(
+                    {"schema_version": schema, "task_spec": {},
+                     "experiment_mode": "baseline_finetune",
+                     "training_protocol": {}, "provenance": {}},
+                    task_spec={}, experiment_mode="baseline_finetune", seeds={},
+                    training_protocol={"execution_revision": "legacy_base_replay_v1"},
+                    provenance={},
+                )
 
     def _assert_resume_trajectory(self, num_workers: int) -> None:
         with TemporaryDirectory() as temporary, patch(

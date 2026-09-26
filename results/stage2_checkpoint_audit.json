@@ -1,0 +1,28 @@
+[
+  {
+    "run": "lipo_formal_stage2_seed0_baseline_legacyexec",
+    "epochs": 32,
+    "best_epoch_zero_based": 1,
+    "checks": {
+      "encoder_best_equals_source": true,
+      "encoder_last_equals_source": true,
+      "encoder_eval_after_train": true,
+      "encoder_all_frozen": true,
+      "scaler_equals_stage1": true,
+      "history_best_matches": true
+    }
+  },
+  {
+    "run": "lipo_formal_stage2_seed0_multiscale_legacyexec",
+    "epochs": 56,
+    "best_epoch_zero_based": 25,
+    "checks": {
+      "encoder_best_equals_source": true,
+      "encoder_last_equals_source": true,
+      "encoder_eval_after_train": true,
+      "encoder_all_frozen": true,
+      "scaler_equals_stage1": true,
+      "history_best_matches": true
+    }
+  }
+]

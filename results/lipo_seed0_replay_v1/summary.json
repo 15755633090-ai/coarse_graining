@@ -1,0 +1,92 @@
+{
+  "dataset": "lipo",
+  "split": "scaffold",
+  "seed": 0,
+  "rows": [
+    {
+      "experiment": "Stage-1 Base",
+      "run": "lipo_formal_stage1_seed0_replay_v1",
+      "epochs": 107,
+      "best_epoch_one_based": 77,
+      "validation_rmse": 0.6710908661004341,
+      "test_rmse": 0.6815348545853535,
+      "test_mae": 0.5097531080245972,
+      "test_r2": 0.6152443357556783
+    },
+    {
+      "experiment": "Stage-2 Base",
+      "run": "lipo_formal_stage2_seed0_base_replay_v1",
+      "epochs": 37,
+      "best_epoch_one_based": 7,
+      "validation_rmse": 0.6751751469388966,
+      "test_rmse": 0.6938082034808986,
+      "test_mae": 0.5212583541870117,
+      "test_r2": 0.6012618888536522
+    },
+    {
+      "experiment": "Stage-2 Multiscale",
+      "run": "lipo_formal_stage2_seed0_multiscale_replay_v1",
+      "epochs": 56,
+      "best_epoch_one_based": 26,
+      "validation_rmse": 0.8158350137012024,
+      "test_rmse": 0.7930612745002743,
+      "test_mae": 0.6338322162628174,
+      "test_r2": 0.47901838483547343
+    }
+  ],
+  "comparisons": {
+    "multiscale_minus_base_test_rmse": 0.09925307101937575,
+    "multiscale_relative_rmse_increase_percent": 14.30554878443554,
+    "multiscale_minus_base_validation_rmse": 0.1406598667623058,
+    "base2_minus_stage1_test_rmse": 0.0122733488955451
+  },
+  "checks": {
+    "Stage-1 Base best_epoch_matches_history": true,
+    "Stage-1 Base completed_with_test": true,
+    "Stage-2 Base best_epoch_matches_history": true,
+    "Stage-2 Base completed_with_test": true,
+    "Stage-2 Base source_hash_matches": true,
+    "Stage-2 Base encoder_best_and_last_unchanged": true,
+    "Stage-2 Base scaler_matches_source": true,
+    "Stage-2 Multiscale best_epoch_matches_history": true,
+    "Stage-2 Multiscale completed_with_test": true,
+    "Stage-2 Multiscale source_hash_matches": true,
+    "Stage-2 Multiscale encoder_best_and_last_unchanged": true,
+    "Stage-2 Multiscale scaler_matches_source": true,
+    "paired_training_protocol_equal": true,
+    "paired_seeds_equal": true,
+    "dataset_and_split_equal": true,
+    "stage1_all_validation_epochs_reproduce_reference": true
+  },
+  "paired_protocol": {
+    "optimizer": "AdamW",
+    "batch_size": 32,
+    "micro_batch_size": 8,
+    "max_epochs": 200,
+    "encoder_learning_rate": 0.0,
+    "downstream_learning_rate": 0.001,
+    "weight_decay": 1e-05,
+    "scheduler": "none",
+    "scheduler_patience": 10,
+    "scheduler_factor": 0.3,
+    "early_stopping_patience": 30,
+    "early_stopping_metric": "valid_rmse",
+    "grad_clip": 5.0,
+    "amp_dtype": "bf16",
+    "train_diagnostics": false,
+    "eval_no_grad": true,
+    "execution_revision": "legacy_base_replay_v1",
+    "head_initialization": "legacy_decoder_rng_replay",
+    "eval_amp_dtype": "none",
+    "deterministic": true,
+    "cublas_workspace_config": ":4096:8",
+    "evaluation_generator_offsets": [
+      10000,
+      20000
+    ],
+    "dropout": 0.1,
+    "num_workers": 0,
+    "device_type": "cuda"
+  },
+  "stage1_source_sha256": "7df661c4e6be06e43baed0573bec1bdaa5e3b8e76a31770a6e6cea49af808e14"
+}
