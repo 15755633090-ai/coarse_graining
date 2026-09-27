@@ -1,0 +1,122 @@
+{
+  "dataset": "lipo",
+  "split": "scaffold",
+  "seed": 0,
+  "rows": [
+    {
+      "experiment": "Stage-1 Base",
+      "run": "lipo_formal_stage1_seed0_replay_v1",
+      "epochs": 107,
+      "best_epoch": 77,
+      "validation_rmse": 0.6710908661004341,
+      "test_rmse": 0.6815348545853535,
+      "test_mae": 0.5097531080245972,
+      "test_r2": 0.6152443357556783
+    },
+    {
+      "experiment": "Stage-2 Base",
+      "run": "lipo_formal_stage2_seed0_base_replay_v1",
+      "epochs": 37,
+      "best_epoch": 7,
+      "validation_rmse": 0.6751751469388966,
+      "test_rmse": 0.6938082034808986,
+      "test_mae": 0.5212583541870117,
+      "test_r2": 0.6012618888536522
+    },
+    {
+      "experiment": "旧多尺度模型",
+      "run": "lipo_formal_stage2_seed0_multiscale_replay_v1",
+      "epochs": 56,
+      "best_epoch": 26,
+      "validation_rmse": 0.8158350137012024,
+      "test_rmse": 0.7930612745002743,
+      "test_mae": 0.6338322162628174,
+      "test_r2": 0.47901838483547343
+    },
+    {
+      "experiment": "随机区域（原版）",
+      "run": "lipo_random_region_seed0_r2_v1",
+      "epochs": 37,
+      "best_epoch": 7,
+      "validation_rmse": 0.6690093295240843,
+      "test_rmse": 0.6759047863892523,
+      "test_mae": 0.5173315405845642,
+      "test_r2": 0.6215749059999397
+    },
+    {
+      "experiment": "随机区域（速度优化版）",
+      "run": "lipo_random_region_seed0_r2_optimized_v1",
+      "epochs": 37,
+      "best_epoch": 7,
+      "validation_rmse": 0.6690093295240843,
+      "test_rmse": 0.6759047863892523,
+      "test_mae": 0.5173315405845642,
+      "test_r2": 0.6215749059999397
+    }
+  ],
+  "comparisons": {
+    "Stage-1 Base": {
+      "test_rmse_reduction": 0.005630068196101123,
+      "test_rmse_reduction_percent": 0.8260866129181996,
+      "test_mae_change": 0.007578432559967041
+    },
+    "Stage-2 Base": {
+      "test_rmse_reduction": 0.017903417091646223,
+      "test_rmse_reduction_percent": 2.580456241627464,
+      "test_mae_change": -0.00392681360244751
+    }
+  },
+  "checks": {
+    "Stage-1 Base history_matches_checkpoint": true,
+    "Stage-1 Base selected_best_epoch": true,
+    "Stage-1 Base completed_with_test": true,
+    "Stage-2 Base history_matches_checkpoint": true,
+    "Stage-2 Base selected_best_epoch": true,
+    "Stage-2 Base completed_with_test": true,
+    "旧多尺度模型 history_matches_checkpoint": true,
+    "旧多尺度模型 selected_best_epoch": true,
+    "旧多尺度模型 completed_with_test": true,
+    "随机区域（原版） history_matches_checkpoint": true,
+    "随机区域（原版） selected_best_epoch": true,
+    "随机区域（原版） completed_with_test": true,
+    "随机区域（速度优化版） history_matches_checkpoint": true,
+    "随机区域（速度优化版） selected_best_epoch": true,
+    "随机区域（速度优化版） completed_with_test": true,
+    "Stage-1 Base dataset_split_matches": true,
+    "Stage-2 Base dataset_split_matches": true,
+    "Stage-2 Base encoder_source_hash": true,
+    "Stage-2 Base frozen_encoder_best_last": true,
+    "Stage-2 Base target_scaler_matches": true,
+    "旧多尺度模型 dataset_split_matches": true,
+    "旧多尺度模型 encoder_source_hash": true,
+    "旧多尺度模型 frozen_encoder_best_last": true,
+    "旧多尺度模型 target_scaler_matches": true,
+    "随机区域（原版） dataset_split_matches": true,
+    "随机区域（原版） encoder_source_hash": true,
+    "随机区域（原版） frozen_encoder_best_last": true,
+    "随机区域（原版） target_scaler_matches": true,
+    "随机区域（速度优化版） dataset_split_matches": true,
+    "随机区域（速度优化版） encoder_source_hash": true,
+    "随机区域（速度优化版） frozen_encoder_best_last": true,
+    "随机区域（速度优化版） target_scaler_matches": true,
+    "optimization_full_history_exact": true,
+    "optimization_test_metrics_exact": true,
+    "optimization_model_config_exact": true,
+    "optimization_training_protocol_exact": true,
+    "optimization_best_weights_exact": true,
+    "paired_base_common_training_protocol": true,
+    "paired_seeds": true
+  },
+  "random_region_config": {
+    "version": 1,
+    "radius": 2,
+    "atoms_per_center": 8,
+    "max_centers": 8,
+    "eval_views": 5,
+    "heads": 4,
+    "distance_buckets": "0..8,9..12,13+,disconnected",
+    "training_views": 1,
+    "fusion": "concat"
+  },
+  "all_checks_pass": true
+}

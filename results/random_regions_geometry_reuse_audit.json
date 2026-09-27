@@ -1,0 +1,21 @@
+{
+  "reference_commit": "d1a9e99",
+  "device": "cuda",
+  "validation_samples": 32,
+  "views": 5,
+  "evaluation": {
+    "max_prediction_difference": 0.0,
+    "gradient_tensors_compared": 0,
+    "exact_match": true
+  },
+  "training": {
+    "max_prediction_difference": 0.0,
+    "gradient_tensors_compared": 21,
+    "exact_match": true
+  },
+  "warm_batch_seconds": {
+    "original": 0.09166192000000004,
+    "shared_geometry": 0.042156729999999955
+  },
+  "note": "Warm-cache timing on one validation batch; not a full-epoch benchmark. Original path skips the new outer geometry preparation. No test-set evaluation."
+}

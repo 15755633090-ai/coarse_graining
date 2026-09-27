@@ -18,11 +18,12 @@ from .partition import (
     derive_partition_seed,
     partition_molecule,
 )
-from .random_regions import RandomRegionBranch
+from .random_regions import RandomRegionBranch, prepare_region_geometry
 
 
 EXPERIMENT_MODES = (
     "random_region_stage2_frozen",
+    "random_region_h2_stage2_frozen",
     "baseline_frozen",
     "multiscale_frozen",
     "baseline_finetune",
@@ -72,6 +73,11 @@ class MultiscaleModelConfig:
     @property
     def is_residual(self) -> bool:
         return self.experiment_mode.endswith("_residual_frozen")
+
+    @property
+    def base_readout_layer(self) -> int:
+        """v1 stays on H4; the independent H2 experiment changes only Base."""
+        return 2 if self.experiment_mode == "random_region_h2_stage2_frozen" else 4
 
 
 @dataclass
@@ -212,10 +218,12 @@ class MultiscaleMolecularModel(nn.Module):
         if self.config.experiment_mode.startswith("random_region_"):
             if partitions is not None:
                 raise ValueError("random regions do not use multiscale partitions")
-            weights = node_mask.to(h4.dtype).unsqueeze(-1)
-            summed = (h4 * weights).sum(1)
+            base_state = hidden_states[self.config.base_readout_layer - 1]
+            weights = node_mask.to(base_state.dtype).unsqueeze(-1)
+            summed = (base_state * weights).sum(1)
             base = torch.cat((summed, summed / weights.sum(1).clamp_min(1)), -1)
             seeds = self._partition_seeds(partition_seeds, batch_size)
+            geometry = prepare_region_geometry(bonds, node_mask)
             predictions, representations = [], []
             for view in range(1 if self.training else self.config.eval_views):
                 view_seeds = [derive_partition_seed(seed, view) for seed in seeds]
@@ -224,6 +232,7 @@ class MultiscaleMolecularModel(nn.Module):
                     radius=self.config.region_radius,
                     atoms_per_center=self.config.atoms_per_center,
                     max_centers=self.config.max_centers,
+                    geometry=geometry,
                 )
                 representation = torch.cat((base, coarse), -1)
                 predictions.append(self.prediction_head(representation))

@@ -543,7 +543,7 @@ def build_property_model(
         return model
     if base_init_checkpoint is not None:
         raise ValueError("base_init_checkpoint is only valid for residual modes")
-    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen"}
+    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -1162,7 +1162,7 @@ def train_property_model(
         preset.early_stopping_patience if patience is None else patience
     )
     scheduler = "none" if scheduler is None else scheduler
-    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen"}
+    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -1241,6 +1241,10 @@ def train_property_model(
             "heads": 4, "distance_buckets": "0..8,9..12,13+,disconnected",
             "training_views": 1, "fusion": "concat",
         }
+        if experiment_mode == "random_region_h2_stage2_frozen":
+            training_protocol["random_regions"].update(
+                version=2, base_readout_layer=2, coarse_source_layer=4,
+            )
     provenance = _experiment_provenance(
         dataset_root, encoder_init_checkpoint,
     )

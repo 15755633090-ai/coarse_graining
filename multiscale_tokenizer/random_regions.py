@@ -33,6 +33,21 @@ def graph_distances(bonds: torch.Tensor) -> np.ndarray:
     return _distances(len(adjacency), adjacency.tobytes())
 
 
+def prepare_region_geometry(bonds: torch.Tensor, mask: torch.Tensor):
+    """Copy topology once and prepare atom indices/distances for all views.
+
+    The returned geometry belongs to this batch only; it is not model state.
+    Sampling and trainable distance embeddings are still evaluated per view.
+    """
+    bonds_cpu, mask_cpu = bonds.detach().cpu(), mask.detach().cpu()
+    geometry = []
+    for index in range(bonds_cpu.size(0)):
+        atom_indices = torch.where(mask_cpu[index])[0]
+        local_bonds = bonds_cpu[index][atom_indices][:, atom_indices]
+        geometry.append((atom_indices.numpy(), graph_distances(local_bonds)))
+    return tuple(geometry)
+
+
 def sample_regions(distances, seed, radius=2, atoms_per_center=8, max_centers=8):
     nodes = len(distances)
     if nodes < 1:
@@ -72,21 +87,23 @@ class RandomRegionBranch(nn.Module):
                         np.where(distances <= 8, distances,
                                  np.where(distances <= 12, 9, 10)))
 
-    def forward(self, h4, bonds, mask, seeds, *, radius, atoms_per_center, max_centers):
+    def forward(self, h4, bonds, mask, seeds, *, radius, atoms_per_center, max_centers,
+                geometry=None):
         batch, nodes, hidden = h4.shape
         memberships = np.zeros((batch, max_centers, nodes), dtype=np.float32)
         buckets = np.zeros((batch, max_centers, max_centers), dtype=np.int64)
         valid = np.zeros((batch, max_centers), dtype=np.bool_)
-        bonds_cpu, mask_cpu = bonds.detach().cpu(), mask.detach().cpu()
+        if geometry is None:
+            geometry = prepare_region_geometry(bonds, mask)
+        if len(geometry) != batch or len(seeds) != batch:
+            raise ValueError("one geometry and seed are required per graph")
         for index, seed in enumerate(seeds):
-            atom_indices = torch.where(mask_cpu[index])[0]
-            local_bonds = bonds_cpu[index][atom_indices][:, atom_indices]
-            distances = graph_distances(local_bonds)
+            atom_indices, distances = geometry[index]
             centers, members = sample_regions(
                 distances, seed, radius, atoms_per_center, max_centers,
             )
             count = len(centers)
-            memberships[index, :count, :][:, atom_indices.numpy()] = members
+            memberships[index, :count, :][:, atom_indices] = members
             buckets[index, :count, :count] = self.bucket_distances(distances[np.ix_(centers, centers)])
             valid[index, :count] = True
         membership = torch.as_tensor(memberships, device=h4.device, dtype=h4.dtype)

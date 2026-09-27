@@ -1,5 +1,8 @@
 # Random region interaction, version 1
 
+The separate [H2 Base experiment](RANDOM_REGIONS_V2_H2.md) uses a new mode;
+this v1 experiment continues to read Base features from H4.
+
 This experiment keeps the H4 Sum/Mean Base representation and concatenates
 an additional region representation. It does not use the old multiscale
 partitions, coarse edges, or residual prediction head.
@@ -22,6 +25,9 @@ partitions, coarse edges, or residual prediction head.
   Seeds depend on sample ID and epoch, independently of model/loader RNG.
 - Validation and test average five predictions using sample-ID/view seeds.
   The encoder is evaluated once per batch and reused for all views.
+  CPU topology transfer, valid-atom extraction, and distance lookup are also
+  performed once per batch and shared across views. This is an execution
+  optimization; sampling, parameters, and checkpoint format are unchanged.
 - AdamW, LR 0.001, weight decay 1e-5, batch 32, micro-batch 8, gradient
   clipping 5, BF16 training and FP32 evaluation. Maximum 200 epochs,
   patience 30; validation RMSE selects the checkpoint. Test runs once at end.

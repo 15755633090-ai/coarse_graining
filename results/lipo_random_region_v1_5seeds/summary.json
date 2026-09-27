@@ -1,0 +1,156 @@
+{
+  "rows": [
+    {
+      "seed": 0,
+      "epochs": 37,
+      "best_epoch": 7,
+      "validation_rmse": 0.6690093295240843,
+      "test_rmse": 0.6759047863892523,
+      "test_mae": 0.5173315405845642,
+      "test_r2": 0.6215749059999397
+    },
+    {
+      "seed": 1,
+      "epochs": 42,
+      "best_epoch": 12,
+      "validation_rmse": 0.6772637395890826,
+      "test_rmse": 0.6769177796854313,
+      "test_mae": 0.5118055939674377,
+      "test_r2": 0.6204397308707146
+    },
+    {
+      "seed": 2,
+      "epochs": 47,
+      "best_epoch": 17,
+      "validation_rmse": 0.6745041041139769,
+      "test_rmse": 0.6759317043160027,
+      "test_mae": 0.512638509273529,
+      "test_r2": 0.6215447518290671
+    },
+    {
+      "seed": 3,
+      "epochs": 59,
+      "best_epoch": 29,
+      "validation_rmse": 0.6715374919482855,
+      "test_rmse": 0.6762070830118891,
+      "test_mae": 0.5112911462783813,
+      "test_r2": 0.6212363185982559
+    },
+    {
+      "seed": 4,
+      "epochs": 50,
+      "best_epoch": 20,
+      "validation_rmse": 0.6663811986402716,
+      "test_rmse": 0.6721549892322376,
+      "test_mae": 0.5142262578010559,
+      "test_r2": 0.6257621225936174
+    }
+  ],
+  "aggregate": {
+    "validation_rmse": {
+      "mean": 0.6717391727631402,
+      "sample_std": 0.004311794578576657,
+      "min": 0.6663811986402716,
+      "max": 0.6772637395890826
+    },
+    "test_rmse": {
+      "mean": 0.6754232685269627,
+      "sample_std": 0.0018721608305095761,
+      "min": 0.6721549892322376,
+      "max": 0.6769177796854313
+    },
+    "test_mae": {
+      "mean": 0.5134586095809937,
+      "sample_std": 0.00243371119123228,
+      "min": 0.5112911462783813,
+      "max": 0.5173315405845642
+    },
+    "test_r2": {
+      "mean": 0.622111565978319,
+      "sample_std": 0.0020914669742199622,
+      "min": 0.6204397308707146,
+      "max": 0.6257621225936174
+    }
+  },
+  "reference_single_seed": {
+    "Stage-1 Base": {
+      "seed": 0,
+      "test_rmse": 0.6815348545853535,
+      "new_seeds_below_reference": 5
+    },
+    "Stage-2 Base": {
+      "seed": 0,
+      "test_rmse": 0.6938082034808986,
+      "new_seeds_below_reference": 5
+    }
+  },
+  "checks": {
+    "0": {
+      "completed": true,
+      "history_matches": true,
+      "best_epoch_matches": true,
+      "seeds_match": true,
+      "mode_matches": true,
+      "protocol_matches": true,
+      "model_config_matches": true,
+      "source_hash_matches": true,
+      "split_matches": true,
+      "scaler_matches": true,
+      "encoder_frozen_best_last": true
+    },
+    "1": {
+      "completed": true,
+      "history_matches": true,
+      "best_epoch_matches": true,
+      "seeds_match": true,
+      "mode_matches": true,
+      "protocol_matches": true,
+      "model_config_matches": true,
+      "source_hash_matches": true,
+      "split_matches": true,
+      "scaler_matches": true,
+      "encoder_frozen_best_last": true
+    },
+    "2": {
+      "completed": true,
+      "history_matches": true,
+      "best_epoch_matches": true,
+      "seeds_match": true,
+      "mode_matches": true,
+      "protocol_matches": true,
+      "model_config_matches": true,
+      "source_hash_matches": true,
+      "split_matches": true,
+      "scaler_matches": true,
+      "encoder_frozen_best_last": true
+    },
+    "3": {
+      "completed": true,
+      "history_matches": true,
+      "best_epoch_matches": true,
+      "seeds_match": true,
+      "mode_matches": true,
+      "protocol_matches": true,
+      "model_config_matches": true,
+      "source_hash_matches": true,
+      "split_matches": true,
+      "scaler_matches": true,
+      "encoder_frozen_best_last": true
+    },
+    "4": {
+      "completed": true,
+      "history_matches": true,
+      "best_epoch_matches": true,
+      "seeds_match": true,
+      "mode_matches": true,
+      "protocol_matches": true,
+      "model_config_matches": true,
+      "source_hash_matches": true,
+      "split_matches": true,
+      "scaler_matches": true,
+      "encoder_frozen_best_last": true
+    }
+  },
+  "all_checks_pass": true,
+  "scope": "Five downstream initialization/data-order seeds; shared fixed Stage-1 seed-0 encoder and fixed region sampling seed. Sample standard deviation uses ddof=1."
+}
