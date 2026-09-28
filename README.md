@@ -4,6 +4,13 @@ Dataset-independent implementation for studying global structural modules on
 top of a pretrained molecular diffusion encoder, with frozen and supervised
 fine-tuning modes.
 
+## Center-token experiment
+
+`center_token_stage2_frozen` selects topology-spaced H2/H3/H4 atoms as tokens,
+then applies one global attention block and joins its readout with H4 Base.
+The deterministic algorithm and Lipo/ESOL commands are in
+[`docs/CENTER_TOKENS.md`](docs/CENTER_TOKENS.md).
+
 ## Random region experiment
 
 The fixed Lipo embedding partition experiment is available as

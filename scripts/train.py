@@ -78,6 +78,9 @@ def main() -> None:
     parser.add_argument("--region-radius", type=int, default=2)
     parser.add_argument("--atoms-per-center", type=int, default=8)
     parser.add_argument("--max-centers", type=int, default=8)
+    parser.add_argument("--center-stride", type=int, default=4)
+    parser.add_argument("--center-min-centers", type=int, default=3)
+    parser.add_argument("--center-min-separation", type=int, default=2)
     parser.add_argument("--eval-views", type=int, default=5)
     parser.add_argument(
         "--num-workers", type=int, default=0,
@@ -125,6 +128,9 @@ def main() -> None:
         base_init_checkpoint=args.base_init_checkpoint,
         region_radius=args.region_radius, atoms_per_center=args.atoms_per_center,
         max_centers=args.max_centers, eval_views=args.eval_views,
+        center_stride=args.center_stride,
+        center_min_centers=args.center_min_centers,
+        center_min_separation=args.center_min_separation,
     )
     summary = {
         key: result[key]

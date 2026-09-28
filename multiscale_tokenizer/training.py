@@ -523,6 +523,9 @@ def build_property_model(
     atoms_per_center: int = 8,
     max_centers: int = 8,
     eval_views: int = 5,
+    center_stride: int = 4,
+    center_min_centers: int = 3,
+    center_min_separation: int = 2,
 ) -> MultiscaleMolecularModel:
     """Construct a mode with explicitly reproducible shared initialization."""
 
@@ -543,7 +546,7 @@ def build_property_model(
         return model
     if base_init_checkpoint is not None:
         raise ValueError("base_init_checkpoint is only valid for residual modes")
-    stage2_modes = {"embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
+    stage2_modes = {"center_token_stage2_frozen", "embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -572,6 +575,8 @@ def build_property_model(
             experiment_mode=experiment_mode,
             region_radius=region_radius, atoms_per_center=atoms_per_center,
             max_centers=max_centers, eval_views=eval_views,
+            center_stride=center_stride, center_min_centers=center_min_centers,
+            center_min_separation=center_min_separation,
         ),
     ).to(device)
 
@@ -1132,6 +1137,9 @@ def train_property_model(
     atoms_per_center: int = 8,
     max_centers: int = 8,
     eval_views: int = 5,
+    center_stride: int = 4,
+    center_min_centers: int = 3,
+    center_min_separation: int = 2,
 ) -> dict[str, object]:
     """Train one arm of the locked formal benchmark protocol."""
 
@@ -1162,7 +1170,7 @@ def train_property_model(
         preset.early_stopping_patience if patience is None else patience
     )
     scheduler = "none" if scheduler is None else scheduler
-    stage2_modes = {"embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
+    stage2_modes = {"center_token_stage2_frozen", "embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -1191,8 +1199,8 @@ def train_property_model(
     if learning_rate is not None:
         downstream_learning_rate = learning_rate
     spec = TASK_SPECS[task]
-    if experiment_mode.startswith(("random_region_", "embedding_region_")) and spec.task_type != "regression":
-        raise ValueError("random region v1 supports regression prediction averaging only")
+    if experiment_mode.startswith(("random_region_", "embedding_region_", "center_token_")) and spec.task_type != "regression":
+        raise ValueError("center/region experiments currently support regression only")
     residual = experiment_mode.endswith("_residual_frozen")
     source = None
     if residual:
@@ -1261,6 +1269,25 @@ def train_property_model(
             "distance_buckets": "0..8,9..12,13+,disconnected",
             "coverage": "exhaustive_disjoint",
         }
+    if experiment_mode == "center_token_stage2_frozen":
+        if encoder_learning_rate != 0:
+            raise ValueError("center selection requires a frozen encoder (LR zero)")
+        training_protocol["center_tokens"] = {
+            "version": 1, "stride": center_stride,
+            "min_centers": center_min_centers, "max_centers": max_centers,
+            "core_count": "1 if K<6 else 2",
+            "core_centrality": "minimum_eccentricity_then_mean_distance",
+            "distance_bands": [1 / 3, 2 / 3], "band_weights": [3, 2, 1],
+            "min_separation": center_min_separation,
+            "feature_layers": [2, 3, 4],
+            "feature_diversity": "minimum_cosine_distance_to_selected",
+            "selection_precision": "fp32_unpadded", "selection_update": "fixed_cached",
+            "token_representation": "selected_atom_no_region_pooling",
+            "projection": "independent_linear", "core_position": "continuous_mlp",
+            "attention_layers": 1, "attention_heads": 4,
+            "pairwise_distance_buckets": "0,1,2,3,4,5+,disconnected",
+            "readout": "mean_max", "base": "h4_sum_mean", "fusion": "concat",
+        }
     provenance = _experiment_provenance(
         dataset_root, encoder_init_checkpoint,
     )
@@ -1324,6 +1351,8 @@ def train_property_model(
         base_init_checkpoint=base_init_checkpoint,
         region_radius=region_radius, atoms_per_center=atoms_per_center,
         max_centers=max_centers, eval_views=eval_views,
+        center_stride=center_stride, center_min_centers=center_min_centers,
+        center_min_separation=center_min_separation,
     )
     optimizer = build_optimizer(
         model,
@@ -1404,6 +1433,7 @@ def train_property_model(
                 return completed
         model.load_state_dict(resume_checkpoint["last_model_state"], strict=True)
         model.embedding_region_cache = resume_checkpoint.get("embedding_region_cache", {})
+        model.center_token_cache = resume_checkpoint.get("center_token_cache", {})
         optimizer.load_state_dict(resume_checkpoint["optimizer_state"])
         if scheduler is not None:
             scheduler.load_state_dict(resume_checkpoint["scheduler_state"])
@@ -1434,6 +1464,20 @@ def train_property_model(
                    output / "embedding_partitions.pt")
         print(f"Cached {len(model.embedding_region_cache)} molecule partitions", flush=True)
 
+    if model.config.uses_center_tokens:
+        print("Preparing fixed FP32 center selections for train/valid...", flush=True)
+        for dataset in (train_dataset, valid_dataset):
+            for record in dataset:
+                graph = record.graph
+                features = graph.node_features.unsqueeze(0).to(device_object)
+                bonds = graph.bonds.unsqueeze(0).to(device_object)
+                mask = torch.ones(features.shape[:2], dtype=torch.bool, device=device_object)
+                model.prepare_center_tokens(features, bonds, mask)
+        torch.save({"protocol": training_protocol["center_tokens"],
+                    "provenance": provenance, "selections": model.center_token_cache},
+                   output / "center_selections.pt")
+        print(f"Cached {len(model.center_token_cache)} molecule centers", flush=True)
+
     def checkpoint_payload(current_epoch: int) -> dict[str, object]:
         selection_metric = _selection_metric(spec)
         minimize = selection_metric in {"valid_loss", "valid_rmse", "valid_mae"}
@@ -1446,6 +1490,8 @@ def train_property_model(
             "schema_version": 4,
             **({"embedding_region_cache": model.embedding_region_cache}
                if model.config.uses_embedding_regions else {}),
+            **({"center_token_cache": model.center_token_cache}
+               if model.config.uses_center_tokens else {}),
             "task_spec": asdict(spec),
             "model_config": asdict(model.config),
             "experiment_mode": experiment_mode,
@@ -1688,6 +1734,7 @@ def load_property_model(
     model = MultiscaleMolecularModel(encoder, config=config).to(device)
     model.load_state_dict(checkpoint["model_state"], strict=True)
     model.embedding_region_cache = checkpoint.get("embedding_region_cache", {})
+    model.center_token_cache = checkpoint.get("center_token_cache", {})
     model.eval()
     spec = TaskSpec(**checkpoint["task_spec"])
     scaler_payload = checkpoint.get("target_scaler")

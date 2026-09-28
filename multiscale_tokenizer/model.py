@@ -19,11 +19,13 @@ from .partition import (
     derive_partition_seed,
     partition_molecule,
 )
-from .random_regions import RandomRegionBranch, prepare_region_geometry
+from .random_regions import RandomRegionBranch, graph_distances, prepare_region_geometry
 from .embedding_regions import spherical_regions
+from .center_tokens import CenterTokenBranch, select_center_tokens
 
 
 EXPERIMENT_MODES = (
+    "center_token_stage2_frozen",
     "embedding_region_stage2_frozen",
     "random_region_stage2_frozen",
     "random_region_h2_stage2_frozen",
@@ -50,10 +52,15 @@ class MultiscaleModelConfig:
     atoms_per_center: int = 8
     max_centers: int = 8
     eval_views: int = 5
+    center_stride: int = 4
+    center_min_centers: int = 3
+    center_min_separation: int = 2
 
     def __post_init__(self) -> None:
         if self.region_radius < 0 or min(self.atoms_per_center, self.max_centers, self.eval_views) < 1:
             raise ValueError("invalid random region configuration")
+        if min(self.center_stride, self.center_min_centers, self.center_min_separation) < 1:
+            raise ValueError("invalid center token configuration")
         if self.hidden_dim < 1 or self.output_dim < 1:
             raise ValueError("hidden_dim and output_dim must be positive")
         if not 0 <= self.dropout < 1:
@@ -76,6 +83,10 @@ class MultiscaleModelConfig:
     @property
     def uses_embedding_regions(self) -> bool:
         return self.experiment_mode == "embedding_region_stage2_frozen"
+
+    @property
+    def uses_center_tokens(self) -> bool:
+        return self.experiment_mode == "center_token_stage2_frozen"
 
     @property
     def finetunes_encoder(self) -> bool:
@@ -131,9 +142,17 @@ class MultiscaleMolecularModel(nn.Module):
         if self.config.hidden_dim != hidden_dim:
             raise ValueError("config.hidden_dim must match the encoder")
         self.embedding_region_cache = {}
+        self.center_token_cache = {}
         if self.config.uses_region_branch:
             self.region_encoders = nn.ModuleList()
             self.random_regions = RandomRegionBranch(hidden_dim, self.config.dropout)
+            self.prediction_head = nn.Sequential(
+                nn.Linear(hidden_dim * 4, hidden_dim), nn.SiLU(),
+                nn.Dropout(self.config.dropout), nn.Linear(hidden_dim, self.config.output_dim),
+            )
+        elif self.config.uses_center_tokens:
+            self.region_encoders = nn.ModuleList()
+            self.center_tokens = CenterTokenBranch(hidden_dim, self.config.dropout)
             self.prediction_head = nn.Sequential(
                 nn.Linear(hidden_dim * 4, hidden_dim), nn.SiLU(),
                 nn.Dropout(self.config.dropout), nn.Linear(hidden_dim, self.config.output_dim),
@@ -238,6 +257,35 @@ class MultiscaleMolecularModel(nn.Module):
             regions.append(self.embedding_region_cache[key])
         return regions
 
+    @torch.no_grad()
+    def prepare_center_tokens(self, node_features, bonds, node_mask):
+        """Cache topology/feature-selected centers from unpadded FP32 states."""
+        if not self.config.uses_center_tokens:
+            raise ValueError("center selection requires center-token mode")
+        selections = []
+        for features, edges, mask in zip(node_features, bonds, node_mask):
+            features = features[mask].unsqueeze(0)
+            edges = edges[mask][:, mask].unsqueeze(0)
+            digest = hashlib.sha256()
+            digest.update(features.cpu().numpy().tobytes())
+            digest.update(edges.cpu().numpy().tobytes())
+            key = digest.hexdigest()
+            if key not in self.center_token_cache:
+                with torch.autocast(device_type=features.device.type, enabled=False):
+                    states = self.encoder(features, edges, torch.ones(
+                        features.shape[:2], device=features.device, dtype=torch.bool,
+                    ))
+                self.center_token_cache[key] = select_center_tokens(
+                    graph_distances(edges[0]),
+                    tuple(h[0].float().cpu().numpy() for h in states[1:]),
+                    stride=self.config.center_stride,
+                    min_centers=self.config.center_min_centers,
+                    max_centers=self.config.max_centers,
+                    min_separation=self.config.center_min_separation,
+                )
+            selections.append(self.center_token_cache[key])
+        return selections
+
     def forward(
         self,
         node_features: Tensor,
@@ -259,6 +307,26 @@ class MultiscaleMolecularModel(nn.Module):
                 base_prediction = self.base_head(torch.cat((summed, averaged), dim=-1))
         hidden_states = (h1, h2, h3, h4)
         batch_size = node_features.size(0)
+        if self.config.uses_center_tokens:
+            if partitions is not None:
+                raise ValueError("center tokens do not use multiscale partitions")
+            weights = node_mask.to(h4.dtype).unsqueeze(-1)
+            summed = (h4 * weights).sum(1)
+            base = torch.cat((summed, summed / weights.sum(1).clamp_min(1)), -1)
+            selections = self.prepare_center_tokens(node_features, bonds, node_mask)
+            long_range, scale_counts = self.center_tokens(
+                (h2, h3, h4), node_mask, selections, self.config.max_centers,
+            )
+            representation = torch.cat((base, long_range), -1)
+            token_counts = torch.zeros((batch_size, 4), dtype=torch.long, device=h4.device)
+            token_counts[:, 1:] = scale_counts
+            return TokenModelOutput(
+                prediction=self.prediction_head(representation),
+                graph_representation=representation,
+                level_norms=torch.zeros((batch_size, 4), device=h4.device),
+                token_counts=token_counts,
+                residual_counts=torch.zeros_like(token_counts),
+            )
         if self.config.uses_region_branch:
             if partitions is not None:
                 raise ValueError("random regions do not use multiscale partitions")
