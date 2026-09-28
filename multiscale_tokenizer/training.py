@@ -526,6 +526,8 @@ def build_property_model(
     center_stride: int = 4,
     center_min_centers: int = 3,
     center_min_separation: int = 2,
+    center_max_centers: int = 32,
+    center_coverage_radius: int = 3,
 ) -> MultiscaleMolecularModel:
     """Construct a mode with explicitly reproducible shared initialization."""
 
@@ -546,7 +548,7 @@ def build_property_model(
         return model
     if base_init_checkpoint is not None:
         raise ValueError("base_init_checkpoint is only valid for residual modes")
-    stage2_modes = {"center_token_stage2_frozen", "embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
+    stage2_modes = {"center_token_stage2_frozen", "center_token_h4_stage2_frozen", "embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -577,6 +579,8 @@ def build_property_model(
             max_centers=max_centers, eval_views=eval_views,
             center_stride=center_stride, center_min_centers=center_min_centers,
             center_min_separation=center_min_separation,
+            center_max_centers=center_max_centers,
+            center_coverage_radius=center_coverage_radius,
         ),
     ).to(device)
 
@@ -1140,6 +1144,8 @@ def train_property_model(
     center_stride: int = 4,
     center_min_centers: int = 3,
     center_min_separation: int = 2,
+    center_max_centers: int = 32,
+    center_coverage_radius: int = 3,
 ) -> dict[str, object]:
     """Train one arm of the locked formal benchmark protocol."""
 
@@ -1170,7 +1176,7 @@ def train_property_model(
         preset.early_stopping_patience if patience is None else patience
     )
     scheduler = "none" if scheduler is None else scheduler
-    stage2_modes = {"center_token_stage2_frozen", "embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
+    stage2_modes = {"center_token_stage2_frozen", "center_token_h4_stage2_frozen", "embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -1269,17 +1275,22 @@ def train_property_model(
             "distance_buckets": "0..8,9..12,13+,disconnected",
             "coverage": "exhaustive_disjoint",
         }
-    if experiment_mode == "center_token_stage2_frozen":
+    if experiment_mode in {"center_token_stage2_frozen", "center_token_h4_stage2_frozen"}:
         if encoder_learning_rate != 0:
             raise ValueError("center selection requires a frozen encoder (LR zero)")
         training_protocol["center_tokens"] = {
-            "version": 1, "stride": center_stride,
-            "min_centers": center_min_centers, "max_centers": max_centers,
-            "core_count": "1 if K<6 else 2",
-            "core_centrality": "minimum_eccentricity_then_mean_distance",
+            "version": 2, "stride": center_stride,
+            "min_centers": center_min_centers,
+            "safety_max_centers": center_max_centers,
+            "coverage_radius": center_coverage_radius,
+            "core_rule": "graph_center_plus_separated_central_second_if_diameter_ge_16",
+            "tie_break": "atom_bond_distance_signature_then_atom_index",
             "distance_bands": [1 / 3, 2 / 3], "band_weights": [3, 2, 1],
             "min_separation": center_min_separation,
+            "selection_order": "topology_coverage_then_feature_diversity_fill",
             "feature_layers": [2, 3, 4],
+            "token_layers": ([4, 4, 4] if experiment_mode == "center_token_h4_stage2_frozen"
+                             else [2, 3, 4]),
             "feature_diversity": "minimum_cosine_distance_to_selected",
             "selection_precision": "fp32_unpadded", "selection_update": "fixed_cached",
             "token_representation": "selected_atom_no_region_pooling",
@@ -1353,6 +1364,8 @@ def train_property_model(
         max_centers=max_centers, eval_views=eval_views,
         center_stride=center_stride, center_min_centers=center_min_centers,
         center_min_separation=center_min_separation,
+        center_max_centers=center_max_centers,
+        center_coverage_radius=center_coverage_radius,
     )
     optimizer = build_optimizer(
         model,

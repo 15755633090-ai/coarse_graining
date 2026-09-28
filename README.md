@@ -8,7 +8,9 @@ fine-tuning modes.
 
 `center_token_stage2_frozen` selects topology-spaced H2/H3/H4 atoms as tokens,
 then applies one global attention block and joins its readout with H4 Base.
-The deterministic algorithm and Lipo/ESOL commands are in
+`center_token_h4_stage2_frozen` uses the same centers and network but reads H4
+for every token as a layer-choice control. The selection algorithm and
+Lipo/ESOL commands are in
 [`docs/CENTER_TOKENS.md`](docs/CENTER_TOKENS.md).
 
 ## Random region experiment

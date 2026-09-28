@@ -26,6 +26,7 @@ from .center_tokens import CenterTokenBranch, select_center_tokens
 
 EXPERIMENT_MODES = (
     "center_token_stage2_frozen",
+    "center_token_h4_stage2_frozen",
     "embedding_region_stage2_frozen",
     "random_region_stage2_frozen",
     "random_region_h2_stage2_frozen",
@@ -55,12 +56,17 @@ class MultiscaleModelConfig:
     center_stride: int = 4
     center_min_centers: int = 3
     center_min_separation: int = 2
+    center_max_centers: int = 32
+    center_coverage_radius: int = 3
 
     def __post_init__(self) -> None:
         if self.region_radius < 0 or min(self.atoms_per_center, self.max_centers, self.eval_views) < 1:
             raise ValueError("invalid random region configuration")
-        if min(self.center_stride, self.center_min_centers, self.center_min_separation) < 1:
+        if min(self.center_stride, self.center_min_centers, self.center_min_separation,
+               self.center_max_centers, self.center_coverage_radius) < 1:
             raise ValueError("invalid center token configuration")
+        if self.center_min_centers > self.center_max_centers:
+            raise ValueError("center_min_centers cannot exceed center_max_centers")
         if self.hidden_dim < 1 or self.output_dim < 1:
             raise ValueError("hidden_dim and output_dim must be positive")
         if not 0 <= self.dropout < 1:
@@ -86,7 +92,9 @@ class MultiscaleModelConfig:
 
     @property
     def uses_center_tokens(self) -> bool:
-        return self.experiment_mode == "center_token_stage2_frozen"
+        return self.experiment_mode in {
+            "center_token_stage2_frozen", "center_token_h4_stage2_frozen",
+        }
 
     @property
     def finetunes_encoder(self) -> bool:
@@ -280,8 +288,11 @@ class MultiscaleMolecularModel(nn.Module):
                     tuple(h[0].float().cpu().numpy() for h in states[1:]),
                     stride=self.config.center_stride,
                     min_centers=self.config.center_min_centers,
-                    max_centers=self.config.max_centers,
+                    max_centers=self.config.center_max_centers,
                     min_separation=self.config.center_min_separation,
+                    coverage_radius=self.config.center_coverage_radius,
+                    atom_features=features[0].cpu().numpy(),
+                    bonds=edges[0].cpu().numpy(),
                 )
             selections.append(self.center_token_cache[key])
         return selections
@@ -315,7 +326,8 @@ class MultiscaleMolecularModel(nn.Module):
             base = torch.cat((summed, summed / weights.sum(1).clamp_min(1)), -1)
             selections = self.prepare_center_tokens(node_features, bonds, node_mask)
             long_range, scale_counts = self.center_tokens(
-                (h2, h3, h4), node_mask, selections, self.config.max_centers,
+                (h2, h3, h4), node_mask, selections, self.config.center_max_centers,
+                use_h4_only=self.config.experiment_mode == "center_token_h4_stage2_frozen",
             )
             representation = torch.cat((base, long_range), -1)
             token_counts = torch.zeros((batch_size, 4), dtype=torch.long, device=h4.device)
