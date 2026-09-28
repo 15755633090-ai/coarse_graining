@@ -543,7 +543,7 @@ def build_property_model(
         return model
     if base_init_checkpoint is not None:
         raise ValueError("base_init_checkpoint is only valid for residual modes")
-    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
+    stage2_modes = {"embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -1162,7 +1162,7 @@ def train_property_model(
         preset.early_stopping_patience if patience is None else patience
     )
     scheduler = "none" if scheduler is None else scheduler
-    stage2_modes = {"baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
+    stage2_modes = {"embedding_region_stage2_frozen", "baseline_stage2_frozen", "multiscale_stage2_frozen", "random_region_stage2_frozen", "random_region_h2_stage2_frozen"}
     if experiment_mode in stage2_modes:
         if encoder_init_checkpoint is None:
             raise ValueError(
@@ -1191,7 +1191,7 @@ def train_property_model(
     if learning_rate is not None:
         downstream_learning_rate = learning_rate
     spec = TASK_SPECS[task]
-    if experiment_mode.startswith("random_region_") and spec.task_type != "regression":
+    if experiment_mode.startswith(("random_region_", "embedding_region_")) and spec.task_type != "regression":
         raise ValueError("random region v1 supports regression prediction averaging only")
     residual = experiment_mode.endswith("_residual_frozen")
     source = None
@@ -1245,6 +1245,22 @@ def train_property_model(
             training_protocol["random_regions"].update(
                 version=2, base_readout_layer=2, coarse_source_layer=4,
             )
+    if experiment_mode == "embedding_region_stage2_frozen":
+        if encoder_learning_rate != 0:
+            raise ValueError("embedding regions require a frozen encoder (LR zero)")
+        training_protocol["embedding_regions"] = {
+            "version": 1, "algorithm": "spherical_kmeans", "source_layer": 4,
+            "atoms_per_center": atoms_per_center, "max_centers": max_centers,
+            "n_init": 10, "max_iter": 100, "epsilon": 1e-12,
+            "initialization": "uniform_atoms_without_replacement",
+            "empty_cluster": "worst_fit_atom_from_non_singleton",
+            "partition_seed": partition_seed, "partition_precision": "fp32_unpadded",
+            "partition_update": "fixed_cached", "training_views": 1, "eval_views": 1,
+            "representative": "member_nearest_spherical_centroid",
+            "topology_in_partition": False, "heads": 4, "fusion": "concat",
+            "distance_buckets": "0..8,9..12,13+,disconnected",
+            "coverage": "exhaustive_disjoint",
+        }
     provenance = _experiment_provenance(
         dataset_root, encoder_init_checkpoint,
     )
@@ -1387,6 +1403,7 @@ def train_property_model(
                 print("training already complete; returning saved result", flush=True)
                 return completed
         model.load_state_dict(resume_checkpoint["last_model_state"], strict=True)
+        model.embedding_region_cache = resume_checkpoint.get("embedding_region_cache", {})
         optimizer.load_state_dict(resume_checkpoint["optimizer_state"])
         if scheduler is not None:
             scheduler.load_state_dict(resume_checkpoint["scheduler_state"])
@@ -1403,6 +1420,20 @@ def train_property_model(
         if start_epoch >= epochs:
             print("training epochs already complete; finalizing best model", flush=True)
 
+    if model.config.uses_embedding_regions:
+        print("Preparing fixed FP32 embedding partitions for train/valid...", flush=True)
+        for dataset in (train_dataset, valid_dataset):
+            for record in dataset:
+                graph = record.graph
+                features = graph.node_features.unsqueeze(0).to(device_object)
+                bonds = graph.bonds.unsqueeze(0).to(device_object)
+                mask = torch.ones(features.shape[:2], dtype=torch.bool, device=device_object)
+                model.prepare_embedding_regions(features, bonds, mask)
+        torch.save({"protocol": training_protocol["embedding_regions"],
+                    "provenance": provenance, "partitions": model.embedding_region_cache},
+                   output / "embedding_partitions.pt")
+        print(f"Cached {len(model.embedding_region_cache)} molecule partitions", flush=True)
+
     def checkpoint_payload(current_epoch: int) -> dict[str, object]:
         selection_metric = _selection_metric(spec)
         minimize = selection_metric in {"valid_loss", "valid_rmse", "valid_mae"}
@@ -1413,6 +1444,8 @@ def train_property_model(
         )["epoch"])
         return {
             "schema_version": 4,
+            **({"embedding_region_cache": model.embedding_region_cache}
+               if model.config.uses_embedding_regions else {}),
             "task_spec": asdict(spec),
             "model_config": asdict(model.config),
             "experiment_mode": experiment_mode,
@@ -1654,6 +1687,7 @@ def load_property_model(
     )
     model = MultiscaleMolecularModel(encoder, config=config).to(device)
     model.load_state_dict(checkpoint["model_state"], strict=True)
+    model.embedding_region_cache = checkpoint.get("embedding_region_cache", {})
     model.eval()
     spec = TaskSpec(**checkpoint["task_spec"])
     scaler_payload = checkpoint.get("target_scaler")

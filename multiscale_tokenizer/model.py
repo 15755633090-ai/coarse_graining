@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from contextlib import nullcontext
+import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence
@@ -19,9 +20,11 @@ from .partition import (
     partition_molecule,
 )
 from .random_regions import RandomRegionBranch, prepare_region_geometry
+from .embedding_regions import spherical_regions
 
 
 EXPERIMENT_MODES = (
+    "embedding_region_stage2_frozen",
     "random_region_stage2_frozen",
     "random_region_h2_stage2_frozen",
     "baseline_frozen",
@@ -65,6 +68,14 @@ class MultiscaleModelConfig:
     @property
     def uses_multiscale(self) -> bool:
         return self.experiment_mode.startswith("multiscale_")
+
+    @property
+    def uses_region_branch(self) -> bool:
+        return self.experiment_mode.startswith(("random_region_", "embedding_region_"))
+
+    @property
+    def uses_embedding_regions(self) -> bool:
+        return self.experiment_mode == "embedding_region_stage2_frozen"
 
     @property
     def finetunes_encoder(self) -> bool:
@@ -119,7 +130,8 @@ class MultiscaleMolecularModel(nn.Module):
         self.config = config or MultiscaleModelConfig(hidden_dim=hidden_dim)
         if self.config.hidden_dim != hidden_dim:
             raise ValueError("config.hidden_dim must match the encoder")
-        if self.config.experiment_mode.startswith("random_region_"):
+        self.embedding_region_cache = {}
+        if self.config.uses_region_branch:
             self.region_encoders = nn.ModuleList()
             self.random_regions = RandomRegionBranch(hidden_dim, self.config.dropout)
             self.prediction_head = nn.Sequential(
@@ -194,6 +206,38 @@ class MultiscaleMolecularModel(nn.Module):
             raise ValueError("one partition seed is required per graph")
         return [int(seed) for seed in seeds]
 
+    @torch.no_grad()
+    def prepare_embedding_regions(self, node_features, bonds, node_mask):
+        """Cache one partition per molecule from unpadded FP32 frozen H4.
+
+        Input tensors identify a molecule only. Spherical k-means receives H4
+        alone, never adjacency or distances. A separate forward on first use
+        avoids train BF16 / evaluation FP32 or batch-padding dependent labels.
+        """
+        if not self.config.uses_embedding_regions:
+            raise ValueError("fixed embedding partitions require embedding mode")
+        regions = []
+        for features, edges, mask in zip(node_features, bonds, node_mask):
+            features = features[mask].unsqueeze(0)
+            edges = edges[mask][:, mask].unsqueeze(0)
+            digest = hashlib.sha256()
+            digest.update(features.cpu().numpy().tobytes())
+            digest.update(edges.cpu().numpy().tobytes())
+            key = digest.hexdigest()
+            if key not in self.embedding_region_cache:
+                with torch.autocast(device_type=features.device.type, enabled=False):
+                    h4 = self.encoder(features, edges, torch.ones(
+                        features.shape[:2], device=features.device, dtype=torch.bool,
+                    ))[-1]
+                self.embedding_region_cache[key] = spherical_regions(
+                    h4[0].float().cpu().numpy(),
+                    seed=self.config.default_partition_seed,
+                    atoms_per_center=self.config.atoms_per_center,
+                    max_centers=self.config.max_centers,
+                )
+            regions.append(self.embedding_region_cache[key])
+        return regions
+
     def forward(
         self,
         node_features: Tensor,
@@ -215,7 +259,7 @@ class MultiscaleMolecularModel(nn.Module):
                 base_prediction = self.base_head(torch.cat((summed, averaged), dim=-1))
         hidden_states = (h1, h2, h3, h4)
         batch_size = node_features.size(0)
-        if self.config.experiment_mode.startswith("random_region_"):
+        if self.config.uses_region_branch:
             if partitions is not None:
                 raise ValueError("random regions do not use multiscale partitions")
             base_state = hidden_states[self.config.base_readout_layer - 1]
@@ -224,8 +268,10 @@ class MultiscaleMolecularModel(nn.Module):
             base = torch.cat((summed, summed / weights.sum(1).clamp_min(1)), -1)
             seeds = self._partition_seeds(partition_seeds, batch_size)
             geometry = prepare_region_geometry(bonds, node_mask)
+            fixed_regions = (self.prepare_embedding_regions(node_features, bonds, node_mask)
+                             if self.config.uses_embedding_regions else None)
             predictions, representations = [], []
-            for view in range(1 if self.training else self.config.eval_views):
+            for view in range(1 if self.training or fixed_regions is not None else self.config.eval_views):
                 view_seeds = [derive_partition_seed(seed, view) for seed in seeds]
                 coarse, counts = self.random_regions(
                     h4, bonds, node_mask, view_seeds,
@@ -233,6 +279,7 @@ class MultiscaleMolecularModel(nn.Module):
                     atoms_per_center=self.config.atoms_per_center,
                     max_centers=self.config.max_centers,
                     geometry=geometry,
+                    fixed_regions=fixed_regions,
                 )
                 representation = torch.cat((base, coarse), -1)
                 predictions.append(self.prediction_head(representation))

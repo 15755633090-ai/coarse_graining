@@ -6,6 +6,12 @@ fine-tuning modes.
 
 ## Random region experiment
 
+The fixed Lipo embedding partition experiment is available as
+`embedding_region_stage2_frozen`: spherical k-means on frozen, fine-tuned H4,
+with the existing region encoder and downstream network. See
+[`docs/EMBEDDING_REGIONS.md`](docs/EMBEDDING_REGIONS.md) for the seed-0 command
+and comparison limits.
+
 The simplified H4 random-region branch is available as
 `random_region_stage2_frozen`. It retains the Base Sum/Mean representation,
 adds radius-2 region tokens with one distance-aware attention block, and

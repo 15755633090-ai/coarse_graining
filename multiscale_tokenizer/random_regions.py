@@ -88,7 +88,7 @@ class RandomRegionBranch(nn.Module):
                                  np.where(distances <= 12, 9, 10)))
 
     def forward(self, h4, bonds, mask, seeds, *, radius, atoms_per_center, max_centers,
-                geometry=None):
+                geometry=None, fixed_regions=None):
         batch, nodes, hidden = h4.shape
         memberships = np.zeros((batch, max_centers, nodes), dtype=np.float32)
         buckets = np.zeros((batch, max_centers, max_centers), dtype=np.int64)
@@ -99,9 +99,12 @@ class RandomRegionBranch(nn.Module):
             raise ValueError("one geometry and seed are required per graph")
         for index, seed in enumerate(seeds):
             atom_indices, distances = geometry[index]
-            centers, members = sample_regions(
-                distances, seed, radius, atoms_per_center, max_centers,
-            )
+            if fixed_regions is None:
+                centers, members = sample_regions(
+                    distances, seed, radius, atoms_per_center, max_centers,
+                )
+            else:
+                centers, members = fixed_regions[index]
             count = len(centers)
             memberships[index, :count, :][:, atom_indices] = members
             buckets[index, :count, :count] = self.bucket_distances(distances[np.ix_(centers, centers)])
