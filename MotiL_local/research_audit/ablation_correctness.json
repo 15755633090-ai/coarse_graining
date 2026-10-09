@@ -1,0 +1,122 @@
+{
+  "scope": "CPU correctness and backward checks only; no parameter update",
+  "fixture_instance_counts": {
+    "B0": 1,
+    "B1": 1,
+    "B2a-1": 3,
+    "B2a-2": 5,
+    "B2b": 5
+  },
+  "variants": {
+    "B0": {
+      "types": 2,
+      "instances": 2,
+      "loss": 222.2483367919922,
+      "shared_encoder_gradient_norm": 0.004174611531198025,
+      "forward_seconds": [
+        0.001276000000000721,
+        0.001206900000001454,
+        0.0011413000000004558
+      ],
+      "molecular_branch_max_error": 0.0
+    },
+    "B1": {
+      "types": 2,
+      "instances": 2,
+      "loss": 263.7925109863281,
+      "shared_encoder_gradient_norm": 1.3549469709396362,
+      "forward_seconds": [
+        0.0016543000000002195,
+        0.0016312000000002769,
+        0.0015897999999996415
+      ],
+      "molecular_branch_max_error": 0.0
+    },
+    "B2a-1": {
+      "types": 2,
+      "instances": 4,
+      "loss": 263.7925109863281,
+      "shared_encoder_gradient_norm": 2.1382956504821777,
+      "forward_seconds": [
+        0.0032303000000002413,
+        0.003107500000000485,
+        0.0032581000000000415
+      ],
+      "molecular_branch_max_error": 0.0
+    },
+    "B2a-2": {
+      "types": 2,
+      "instances": 6,
+      "loss": 257.52581787109375,
+      "shared_encoder_gradient_norm": 0.8493852615356445,
+      "forward_seconds": [
+        0.004856300000000147,
+        0.004686799999999991,
+        0.004604399999999842
+      ],
+      "molecular_branch_max_error": 0.0
+    },
+    "B2b": {
+      "types": 2,
+      "instances": 6,
+      "loss": 257.52581787109375,
+      "shared_encoder_gradient_norm": 0.8493852615356445,
+      "forward_seconds": [
+        0.004933299999999363,
+        0.004916200000000259,
+        0.00465120000000141
+      ],
+      "molecular_branch_max_error": 0.0
+    }
+  },
+  "atom_renumbering": {
+    "tested_orders": [
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      [
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      [
+        2,
+        3,
+        0,
+        8,
+        7,
+        5,
+        1,
+        9,
+        4,
+        6
+      ]
+    ],
+    "motif_type_mean_max_errors": [
+      5.960464477539063e-08,
+      5.960464477539063e-08
+    ],
+    "molecular_gru_max_errors": [
+      0.048640280961990356,
+      0.5250775814056396
+    ],
+    "limitation": "Three orderings of one molecule; not a universal invariance proof."
+  },
+  "low_type_batch_policy": "fewer than two motif types: skip motif update, log count"
+}

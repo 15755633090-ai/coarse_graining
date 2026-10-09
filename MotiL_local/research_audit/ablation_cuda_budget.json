@@ -1,0 +1,122 @@
+{
+  "scope": "two fixed ESOL batches; two views plus backward, no optimizer update",
+  "device": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "dtype": "float32",
+  "dropout": [
+    0.3,
+    0.3
+  ],
+  "measurements": [
+    {
+      "batch_size": 8,
+      "variant": "B0",
+      "atoms": 131,
+      "types": 10,
+      "instances": 10,
+      "two_view_backward_seconds": 0.29521789999999903,
+      "peak_allocated_MiB": 40.31982421875,
+      "incremental_peak_MiB": 24.82080078125,
+      "peak_reserved_MiB": 62.0
+    },
+    {
+      "batch_size": 8,
+      "variant": "B1",
+      "atoms": 131,
+      "types": 10,
+      "instances": 10,
+      "two_view_backward_seconds": 0.0854727000000004,
+      "peak_allocated_MiB": 68.6298828125,
+      "incremental_peak_MiB": 45.005859375,
+      "peak_reserved_MiB": 90.0
+    },
+    {
+      "batch_size": 8,
+      "variant": "B2a-1",
+      "atoms": 131,
+      "types": 10,
+      "instances": 24,
+      "two_view_backward_seconds": 0.20305190000000017,
+      "peak_allocated_MiB": 123.8125,
+      "incremental_peak_MiB": 100.1884765625,
+      "peak_reserved_MiB": 148.0
+    },
+    {
+      "batch_size": 8,
+      "variant": "B2a-2",
+      "atoms": 131,
+      "types": 10,
+      "instances": 27,
+      "two_view_backward_seconds": 0.21522140000000078,
+      "peak_allocated_MiB": 135.59130859375,
+      "incremental_peak_MiB": 111.96728515625,
+      "peak_reserved_MiB": 160.0
+    },
+    {
+      "batch_size": 8,
+      "variant": "B2b",
+      "atoms": 131,
+      "types": 10,
+      "instances": 27,
+      "two_view_backward_seconds": 0.23812109999999898,
+      "peak_allocated_MiB": 135.59130859375,
+      "incremental_peak_MiB": 111.96728515625,
+      "peak_reserved_MiB": 160.0
+    },
+    {
+      "batch_size": 16,
+      "variant": "B0",
+      "atoms": 235,
+      "types": 10,
+      "instances": 10,
+      "two_view_backward_seconds": 0.04342600000000019,
+      "peak_allocated_MiB": 52.41748046875,
+      "incremental_peak_MiB": 28.79345703125,
+      "peak_reserved_MiB": 74.0
+    },
+    {
+      "batch_size": 16,
+      "variant": "B1",
+      "atoms": 235,
+      "types": 10,
+      "instances": 10,
+      "two_view_backward_seconds": 0.08514839999999957,
+      "peak_allocated_MiB": 98.7255859375,
+      "incremental_peak_MiB": 75.1015625,
+      "peak_reserved_MiB": 122.0
+    },
+    {
+      "batch_size": 16,
+      "variant": "B2a-1",
+      "atoms": 235,
+      "types": 10,
+      "instances": 24,
+      "two_view_backward_seconds": 0.19914769999999926,
+      "peak_allocated_MiB": 195.5458984375,
+      "incremental_peak_MiB": 171.921875,
+      "peak_reserved_MiB": 222.0
+    },
+    {
+      "batch_size": 16,
+      "variant": "B2a-2",
+      "atoms": 235,
+      "types": 10,
+      "instances": 42,
+      "two_view_backward_seconds": 0.3526833000000007,
+      "peak_allocated_MiB": 319.93310546875,
+      "incremental_peak_MiB": 296.30908203125,
+      "peak_reserved_MiB": 350.0
+    },
+    {
+      "batch_size": 16,
+      "variant": "B2b",
+      "atoms": 235,
+      "types": 10,
+      "instances": 42,
+      "two_view_backward_seconds": 0.3477492999999985,
+      "peak_allocated_MiB": 319.93310546875,
+      "incremental_peak_MiB": 296.30908203125,
+      "peak_reserved_MiB": 350.0
+    }
+  ],
+  "limitations": "Single measurement per condition, not full diffusion pretraining memory or throughput."
+}

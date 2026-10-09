@@ -1,0 +1,46 @@
+{
+  "status": "specified exploratory protocol; not executed; full training runner not yet integrated",
+  "claim_scope": "matched continuation from author weights; not independent paper pretraining replication",
+  "variants": ["B0", "B1", "B2a-1", "B2a-2", "B2b"],
+  "shared_compatibility": ["remove obsolete extra False argument", "clone before in-place motif writes for PyTorch autograd", "skip motif loss for fewer than two types and log skips"],
+  "checkpoint_sha256": "38082cdccb14a7d1b2749181548a81253e70196940bf979ef0f983b3a47e0f78",
+  "pretraining_data": {
+    "path": "MotiL_micromolecule/data/zinc15_250K.csv",
+    "sha256": "2efdcff64935073cf7aa593eceab20dcc88de78059800c3a07c625551e505a85",
+    "labels_used": false,
+    "subset_size": 4096,
+    "subset_seed": 2024,
+    "selection": "canonical-isomeric-SMILES deduplicate; remove exact downstream ESOL/BBBP/ClinTox/BACE overlaps; sort canonical strings; NumPy default_rng(seed) permutation; take first 4096",
+    "gate": "save exact selected SMILES, hashes and overlap counts before any optimizer update; does not establish original checkpoint lacked overlap"
+  },
+  "budget": {"batch_size": 16, "minibatches_per_run": 200, "runs_per_variant": 3, "seeds": [2024, 2025, 2026], "shuffle": "seeded fixed batch sequence shared by variants", "num_workers": 0, "precision": "float32"},
+  "encoder": {"hidden_size": 300, "depth": 3, "activation": "ReLU", "bias": false, "view_depths": [3, 2], "view_dropout": [0.3, 0.3]},
+  "objectives": {
+    "diffusion": "hold current public atom-feature DDPM path fixed in all groups; not claimed to implement paper adjacency diffusion",
+    "timesteps": 1000,
+    "contrastive": "original PointwiseLoss; mean instances within type; one row per type",
+    "contrastive_schedule": "alternate molecular/motif after each diffusion update; start molecular",
+    "adam_lr": 0.00003,
+    "adam_betas": [0.9, 0.999],
+    "adam_eps": 1e-8,
+    "weight_decay": 0,
+    "optimizers": "fresh separate diffusion and contrastive Adam states per run, as public loop",
+    "lr_decay": {"gamma": 0.99, "every_minibatches": 500, "note": "no decay within this 200-minibatch pilot"}
+  },
+  "parameter_provenance": {
+    "public_code": ["encoder settings", "view depths/dropout", "Adam settings", "timesteps", "scheduler interval/gamma"],
+    "research_design_not_paper_parameters": ["4096 subset", "200 minibatches", "batch size 16", "continuation from author checkpoint", "three seeds", "common low-type skip policy"]
+  },
+  "selection_rule": "use final fixed-budget encoder, never downstream test scores to select continuation checkpoint",
+  "downstream": {
+    "tasks": ["esol", "bbbp", "clintox", "bace"],
+    "parameter_source": "existing author task settings in run_motil_windows.py, mirrored by prior verified-run manifest",
+    "split": "same scaffold_balanced split seed 2024 across variants; exploratory because previously inspected",
+    "initialization": "seed after legacy imports; paired across variants",
+    "checkpoint_selection": "validation only",
+    "include_no_continuation_control": true,
+    "gate": "save full resolved commands and exact split hashes before training; new splits/tasks required for final generalization claim"
+  },
+  "required_logs": ["actual diffusion/molecular/motif optimizer steps", "low-type skipped steps", "type and instance counts", "nonfinite events", "wall time", "peak CUDA memory", "source and data hashes", "checkpoint tensor hashes", "shared encoder gradient norms"],
+  "remaining_gates": ["integrate ablation batch and encoder into a separate continuation runner", "validate exact subset and overlap removal", "verify full DDPM plus motif one-minibatch backward budget", "verify reset RNG streams independently for batch order, diffusion noise and activation dropout across variants"]
+}
