@@ -1,0 +1,47 @@
+{
+  "scope": "one-epoch ESOL downstream wiring only; no performance inference",
+  "same_saved_split_hashes": {
+    "author": {
+      "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+      "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+      "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+    },
+    "B0": {
+      "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+      "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+      "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+    },
+    "B1": {
+      "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+      "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+      "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+    },
+    "B2b": {
+      "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+      "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+      "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+    }
+  },
+  "results": [
+    {
+      "variant": "author",
+      "one_epoch_wiring_test_rmse": 1.348763,
+      "warning": "Do not rank methods by this connection test."
+    },
+    {
+      "variant": "B0",
+      "one_epoch_wiring_test_rmse": 1.329155,
+      "warning": "Do not rank methods by this connection test."
+    },
+    {
+      "variant": "B1",
+      "one_epoch_wiring_test_rmse": 1.312334,
+      "warning": "Do not rank methods by this connection test."
+    },
+    {
+      "variant": "B2b",
+      "one_epoch_wiring_test_rmse": 1.329223,
+      "warning": "Do not rank methods by this connection test."
+    }
+  ]
+}

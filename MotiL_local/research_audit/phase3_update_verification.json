@@ -1,0 +1,150 @@
+{
+  "scope": "2-minibatch five-group wiring + 20-minibatch three-group stability; not 200-step pilot",
+  "paired_initialization_and_batch_checks": "passed",
+  "runs": [
+    {
+      "stage": "smoke",
+      "variant": "B0",
+      "counts": {
+        "diffusion": 2,
+        "molecule": 1,
+        "motif": 1,
+        "motif_skipped": 0
+      },
+      "seconds": 1.2092811999999995,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "85c2d6708a2d603d9879edd7f87f631238cd3286fdbf006f0743ca6b574ebe31",
+      "final_ddpm_mlp_tensor_sha256": "fae31539fd83f3a9f7582c12185bd5a2931021e28dcc43ef0a94c872ae583650",
+      "peak_cuda_allocated_MiB": 118.90625,
+      "checkpoint_file_sha256": "43ecb00cd26396cb98a0f4054b992b8bd9747a79560ad8cb0ccd55ef46602a2a",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "stage": "smoke",
+      "variant": "B1",
+      "counts": {
+        "diffusion": 2,
+        "molecule": 1,
+        "motif": 1,
+        "motif_skipped": 0
+      },
+      "seconds": 1.0496175,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "03b07908a7105777b9eae31c3491431af32a5f0a2a565a98c145a4d6da96dc3f",
+      "final_ddpm_mlp_tensor_sha256": "fae31539fd83f3a9f7582c12185bd5a2931021e28dcc43ef0a94c872ae583650",
+      "peak_cuda_allocated_MiB": 158.43603515625,
+      "checkpoint_file_sha256": "146a1f81c8b65933eb19cd521aa2857a3c50a0445c97730bfa8ef841e11f9167",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "stage": "smoke",
+      "variant": "B2a-1",
+      "counts": {
+        "diffusion": 2,
+        "molecule": 1,
+        "motif": 1,
+        "motif_skipped": 0
+      },
+      "seconds": 0.944654400000001,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "cb7b29f6c54a04d0993ce198f9e76e074b6b95cf7ec2ec9b5b4637fc6bdc0355",
+      "final_ddpm_mlp_tensor_sha256": "fae31539fd83f3a9f7582c12185bd5a2931021e28dcc43ef0a94c872ae583650",
+      "peak_cuda_allocated_MiB": 169.31689453125,
+      "checkpoint_file_sha256": "f51f613c69c58834c8651156fa87484a8a1e10dc5787afd46c697bbe9466be89",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "stage": "smoke",
+      "variant": "B2a-2",
+      "counts": {
+        "diffusion": 2,
+        "molecule": 1,
+        "motif": 1,
+        "motif_skipped": 0
+      },
+      "seconds": 1.4441032000000007,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "eae709f362a25cd1351eca45fee1ecd2dda3772a389396b454ca12fc27c667d9",
+      "final_ddpm_mlp_tensor_sha256": "fae31539fd83f3a9f7582c12185bd5a2931021e28dcc43ef0a94c872ae583650",
+      "peak_cuda_allocated_MiB": 736.5458984375,
+      "checkpoint_file_sha256": "0d28afec8c7f55f2b3ce3d8cc27c5f95d93a9338e6061c752443a985e9479393",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "stage": "smoke",
+      "variant": "B2b",
+      "counts": {
+        "diffusion": 2,
+        "molecule": 1,
+        "motif": 1,
+        "motif_skipped": 0
+      },
+      "seconds": 1.4240811000000004,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "eae709f362a25cd1351eca45fee1ecd2dda3772a389396b454ca12fc27c667d9",
+      "final_ddpm_mlp_tensor_sha256": "fae31539fd83f3a9f7582c12185bd5a2931021e28dcc43ef0a94c872ae583650",
+      "peak_cuda_allocated_MiB": 736.5458984375,
+      "checkpoint_file_sha256": "0d28afec8c7f55f2b3ce3d8cc27c5f95d93a9338e6061c752443a985e9479393",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "stage": "short",
+      "variant": "B0",
+      "counts": {
+        "diffusion": 20,
+        "molecule": 10,
+        "motif": 10,
+        "motif_skipped": 0
+      },
+      "seconds": 5.3945808,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "da854320d5d1fbc12beafdd8940f3cfd8d5c1888648b1aa0ff7a721be460d65a",
+      "final_ddpm_mlp_tensor_sha256": "ec5bc53fb78b133d7ec6f6c8bc843b256463ec321f3dff22b2d052441ca0e3c6",
+      "peak_cuda_allocated_MiB": 135.6865234375,
+      "checkpoint_file_sha256": "c2c743e2beb16b90c0ada35fff640ca37b14137125aa3c03e9cbf8d4f92c9500",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "stage": "short",
+      "variant": "B1",
+      "counts": {
+        "diffusion": 20,
+        "molecule": 10,
+        "motif": 10,
+        "motif_skipped": 0
+      },
+      "seconds": 5.937685200000001,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "9c93a65fd3a6c01439c8cd0253b0a9a4215df1bea893d2f672dc8fcf51ae95fb",
+      "final_ddpm_mlp_tensor_sha256": "79e50b4048e24eeddd0e2ceb1c29ff538d1f09d3f12b699d5905817e05a7cd66",
+      "peak_cuda_allocated_MiB": 174.306640625,
+      "checkpoint_file_sha256": "f03d17a1d90c51ef9ef5deef53e0ee1cce7d51c5c201a70ab7512ebedfaafc21",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "stage": "short",
+      "variant": "B2b",
+      "counts": {
+        "diffusion": 20,
+        "molecule": 10,
+        "motif": 10,
+        "motif_skipped": 0
+      },
+      "seconds": 9.9697408,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "3ce8ede8c0603cd253756ec6445f06c6b039ad763ae1fb367806623bb5c95ebc",
+      "final_ddpm_mlp_tensor_sha256": "a0933e7bc1d2e4220bb5a75b61804ba97e84b3c04a8c50ecc9a746d564890403",
+      "peak_cuda_allocated_MiB": 807.29443359375,
+      "checkpoint_file_sha256": "518b6cdf4f12324ccf977a7d20b0af15beb7b5855e73d0e32a49e116c5b94262",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "scope": "real ZINC batch inference only, author weights",
+  "batches_over_ten": 20,
+  "batches_total": 256,
+  "subset_sha256": "e52dceb4ea509aeae24d50cd68c687becb29ba32c6b48b2438856d2c6cacb999",
+  "real_example": {
+    "start_index": 0,
+    "smiles": [
+      "CCc1cnccc1CNC(=O)[C@H](CNC(=O)OC(C)(C)C)OC",
+      "CC(C)CN(C(=O)CN[C@@H](C)c1ccccc1)C1CC1",
+      "Cn1nnc2c(C(=O)N[C@]3(C)CCN(C(=O)C(N)=O)C3)ccnc21",
+      "C[C@@H](NN=C/C=C/c1cccc(F)c1)C(F)(F)F",
+      "CCN(C(=O)c1cncc(C(N)=O)c1)[C@@H]1CCN([C@H]2CCNC2=O)C1",
+      "N#CCOc1ccc(NCC2CCSCC2)cc1",
+      "CN(CC(N)=O)C1CCN(C(=O)C2CCOCC2)CC1",
+      "CN1N=C(C(=O)N2CCN([C@H]3CCNC3)CC2)CCC1=O",
+      "Cc1nonc1CNC(=O)N(C)C[C@@H](C)C(=O)OC(C)(C)C",
+      "C[C@H](NC(=O)/C=C/c1ccc(Cl)cc1)[C@@H]1CCOC1",
+      "O=C(COC1CC1)N[C@H](C1CC1)[C@@H]1CCCOC1",
+      "Cc1[nH]ncc1[C@H](C)Nc1cnn(CC(F)F)c1",
+      "Cc1cc(OCC(=O)N(CC2CC2)C2CCC2)ccc1[N+](=O)[O-]",
+      "COc1ncc(COC(=O)[C@@H]2CCN(C)C2=O)cc1Cl",
+      "CC(C)C(=O)N(CCO)CCNC(=O)c1cc(C2CC2)oc1C1CC1",
+      "O=C(c1cncs1)N1CC[C@]2(CCCN(CCCF)C2)C1"
+    ],
+    "uncapped_types": [
+      "Carboalkoxy",
+      "Carbonyl",
+      "Carboxamide",
+      "Carbamate",
+      "Pyridyl",
+      "halo",
+      "SecondaryAldimine",
+      "SecondaryKetimine",
+      "Nitrile",
+      "Nitro",
+      "Hydroxyl"
+    ],
+    "capped_types": [
+      "Carboalkoxy",
+      "Carbonyl",
+      "Carboxamide",
+      "Carbamate",
+      "Pyridyl",
+      "halo",
+      "SecondaryAldimine",
+      "SecondaryKetimine",
+      "Nitrile",
+      "Nitro"
+    ],
+    "full_instances": 65,
+    "capped_instances": 64
+  },
+  "outputs": {
+    "B2a-2": {
+      "types": [
+        "Carboalkoxy",
+        "Carbonyl",
+        "Carboxamide",
+        "Carbamate",
+        "Pyridyl",
+        "halo",
+        "SecondaryAldimine",
+        "SecondaryKetimine",
+        "Nitrile",
+        "Nitro"
+      ],
+      "instances": 64,
+      "vector_shape": [
+        10,
+        300
+      ]
+    },
+    "B2b": {
+      "types": [
+        "Carboalkoxy",
+        "Carbonyl",
+        "Carboxamide",
+        "Carbamate",
+        "Pyridyl",
+        "halo",
+        "SecondaryAldimine",
+        "SecondaryKetimine",
+        "Nitrile",
+        "Nitro",
+        "Hydroxyl"
+      ],
+      "instances": 65,
+      "vector_shape": [
+        11,
+        300
+      ]
+    }
+  }
+}

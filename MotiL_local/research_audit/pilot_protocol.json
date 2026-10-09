@@ -1,5 +1,5 @@
 {
-  "status": "specified exploratory protocol; not executed; full training runner not yet integrated",
+  "status": "bounded 2-step/20-step end-to-end checks completed; full 200-step three-seed pilot not executed",
   "claim_scope": "matched continuation from author weights; not independent paper pretraining replication",
   "variants": ["B0", "B1", "B2a-1", "B2a-2", "B2b"],
   "shared_compatibility": ["remove obsolete extra False argument", "clone before in-place motif writes for PyTorch autograd", "skip motif loss for fewer than two types and log skips"],
@@ -24,7 +24,7 @@
     "adam_betas": [0.9, 0.999],
     "adam_eps": 1e-8,
     "weight_decay": 0,
-    "optimizers": "fresh separate diffusion and contrastive Adam states per run, as public loop",
+    "optimizers": "fresh separate diffusion and contrastive Adam states per run, as public loop; projection FFN and DDPM MLP freshly initialized identically across variants",
     "lr_decay": {"gamma": 0.99, "every_minibatches": 500, "note": "no decay within this 200-minibatch pilot"}
   },
   "parameter_provenance": {
@@ -42,5 +42,7 @@
     "gate": "save full resolved commands and exact split hashes before training; new splits/tasks required for final generalization claim"
   },
   "required_logs": ["actual diffusion/molecular/motif optimizer steps", "low-type skipped steps", "type and instance counts", "nonfinite events", "wall time", "peak CUDA memory", "source and data hashes", "checkpoint tensor hashes", "shared encoder gradient norms"],
-  "remaining_gates": ["integrate ablation batch and encoder into a separate continuation runner", "validate exact subset and overlap removal", "verify full DDPM plus motif one-minibatch backward budget", "verify reset RNG streams independently for batch order, diffusion noise and activation dropout across variants"]
+  "completed_gates": ["isolated continuation runner", "4096-molecule subset manifest and exact downstream exclusion", "five-group two-minibatch full update check", "B0/B1/B2b paired twenty-minibatch stability check", "independent per-minibatch phase RNG resets", "author/B0/B1/B2b one-epoch ESOL downstream wiring"],
+  "remaining_gates": ["run full author downstream epoch schedules before any efficacy comparison", "decide whether to expand to 200-minibatch three-seed pilot without test-driven retuning", "new splits/tasks and independent pretraining needed for stronger claims"],
+  "bounded_verification_budgets": {"smoke": "2 minibatches for each of five groups", "short": "20 minibatches for B0/B1/B2b, seed 2024", "downstream": "1 ESOL epoch for author and three short-run encoders; connection check only"}
 }

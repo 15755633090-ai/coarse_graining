@@ -48,3 +48,23 @@ Both commands execute diagnostics/inference only. The prototype intentionally
 retains legacy padding pooling, resets message-passing depth for each instance,
 and records overlap separately from true chemical bridge bonds. Its connection
 metadata has not yet been used to train a region message-passing model.
+
+## Controlled training connection checks
+
+The subsequent `motif_ablation.py` implements B0/B1/B2a-1/B2a-2/B2b.
+See `研究第二阶段结果.md` for gradient and resource tests.
+
+Phase 3 entry points are `prepare_phase3_data.py`,
+`continue_motif_pretraining.py`, `run_phase3_checks.py` and
+`verify_phase3_downstream.py`. **Unlike the earlier diagnostics, these continuation
+and downstream checks actually update parameters.** Continuation requires an
+explicit 2–200 minibatch budget and a fresh output directory. It loads author
+encoder weights while initializing new projection FFN, DDPM MLP and optimizers.
+It is not a recovery of the author's complete training state or an implementation
+of the paper's adjacency diffusion formulas.
+
+The bounded phase-3 validation uses 2 minibatches for each of five groups,
+20 minibatches for B0/B1/B2b, and one downstream ESOL epoch. These budgets test
+the wiring and do not establish property-performance improvements. Original
+per-epoch test evaluation is disabled; a final evaluation follows validation
+checkpoint selection. Large local data and checkpoint outputs are ignored by Git.
