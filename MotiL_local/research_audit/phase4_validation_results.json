@@ -1,0 +1,540 @@
+{
+  "scope": "exploratory matched author-encoder continuation; validation only",
+  "test_evaluated": false,
+  "aggregates": {
+    "author": {
+      "validation_mean": 0.8915623489923181,
+      "validation_sample_std": 0.015665829922459778,
+      "per_seed": [
+        0.8944056274812829,
+        0.8746696059496227,
+        0.9056118135460486
+      ]
+    },
+    "B0": {
+      "validation_mean": 0.9266065744029247,
+      "validation_sample_std": 0.012859547246263137,
+      "per_seed": [
+        0.9404847558412359,
+        0.915094189974323,
+        0.9242407773932151
+      ]
+    },
+    "B1": {
+      "validation_mean": 0.9374713810909712,
+      "validation_sample_std": 0.004471770954821443,
+      "per_seed": [
+        0.9426238285922632,
+        0.9351883279940513,
+        0.9346019866865989
+      ]
+    },
+    "B2b": {
+      "validation_mean": 0.9241655059791688,
+      "validation_sample_std": 0.011905685803601953,
+      "per_seed": [
+        0.9128146086745915,
+        0.9365575908609844,
+        0.9231243184019309
+      ]
+    }
+  },
+  "paired_differences": {
+    "B0_minus_author": {
+      "per_seed": [
+        0.04607912835995298,
+        0.04042458402470028,
+        0.018628963847166502
+      ],
+      "mean": 0.03504422541060659,
+      "sample_std": 0.014494449870793638,
+      "meaning": "negative means lower validation RMSE; no test/generalization claim"
+    },
+    "B1_minus_B0": {
+      "per_seed": [
+        0.0021390727510273155,
+        0.020094138019728258,
+        0.0103612092933838
+      ],
+      "mean": 0.010864806688046458,
+      "sample_std": 0.00898811993426662,
+      "meaning": "negative means lower validation RMSE; no test/generalization claim"
+    },
+    "B2b_minus_B1": {
+      "per_seed": [
+        -0.029809219917671714,
+        0.0013692628669331741,
+        -0.011477668284668008
+      ],
+      "mean": -0.013305875111802182,
+      "sample_std": 0.015669435291023125,
+      "meaning": "negative means lower validation RMSE; no test/generalization claim"
+    }
+  },
+  "pretraining": [
+    {
+      "variant": "B0",
+      "seed": 2024,
+      "counts": {
+        "diffusion": 200,
+        "molecule": 100,
+        "motif": 100,
+        "motif_skipped": 0
+      },
+      "seconds": 51.8123426,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "03550aeed58a98c1792bbc9b4feb7851d355d9c73e547a3c325cfd4afd69cce3",
+      "final_ddpm_mlp_tensor_sha256": "3558545e6f03f8d58fa249b8d82e6f75cd45a0f0d1b7e821ed4441749f587339",
+      "peak_cuda_allocated_MiB": 135.91796875,
+      "checkpoint_file_sha256": "fc27ea088690d88eaf6066b4315001e408f8df261b5689bcf2072d9df188d02d",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "variant": "B1",
+      "seed": 2024,
+      "counts": {
+        "diffusion": 200,
+        "molecule": 100,
+        "motif": 100,
+        "motif_skipped": 0
+      },
+      "seconds": 54.6442076,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "ca05368ed0871440ee3b1120fcfa0c11a63126f407173e77601afa6d26af322b",
+      "final_ddpm_mlp_tensor_sha256": "2e8ab23b5d10b22aaae10cc2c471bed7cdf91eba7967c43f5efaf48440b4b2b9",
+      "peak_cuda_allocated_MiB": 177.37109375,
+      "checkpoint_file_sha256": "5b96e0a498264b50d01f5f39577c6b7b0f3d25f0131f07cddb269fb7820d1e24",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "variant": "B2b",
+      "seed": 2024,
+      "counts": {
+        "diffusion": 200,
+        "molecule": 100,
+        "motif": 100,
+        "motif_skipped": 0
+      },
+      "seconds": 99.60470430000001,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "47cc1baf240d495dace7b8acd3b604ab20d32730e9746f7f4de5192a70a1d7b7",
+      "final_ddpm_mlp_tensor_sha256": "b41ab8583dabc503af586486eff7d85f9d2ddd7b23efe9c8d4bb0e89114b0aab",
+      "peak_cuda_allocated_MiB": 908.50732421875,
+      "checkpoint_file_sha256": "c562abc870b8f7694898c5b128e0386e50586d36e5997d3a81655cdf9442a2ba",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "variant": "B0",
+      "seed": 2025,
+      "counts": {
+        "diffusion": 200,
+        "molecule": 100,
+        "motif": 100,
+        "motif_skipped": 0
+      },
+      "seconds": 52.406361000000004,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "091ee826f52cf956d02d55978bb81b7b8c32605dfb6766df299708dbe4f5b8e3",
+      "final_ddpm_mlp_tensor_sha256": "ed3efbfd26a5647e050e94bb861b4107d5180070610edb508967fc8bf5b43553",
+      "peak_cuda_allocated_MiB": 135.37548828125,
+      "checkpoint_file_sha256": "e2ef666de1bad6a1ed93e1bff33cc4099c92c0cf099d571a53a4317fab8b9732",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "variant": "B1",
+      "seed": 2025,
+      "counts": {
+        "diffusion": 200,
+        "molecule": 100,
+        "motif": 100,
+        "motif_skipped": 0
+      },
+      "seconds": 54.9257287,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "ad14ddfa09ba4898e8de60eb72088b22d9ca1527c79b356e353b998e41c58807",
+      "final_ddpm_mlp_tensor_sha256": "a5747c5347c67c32fe822544e2edf388dc7c949956562c512990e3fe85706805",
+      "peak_cuda_allocated_MiB": 176.29443359375,
+      "checkpoint_file_sha256": "2e7f511209cd855670b9d28cfeca59fb35dab1abf6d22d07adb09a5e10482eb6",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "variant": "B2b",
+      "seed": 2025,
+      "counts": {
+        "diffusion": 200,
+        "molecule": 100,
+        "motif": 100,
+        "motif_skipped": 0
+      },
+      "seconds": 103.14247560000001,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "d024e870e7798faea7cb16f4f944e4f58eea9eab53d680f63d62c7d424cbefa9",
+      "final_ddpm_mlp_tensor_sha256": "7255ba18be47d8653727a2cd6c578191715119ec11d4b11feecc04916b58de0a",
+      "peak_cuda_allocated_MiB": 880.88232421875,
+      "checkpoint_file_sha256": "6b3166c1ffd67bf210c252216921af3c6a31679749f8a4fa7c3ae41f878310ce",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "variant": "B0",
+      "seed": 2026,
+      "counts": {
+        "diffusion": 200,
+        "molecule": 100,
+        "motif": 100,
+        "motif_skipped": 0
+      },
+      "seconds": 51.2508257,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "6cfbcfc11af36dfa7f8ea4a0196dd2e8ddcd5e68389b4982a7045fe61a586006",
+      "final_ddpm_mlp_tensor_sha256": "23ab93e0c85d84295c7472f4a7f22f67eb463267b60f6f3b22bafd34605a9eea",
+      "peak_cuda_allocated_MiB": 135.71337890625,
+      "checkpoint_file_sha256": "21c59e3e990a8261793574330ce74a1c22439eb6a3ba6039af5bd72cb8467b17",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "variant": "B1",
+      "seed": 2026,
+      "counts": {
+        "diffusion": 200,
+        "molecule": 100,
+        "motif": 100,
+        "motif_skipped": 0
+      },
+      "seconds": 57.325265,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "bedcdcf8513bbc52c6a08eb8093a6a4bfafcd6e835ce7af32fb1f636a485e0f6",
+      "final_ddpm_mlp_tensor_sha256": "78461f4b714e187c550c9b92f71593a6db7a02a6e22603a4379c2ae0e2e36e5a",
+      "peak_cuda_allocated_MiB": 176.97412109375,
+      "checkpoint_file_sha256": "35a372d297377468341b0257dc4463215d115ca8dac773652aab1eb69a03c19f",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    },
+    {
+      "variant": "B2b",
+      "seed": 2026,
+      "counts": {
+        "diffusion": 200,
+        "molecule": 100,
+        "motif": 100,
+        "motif_skipped": 0
+      },
+      "seconds": 96.6151921,
+      "initial_encoder_tensor_sha256": "f124e23dfcf5c2fa8c35be61d0cc35e3c76f1266878f0160e4b77571b37a8ef8",
+      "final_encoder_tensor_sha256": "a35740981e7f15d458bc7b5355dfd12dbe2fdc05fa6120056d47d9b399198eaa",
+      "final_ddpm_mlp_tensor_sha256": "bae7064a7c4555769bfdd917f31b52864363772ce0505a28f495ce3ac437e27c",
+      "peak_cuda_allocated_MiB": 870.49267578125,
+      "checkpoint_file_sha256": "c2ea98a50de33c7c65a9fe0282eec960bd0de33eab0835ba62a3e2d58dc12d8b",
+      "all_updates_finite": true,
+      "scope": "bounded continuation update verification; no property-performance claim"
+    }
+  ],
+  "downstream": [
+    {
+      "variant": "author",
+      "seed": 2024,
+      "best_validation_rmse": 0.8944056274812829,
+      "reloaded_validation_rmse": 0.8944056274812829,
+      "best_epoch_zero_based": 32,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\author_seed2024\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\author_seed2024",
+      "test_evaluated": false,
+      "initialization_seed": 2024,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 257.27161,
+      "encoder_sha256": "38082cdccb14a7d1b2749181548a81253e70196940bf979ef0f983b3a47e0f78",
+      "selected_checkpoint_sha256": "daae1f71c20517dcf8e8a97a8ebc05ed05af780137c61b9b1ab305e29b84546e",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "B0",
+      "seed": 2024,
+      "best_validation_rmse": 0.9404847558412359,
+      "reloaded_validation_rmse": 0.9404847558412359,
+      "best_epoch_zero_based": 53,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B0_seed2024\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B0_seed2024",
+      "test_evaluated": false,
+      "initialization_seed": 2024,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 262.09793690000004,
+      "encoder_sha256": "fc27ea088690d88eaf6066b4315001e408f8df261b5689bcf2072d9df188d02d",
+      "selected_checkpoint_sha256": "956dfbb8a9ffbd6af956c6d0c34ef2651d0bbd260a61818ddd4c3ebc9ea07be5",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "B1",
+      "seed": 2024,
+      "best_validation_rmse": 0.9426238285922632,
+      "reloaded_validation_rmse": 0.9426238285922632,
+      "best_epoch_zero_based": 53,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B1_seed2024\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B1_seed2024",
+      "test_evaluated": false,
+      "initialization_seed": 2024,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 258.9025323999999,
+      "encoder_sha256": "5b96e0a498264b50d01f5f39577c6b7b0f3d25f0131f07cddb269fb7820d1e24",
+      "selected_checkpoint_sha256": "2ff16942564203d02b4559fc227a2b1c431cacdc57afbe6e67212f9803eac243",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "B2b",
+      "seed": 2024,
+      "best_validation_rmse": 0.9128146086745915,
+      "reloaded_validation_rmse": 0.9128146086745915,
+      "best_epoch_zero_based": 32,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B2b_seed2024\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B2b_seed2024",
+      "test_evaluated": false,
+      "initialization_seed": 2024,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 249.84478220000005,
+      "encoder_sha256": "c562abc870b8f7694898c5b128e0386e50586d36e5997d3a81655cdf9442a2ba",
+      "selected_checkpoint_sha256": "d615352198d8b250d51ea36c73b7e53e4f96914acc9d90288682dd71c3fff8bf",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "author",
+      "seed": 2025,
+      "best_validation_rmse": 0.8746696059496227,
+      "reloaded_validation_rmse": 0.8746696059496227,
+      "best_epoch_zero_based": 37,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\author_seed2025\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\author_seed2025",
+      "test_evaluated": false,
+      "initialization_seed": 2025,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 233.89019940000003,
+      "encoder_sha256": "38082cdccb14a7d1b2749181548a81253e70196940bf979ef0f983b3a47e0f78",
+      "selected_checkpoint_sha256": "cee8a3161e95831b12d3efaa8f5d247f2a74ef7b7c5020503de0ff3d0a8cd814",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "B0",
+      "seed": 2025,
+      "best_validation_rmse": 0.915094189974323,
+      "reloaded_validation_rmse": 0.915094189974323,
+      "best_epoch_zero_based": 37,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B0_seed2025\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B0_seed2025",
+      "test_evaluated": false,
+      "initialization_seed": 2025,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 230.55502460000025,
+      "encoder_sha256": "e2ef666de1bad6a1ed93e1bff33cc4099c92c0cf099d571a53a4317fab8b9732",
+      "selected_checkpoint_sha256": "548196ba8c73503a90e515cf7d3b05674b20255a35b6531716030f1b12af713e",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "B1",
+      "seed": 2025,
+      "best_validation_rmse": 0.9351883279940513,
+      "reloaded_validation_rmse": 0.9351883279940513,
+      "best_epoch_zero_based": 24,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B1_seed2025\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B1_seed2025",
+      "test_evaluated": false,
+      "initialization_seed": 2025,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 235.4832093,
+      "encoder_sha256": "2e7f511209cd855670b9d28cfeca59fb35dab1abf6d22d07adb09a5e10482eb6",
+      "selected_checkpoint_sha256": "b5571f1b2d3c9d100bff1cddd6bb067389b85f846e4e2a13ece6a901045e2cce",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "B2b",
+      "seed": 2025,
+      "best_validation_rmse": 0.9365575908609844,
+      "reloaded_validation_rmse": 0.9365575908609844,
+      "best_epoch_zero_based": 74,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B2b_seed2025\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B2b_seed2025",
+      "test_evaluated": false,
+      "initialization_seed": 2025,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 254.24843720000035,
+      "encoder_sha256": "6b3166c1ffd67bf210c252216921af3c6a31679749f8a4fa7c3ae41f878310ce",
+      "selected_checkpoint_sha256": "a14a2631200f2f6205ce591a150df12f2f82eb422445433b6c1c9097a52d2524",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "author",
+      "seed": 2026,
+      "best_validation_rmse": 0.9056118135460486,
+      "reloaded_validation_rmse": 0.9056118135460486,
+      "best_epoch_zero_based": 35,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\author_seed2026\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\author_seed2026",
+      "test_evaluated": false,
+      "initialization_seed": 2026,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 257.13204970000015,
+      "encoder_sha256": "38082cdccb14a7d1b2749181548a81253e70196940bf979ef0f983b3a47e0f78",
+      "selected_checkpoint_sha256": "67282374043ee5b32ba35a788ea996b628b065a556e599b3e7b9c51652c1c13d",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "B0",
+      "seed": 2026,
+      "best_validation_rmse": 0.9242407773932151,
+      "reloaded_validation_rmse": 0.9242407773932151,
+      "best_epoch_zero_based": 24,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B0_seed2026\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B0_seed2026",
+      "test_evaluated": false,
+      "initialization_seed": 2026,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 251.8332204999997,
+      "encoder_sha256": "21c59e3e990a8261793574330ce74a1c22439eb6a3ba6039af5bd72cb8467b17",
+      "selected_checkpoint_sha256": "55c803c8c5bf4bb2ad9e5275a2dd55f7922addf50f461cae5081c1cb045e2c11",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "B1",
+      "seed": 2026,
+      "best_validation_rmse": 0.9346019866865989,
+      "reloaded_validation_rmse": 0.9346019866865989,
+      "best_epoch_zero_based": 47,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B1_seed2026\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B1_seed2026",
+      "test_evaluated": false,
+      "initialization_seed": 2026,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 251.99269559999993,
+      "encoder_sha256": "35a372d297377468341b0257dc4463215d115ca8dac773652aab1eb69a03c19f",
+      "selected_checkpoint_sha256": "05cb54240a0e81ba0d20de755a538bdbcd17ac893c2681c3ea12b533b7305aec",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    },
+    {
+      "variant": "B2b",
+      "seed": 2026,
+      "best_validation_rmse": 0.9231243184019309,
+      "reloaded_validation_rmse": 0.9231243184019309,
+      "best_epoch_zero_based": 24,
+      "epochs": 100,
+      "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B2b_seed2026\\model_0\\model.pt",
+      "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\downstream_models\\1009-phase4_esol\\B2b_seed2026",
+      "test_evaluated": false,
+      "initialization_seed": 2026,
+      "split_seed": 2024,
+      "prediction_guard": {
+        "test_prediction_attempts": 0,
+        "allowed_predictions": 201
+      },
+      "seconds": 252.50796720000017,
+      "encoder_sha256": "c2ea98a50de33c7c65a9fe0282eec960bd0de33eab0835ba62a3e2d58dc12d8b",
+      "selected_checkpoint_sha256": "198bbb8df49f47ae62903498d981a6f1423a8f55c9dd95e6fc751ced1b9aa9cb",
+      "split_sha256": {
+        "test_smiles.csv": "c55117485eaf0d6548629a21e4afc9b8eea718d357ad5567a425005ea03cb64b",
+        "train_smiles.csv": "8e396d44537fa560fe364d3cfed88cee7d942f9273ba790635b9a73d351c6bf2",
+        "val_smiles.csv": "be35702fbd5265eb4004d559b2fe9873c0b00664cd2a9d0c1e928d6f8df4fb36"
+      }
+    }
+  ]
+}

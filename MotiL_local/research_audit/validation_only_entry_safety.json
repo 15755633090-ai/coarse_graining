@@ -1,0 +1,16 @@
+{
+  "best_validation_rmse": 1.8042296775834532,
+  "reloaded_validation_rmse": 1.8042296775834532,
+  "best_epoch_zero_based": 0,
+  "epochs": 1,
+  "checkpoint_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\preflight_models\\1009-validation_only_preflight\\cpu_safety\\model_0\\model.pt",
+  "split_directory": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\coarse_graining1\\MotiL_local\\phase4_runs_20261009\\preflight_models\\1009-validation_only_preflight\\cpu_safety",
+  "test_evaluated": false,
+  "initialization_seed": 2024,
+  "split_seed": 2024,
+  "prediction_guard": {
+    "test_prediction_attempts": 0,
+    "allowed_predictions": 3
+  },
+  "scope": "CPU one-epoch validation-entry safety check only; excluded from phase-4 efficacy comparison"
+}
