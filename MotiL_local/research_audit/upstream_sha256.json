@@ -1,0 +1,22 @@
+[
+  {
+    "File": "cmpn.py",
+    "SHA256": "f87758c7871417266bf379160561dbacfbec36dd7b79b4a435451b498f76f13a"
+  },
+  {
+    "File": "featurization.py",
+    "SHA256": "03663d6b563a642049a7ae70655097153d4ebf5e178c7740e465ee87487dc86e"
+  },
+  {
+    "File": "loss.py",
+    "SHA256": "e54d505a904bf49483057ef3121c65d4e989eedcfaa73067c10e0c5ca654c44f"
+  },
+  {
+    "File": "model.py",
+    "SHA256": "f90a479bbebbde9cf6c65840547bbdd5329bf584551dc1a246138f9060c7fb61"
+  },
+  {
+    "File": "run_training.py",
+    "SHA256": "9b3d92a89e545ec69ab62f67a92d8c3178ca959e51b7b97f4d0383d7119b0f22"
+  }
+]

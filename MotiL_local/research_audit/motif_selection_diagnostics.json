@@ -1,0 +1,262 @@
+{
+  "kind": "label-free structural audit, not prediction benchmark",
+  "matching": "official vocabulary, >1 atoms, RDKit default matching cap",
+  "source_sha256": {
+    "cmpn.py": "f87758c7871417266bf379160561dbacfbec36dd7b79b4a435451b498f76f13a",
+    "featurization.py": "03663d6b563a642049a7ae70655097153d4ebf5e178c7740e465ee87487dc86e",
+    "loss.py": "e54d505a904bf49483057ef3121c65d4e989eedcfaa73067c10e0c5ca654c44f",
+    "model.py": "f90a479bbebbde9cf6c65840547bbdd5329bf584551dc1a246138f9060c7fb61",
+    "run_training.py": "9b3d92a89e545ec69ab62f67a92d8c3178ca959e51b7b97f4d0383d7119b0f22"
+  },
+  "datasets": {
+    "esol": {
+      "molecules": 1128,
+      "invalid": 0,
+      "without_eligible_motif": 271,
+      "all_enumerated_instances": 2793,
+      "single_molecule_retained": 1639,
+      "molecules_with_repeated_type": 420,
+      "examples": [
+        {
+          "smiles": "OCC3OC(OCC2OC(OC(C#N)c1ccccc1)C(O)C(O)C2O)C(O)C(O)C3O",
+          "enumerated": 14,
+          "retained": 5
+        },
+        {
+          "smiles": "c2ccc1scnc1c2",
+          "enumerated": 2,
+          "retained": 1
+        },
+        {
+          "smiles": "Clc1cc(Cl)c(c(Cl)c1)c2c(Cl)cccc2Cl",
+          "enumerated": 5,
+          "retained": 1
+        }
+      ],
+      "audit_batches": {
+        "16": {
+          "retained_instances": 602,
+          "fraction_of_enumerated": 0.21553884711779447
+        },
+        "32": {
+          "retained_instances": 347,
+          "fraction_of_enumerated": 0.12423916935195131
+        },
+        "64": {
+          "retained_instances": 180,
+          "fraction_of_enumerated": 0.0644468313641246
+        }
+      }
+    },
+    "bbbp": {
+      "molecules": 2039,
+      "invalid": 0,
+      "without_eligible_motif": 235,
+      "all_enumerated_instances": 9168,
+      "single_molecule_retained": 5218,
+      "molecules_with_repeated_type": 1142,
+      "examples": [
+        {
+          "smiles": "C(=O)(OC(C)(C)C)CCCc1ccc(cc1)N(CCCl)CCCl",
+          "enumerated": 4,
+          "retained": 3
+        },
+        {
+          "smiles": "c12c3c(N4CCN(C)CC4)c(F)cc1c(c(C(O)=O)cn2C(C)CO3)=O",
+          "enumerated": 7,
+          "retained": 5
+        },
+        {
+          "smiles": "Cc1onc(c2ccccc2Cl)c1C(=O)N[C@H]3[C@H]4SC(C)(C)[C@@H](N4C3=O)C(O)=O",
+          "enumerated": 8,
+          "retained": 5
+        }
+      ],
+      "audit_batches": {
+        "16": {
+          "retained_instances": 1204,
+          "fraction_of_enumerated": 0.131326352530541
+        },
+        "32": {
+          "retained_instances": 639,
+          "fraction_of_enumerated": 0.06969895287958115
+        },
+        "64": {
+          "retained_instances": 320,
+          "fraction_of_enumerated": 0.034904013961605584
+        }
+      }
+    },
+    "clintox": {
+      "molecules": 1478,
+      "invalid": 0,
+      "without_eligible_motif": 156,
+      "all_enumerated_instances": 7445,
+      "single_molecule_retained": 3675,
+      "molecules_with_repeated_type": 884,
+      "examples": [
+        {
+          "smiles": "*C(=O)[C@H](CCCCNC(=O)OCCOC)NC(=O)OCCOC",
+          "enumerated": 7,
+          "retained": 3
+        },
+        {
+          "smiles": "[C@@H]1([C@@H]([C@@H]([C@H]([C@@H]([C@@H]1Cl)Cl)Cl)Cl)Cl)Cl",
+          "enumerated": 6,
+          "retained": 1
+        },
+        {
+          "smiles": "[C@H]([C@@H]([C@@H](C(=O)[O-])O)O)([C@H](C(=O)[O-])O)O",
+          "enumerated": 8,
+          "retained": 3
+        }
+      ],
+      "audit_batches": {
+        "16": {
+          "retained_instances": 830,
+          "fraction_of_enumerated": 0.11148421759570182
+        },
+        "32": {
+          "retained_instances": 452,
+          "fraction_of_enumerated": 0.06071188717259906
+        },
+        "64": {
+          "retained_instances": 231,
+          "fraction_of_enumerated": 0.031027535258562795
+        }
+      }
+    },
+    "bace": {
+      "molecules": 1513,
+      "invalid": 0,
+      "without_eligible_motif": 30,
+      "all_enumerated_instances": 9485,
+      "single_molecule_retained": 5850,
+      "molecules_with_repeated_type": 1236,
+      "examples": [
+        {
+          "smiles": "O1CC[C@@H](NC(=O)[C@@H](Cc2cc3cc(ccc3nc2N)-c2ccccc2C)C)CC1(C)C",
+          "enumerated": 5,
+          "retained": 3
+        },
+        {
+          "smiles": "Fc1cc(cc(F)c1)C[C@H](NC(=O)[C@@H](N1CC[C@](NC(=O)C)(CC(C)C)C1=O)CCc1ccccc1)[C@H](O)[C@@H]1[NH2+]C[C@H](OCCC)C1",
+          "enumerated": 9,
+          "retained": 4
+        },
+        {
+          "smiles": "S1(=O)(=O)N(c2cc(cc3c2n(cc3CC)CC1)C(=O)N[C@H]([C@H](O)C[NH2+]Cc1cc(OC)ccc1)Cc1ccccc1)C",
+          "enumerated": 6,
+          "retained": 4
+        }
+      ],
+      "audit_batches": {
+        "16": {
+          "retained_instances": 794,
+          "fraction_of_enumerated": 0.08371112282551398
+        },
+        "32": {
+          "retained_instances": 434,
+          "fraction_of_enumerated": 0.045756457564575644
+        },
+        "64": {
+          "retained_instances": 231,
+          "fraction_of_enumerated": 0.024354243542435424
+        }
+      }
+    },
+    "lipo": {
+      "molecules": 4200,
+      "invalid": 0,
+      "without_eligible_motif": 192,
+      "all_enumerated_instances": 21021,
+      "single_molecule_retained": 11531,
+      "molecules_with_repeated_type": 2934,
+      "examples": [
+        {
+          "smiles": "Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14",
+          "enumerated": 5,
+          "retained": 2
+        },
+        {
+          "smiles": "COc1cc(OC)c(cc1NC(=O)CSCC(=O)O)S(=O)(=O)N2C(C)CCc3ccccc23",
+          "enumerated": 5,
+          "retained": 4
+        },
+        {
+          "smiles": "OC[C@H](O)CN1C(=O)C(Cc2ccccc12)NC(=O)c3cc4cc(Cl)sc4[nH]3",
+          "enumerated": 9,
+          "retained": 5
+        }
+      ],
+      "audit_batches": {
+        "16": {
+          "retained_instances": 2308,
+          "fraction_of_enumerated": 0.10979496693782408
+        },
+        "32": {
+          "retained_instances": 1277,
+          "fraction_of_enumerated": 0.06074877503448932
+        },
+        "64": {
+          "retained_instances": 660,
+          "fraction_of_enumerated": 0.03139717425431711
+        }
+      }
+    }
+  },
+  "batch_order_demo": {
+    "forward": {
+      "types": [
+        "Carboalkoxy",
+        "Carbonyl"
+      ],
+      "global_atoms": {
+        "Carboalkoxy": [
+          [
+            2,
+            3,
+            4
+          ]
+        ],
+        "Carbonyl": [
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "owner_smiles": {
+        "Carbonyl": "CC(=O)OCCOC(=O)C",
+        "Carboalkoxy": "CC(=O)OCCOC(=O)C"
+      }
+    },
+    "reverse": {
+      "types": [
+        "Carboalkoxy",
+        "Carbonyl"
+      ],
+      "global_atoms": {
+        "Carboalkoxy": [
+          [
+            3,
+            4,
+            5
+          ]
+        ],
+        "Carbonyl": [
+          [
+            3,
+            4
+          ]
+        ]
+      },
+      "owner_smiles": {
+        "Carbonyl": "CCC(=O)OCC",
+        "Carboalkoxy": "CCC(=O)OCC"
+      }
+    },
+    "owner_changes": true
+  },
+  "prototype_checks": "full counts, valid local atom indices, bridge endpoints, overlap: passed"
+}

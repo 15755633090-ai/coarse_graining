@@ -1,0 +1,7 @@
+# Core packages are provided by polyolefin_ml through system-site-packages.
+# Do not install the upstream requirements.txt with Linux file:// paths.
+tensorboardX==2.6.5
+Unidecode==1.4.0
+numpy==2.0.2
+protobuf==6.33.6
+packaging==26.3

@@ -1,0 +1,29 @@
+{
+  "mode": "author checkpoint CPU inference only, dropout=0, no training",
+  "checkpoint_sha256": "38082cdccb14a7d1b2749181548a81253e70196940bf979ef0f983b3a47e0f78",
+  "args": {
+    "hidden_size": 300,
+    "depth": 3,
+    "bias": false,
+    "undirected": false,
+    "atom_messages": false,
+    "features_only": false,
+    "use_input_features": false,
+    "activation": "ReLU",
+    "cuda": false
+  },
+  "legacy_shape": [
+    2,
+    300
+  ],
+  "instance_shape": [
+    6,
+    300
+  ],
+  "legacy_selected_max_error": 0.0,
+  "original_multi_type_batch_max_error": 0.5736554861068726,
+  "matched_instance_batch_reversal_max_error": 0.0,
+  "all_finite": true,
+  "strict_checkpoint_load": true,
+  "limitation": "Legacy single-instance path preserved; original loop overwrites depth across motif types. Prototype resets depth per instance. Connection graph not trained."
+}

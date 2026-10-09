@@ -1,0 +1,309 @@
+[
+  {
+    "smiles": "CC(=O)OCCOC(=O)C",
+    "num_atoms": 10,
+    "instances": [
+      {
+        "id": 0,
+        "type_id": 16,
+        "type": "Carboalkoxy",
+        "atoms": [
+          1,
+          2,
+          3
+        ],
+        "internal_bonds": [
+          {
+            "atoms": [
+              1,
+              2
+            ],
+            "bond_type": "DOUBLE"
+          },
+          {
+            "atoms": [
+              1,
+              3
+            ],
+            "bond_type": "SINGLE"
+          }
+        ],
+        "boundary_bonds": [
+          {
+            "atoms": [
+              0,
+              1
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 1,
+            "outside_atom": 0
+          },
+          {
+            "atoms": [
+              3,
+              4
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 3,
+            "outside_atom": 4
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "type_id": 16,
+        "type": "Carboalkoxy",
+        "atoms": [
+          7,
+          8,
+          6
+        ],
+        "internal_bonds": [
+          {
+            "atoms": [
+              6,
+              7
+            ],
+            "bond_type": "SINGLE"
+          },
+          {
+            "atoms": [
+              7,
+              8
+            ],
+            "bond_type": "DOUBLE"
+          }
+        ],
+        "boundary_bonds": [
+          {
+            "atoms": [
+              5,
+              6
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 6,
+            "outside_atom": 5
+          },
+          {
+            "atoms": [
+              7,
+              9
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 7,
+            "outside_atom": 9
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "type_id": 23,
+        "type": "Carbonyl",
+        "atoms": [
+          1,
+          2
+        ],
+        "internal_bonds": [
+          {
+            "atoms": [
+              1,
+              2
+            ],
+            "bond_type": "DOUBLE"
+          }
+        ],
+        "boundary_bonds": [
+          {
+            "atoms": [
+              0,
+              1
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 1,
+            "outside_atom": 0
+          },
+          {
+            "atoms": [
+              1,
+              3
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 1,
+            "outside_atom": 3
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "type_id": 23,
+        "type": "Carbonyl",
+        "atoms": [
+          7,
+          8
+        ],
+        "internal_bonds": [
+          {
+            "atoms": [
+              7,
+              8
+            ],
+            "bond_type": "DOUBLE"
+          }
+        ],
+        "boundary_bonds": [
+          {
+            "atoms": [
+              6,
+              7
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 7,
+            "outside_atom": 6
+          },
+          {
+            "atoms": [
+              7,
+              9
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 7,
+            "outside_atom": 9
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "left": 0,
+        "right": 2,
+        "overlap_atoms": [
+          1,
+          2
+        ],
+        "bridge_bonds": []
+      },
+      {
+        "left": 1,
+        "right": 3,
+        "overlap_atoms": [
+          7,
+          8
+        ],
+        "bridge_bonds": []
+      }
+    ],
+    "uncovered_atoms": [
+      0,
+      4,
+      5,
+      9
+    ]
+  },
+  {
+    "smiles": "CCC(=O)OCC",
+    "num_atoms": 7,
+    "instances": [
+      {
+        "id": 0,
+        "type_id": 16,
+        "type": "Carboalkoxy",
+        "atoms": [
+          2,
+          3,
+          4
+        ],
+        "internal_bonds": [
+          {
+            "atoms": [
+              2,
+              3
+            ],
+            "bond_type": "DOUBLE"
+          },
+          {
+            "atoms": [
+              2,
+              4
+            ],
+            "bond_type": "SINGLE"
+          }
+        ],
+        "boundary_bonds": [
+          {
+            "atoms": [
+              1,
+              2
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 2,
+            "outside_atom": 1
+          },
+          {
+            "atoms": [
+              4,
+              5
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 4,
+            "outside_atom": 5
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "type_id": 23,
+        "type": "Carbonyl",
+        "atoms": [
+          2,
+          3
+        ],
+        "internal_bonds": [
+          {
+            "atoms": [
+              2,
+              3
+            ],
+            "bond_type": "DOUBLE"
+          }
+        ],
+        "boundary_bonds": [
+          {
+            "atoms": [
+              1,
+              2
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 2,
+            "outside_atom": 1
+          },
+          {
+            "atoms": [
+              2,
+              4
+            ],
+            "bond_type": "SINGLE",
+            "inside_atom": 2,
+            "outside_atom": 4
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "left": 0,
+        "right": 1,
+        "overlap_atoms": [
+          2,
+          3
+        ],
+        "bridge_bonds": []
+      }
+    ],
+    "uncovered_atoms": [
+      0,
+      1,
+      5,
+      6
+    ]
+  }
+]
