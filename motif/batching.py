@@ -60,3 +60,39 @@ def validation_noise(schedule,graphs,seed,device):
         one=to_device(collate_graphs([g]),device);t=schedule.sample_t(1,device,rng)
         x,e=schedule(one,t,rng);n=len(g['x']);xt[k,:n]=x[0];et[k,:n,:n]=e[0];ts.append(t[0])
     return b,xt,et,torch.stack(ts)
+
+class CachedValidation:
+    """Cache the SAME item-seeded GPU corruptions on bounded pinned CPU memory.
+
+    No CPU re-sampling and no changed noise distribution. Over-budget batches
+    transparently use the existing generator path. Never reads test samples.
+    """
+    def __init__(self,loader,schedule,seed,device,max_mb=512,max_batches=0):
+        self.schedule=schedule;self.seed=seed;self.device=device;self.items=[]
+        self.bytes=0;self.cached=0;budget=int(max_mb*1024*1024)
+        if max_mb<0:raise ValueError('Cache size must be nonnegative')
+        for i,graphs in enumerate(loader):
+            if max_batches and i>=max_batches:break
+            n=max(len(g['x']) for g in graphs);size=len(graphs)
+            estimate=size*(n*(len(ATOM_DIMS)*8+1+sum(ATOM_DIMS)*4)+n*n*(8+BOND_CLASSES*4)+8)
+            entry=None
+            if self.bytes+estimate<=budget:
+                b,x,e,t=validation_noise(schedule,graphs,seed,device)
+                entry={**b,'xt':x,'et':e,'t':t}
+                entry={k:v.cpu() for k,v in entry.items()}
+                actual=sum(v.numel()*v.element_size() for v in entry.values())
+                if self.bytes+actual<=budget:
+                    if str(device).startswith('cuda'):entry={k:v.pin_memory() for k,v in entry.items()}
+                    self.bytes+=actual;self.cached+=1
+                else:entry=None
+            self.items.append((graphs,entry))
+
+    def __iter__(self):
+        for graphs,entry in self.items:
+            if entry is None:b,x,e,t=validation_noise(self.schedule,graphs,self.seed,self.device)
+            else:
+                d={k:v.to(self.device,non_blocking=True) for k,v in entry.items()}
+                b={k:d[k] for k in ('x','edges','mask')};x,e,t=d['xt'],d['et'],d['t']
+            yield graphs,b,x,e,t
+
+    def metadata(self):return {'batches':len(self.items),'cached_batches':self.cached,'cpu_bytes':self.bytes,'noise_unchanged':True}

@@ -24,29 +24,40 @@ class RecoveryMeter:
 
     @torch.no_grad()
     def update(self,output,batch,t,graphs=None,include_clean=True):
-        atom=torch.stack([v.argmax(-1) for v in output['atom_logits']],-1).cpu()
-        edge=output['edge_logits'].argmax(-1).cpu()
-        x=batch['x'].cpu();truth=batch['edges'].cpu();mask=batch['mask'].cpu()
+        atom=torch.stack([v.argmax(-1) for v in output['atom_logits']],-1)
+        edge=output['edge_logits'].argmax(-1)
+        x=batch['x'];truth=batch['edges'];mask=batch['mask']
         upper=torch.triu(pair_mask(mask),diagonal=1)
-        for k,time in enumerate(t.cpu().tolist()):
-            bucket=self.bucket(time)
-            if bucket=='clean_t0' and not include_clean:continue
-            c=self.counts[bucket];selected=mask[k]
-            good=atom[k,selected]==x[k,selected]
-            a=edge[k][upper[k]];b=truth[k][upper[k]];bond=b!=0;nonbond=~bond
-            c['motifs']+=1;c['atoms']+=int(selected.sum())
-            for j in range(len(ATOM_DIMS)):c['attribute_correct'][j]+=int(good[:,j].sum())
-            c['all_attributes_correct_atoms']+=int(good.all(-1).sum())
-            c['true_bonds']+=int(bond.sum());c['true_nonbonds']+=int(nonbond.sum())
-            c['recalled_bonds']+=int(((a!=0)&bond).sum())
-            c['false_positive_bonds']+=int(((a!=0)&nonbond).sum())
-            c['correct_bond_types']+=int(((a==b)&bond).sum())
-            connectivity=bool(((a!=0)==bond).all());edges=bool((a==b).all())
-            c['exact_connectivity_motifs']+=int(connectivity)
-            c['exact_element_and_bonds_motifs']+=int(bool(good[:,0].all()) and edges)
-            c['exact_all_attributes_and_bonds_motifs']+=int(bool(good.all()) and edges)
-            if graphs is not None:
-                name=graphs[k]['method'];c['method_counts'][name]=c['method_counts'].get(name,0)+1
+        good=atom==x;bond=upper&(truth!=0);nonbond=upper&(truth==0)
+        attr=(good&mask[...,None]).sum(1)
+        exact_edge=((edge==truth)|~upper).all(2).all(1)
+        exact_conn=(((edge!=0)==(truth!=0))|~upper).all(2).all(1)
+        exact_element=(good[...,0]|~mask).all(1)&exact_edge
+        exact_attributes=(good.all(-1)|~mask).all(1)&exact_edge
+        columns=['motifs','atoms']+['attribute_'+str(i) for i in range(len(ATOM_DIMS))]+[
+            'all_attributes_correct_atoms','true_bonds','true_nonbonds','recalled_bonds',
+            'false_positive_bonds','correct_bond_types','exact_connectivity_motifs',
+            'exact_element_and_bonds_motifs','exact_all_attributes_and_bonds_motifs']
+        values=torch.stack([torch.ones_like(t),mask.sum(1)]+[attr[:,i] for i in range(len(ATOM_DIMS))]+[
+            (good.all(-1)&mask).sum(1),bond.sum((1,2)),nonbond.sum((1,2)),
+            ((edge!=0)&bond).sum((1,2)),((edge!=0)&nonbond).sum((1,2)),
+            ((edge==truth)&bond).sum((1,2)),exact_conn.long(),exact_element.long(),exact_attributes.long()],1)
+        bins=torch.where(t==0,0,torch.where(3*t<=self.steps,1,torch.where(3*t<=2*self.steps,2,3)))
+        if not include_clean:values=values*(t!=0)[:,None]
+        summary=torch.zeros(4,len(columns),device=t.device,dtype=torch.long).index_add_(0,bins,values)
+        # A single small device transfer, instead of predictions+truth per motif.
+        packed=torch.cat([summary.flatten(),t]).cpu().tolist();end=4*len(columns)
+        names=[self.bucket(v) for v in packed[end:]]
+        for k,bucket in enumerate(BINS):
+            c=self.counts[bucket]
+            for j,column in enumerate(columns):
+                value=packed[k*len(columns)+j]
+                if column.startswith('attribute_'):c['attribute_correct'][int(column.split('_')[1])]+=value
+                else:c[column]+=value
+        if graphs is not None:
+            for name,g in zip(names,graphs):
+                if name=='clean_t0' and not include_clean:continue
+                c=self.counts[name];method=g['method'];c['method_counts'][method]=c['method_counts'].get(method,0)+1
 
     def report(self):
         def ratio(a,b):return a/b if b else None

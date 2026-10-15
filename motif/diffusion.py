@@ -92,20 +92,24 @@ class MotifDenoiser(nn.Module):
         return self(x*batch['mask'][...,None],e*pair_mask(batch['mask'])[...,None],t,batch['mask'])
 
 def denoising_loss(output,batch,atom_weight=1.,edge_weight=1.):
-    # Each motif has equal weight, independent of its size or batch neighbors.
+    # Vectorized but still exactly the same per-motif reduction/stratification.
     mask=batch['mask']; pm=torch.triu(pair_mask(mask),diagonal=1)
-    atoms=[];edges=[]
-    for k in range(len(mask)):
-        atoms.append(torch.stack([F.cross_entropy(logit[k,mask[k]],batch['x'][k,:,i][mask[k]])
-                                  for i,logit in enumerate(output['atom_logits'])]).mean())
-        logits=output['edge_logits'][k][pm[k]];target=batch['edges'][k][pm[k]]
-        terms=[]
-        for selected in (target!=0,target==0):
-            if bool(selected.any()): terms.append(F.cross_entropy(logits[selected],target[selected]))
-        # A singleton contributes zero edge loss; absent strata are not invented.
-        edges.append(torch.stack(terms).mean() if terms else output['edge_logits'][k].sum()*0)
-    atom_per_motif=torch.stack(atoms);edge_per_motif=torch.stack(edges)
+    n=mask.sum(1).clamp_min(1)
+    attributes=[]
+    for i,logit in enumerate(output['atom_logits']):
+        ce=F.cross_entropy(logit.transpose(1,2),batch['x'][...,i],reduction='none')
+        attributes.append((ce*mask).sum(1)/n)
+    atom_per_motif=torch.stack(attributes).mean(0)
+    logits=output['edge_logits'];target=batch['edges']
+    ce=F.cross_entropy(logits.permute(0,3,1,2),target,reduction='none')
+    yes=pm&(target!=0);no=pm&(target==0)
+    ny=yes.sum((1,2));nn=no.sum((1,2))
+    sy=(ce*yes).sum((1,2))/ny.clamp_min(1)
+    sn=(ce*no).sum((1,2))/nn.clamp_min(1)
+    strata=(ny>0).long()+(nn>0).long()
+    edge_per_motif=(sy+sn)/strata.clamp_min(1)
     per_motif=atom_weight*atom_per_motif+edge_weight*edge_per_motif
-    return per_motif.mean(), {'atom':float(atom_per_motif.detach().mean()),
-                             'edge':float(edge_per_motif.detach().mean()),
+    # Detached tensors avoid two forced device-to-host synchronizations/batch.
+    return per_motif.mean(), {'atom':atom_per_motif.detach().mean(),
+                             'edge':edge_per_motif.detach().mean(),
                              'per_motif':per_motif.detach()}
