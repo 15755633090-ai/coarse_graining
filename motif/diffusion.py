@@ -92,14 +92,20 @@ class MotifDenoiser(nn.Module):
         return self(x*batch['mask'][...,None],e*pair_mask(batch['mask'])[...,None],t,batch['mask'])
 
 def denoising_loss(output,batch,atom_weight=1.,edge_weight=1.):
+    # Each motif has equal weight, independent of its size or batch neighbors.
     mask=batch['mask']; pm=torch.triu(pair_mask(mask),diagonal=1)
-    atom=torch.stack([F.cross_entropy(logit[mask],batch['x'][...,i][mask])
-                      for i,logit in enumerate(output['atom_logits'])]).mean()
-    logits=output['edge_logits'][pm]; target=batch['edges'][pm]
-    # Balance existing bonds and no-bonds, without sampling away observed pairs.
-    terms=[]
-    for selected in (target!=0,target==0):
-        if bool(selected.any()): terms.append(F.cross_entropy(logits[selected],target[selected]))
-    edge=torch.stack(terms).mean() if terms else output['edge_logits'].sum()*0
-    total=atom_weight*atom+edge_weight*edge
-    return total, {'atom':float(atom.detach()),'edge':float(edge.detach())}
+    atoms=[];edges=[]
+    for k in range(len(mask)):
+        atoms.append(torch.stack([F.cross_entropy(logit[k,mask[k]],batch['x'][k,:,i][mask[k]])
+                                  for i,logit in enumerate(output['atom_logits'])]).mean())
+        logits=output['edge_logits'][k][pm[k]];target=batch['edges'][k][pm[k]]
+        terms=[]
+        for selected in (target!=0,target==0):
+            if bool(selected.any()): terms.append(F.cross_entropy(logits[selected],target[selected]))
+        # A singleton contributes zero edge loss; absent strata are not invented.
+        edges.append(torch.stack(terms).mean() if terms else output['edge_logits'][k].sum()*0)
+    atom_per_motif=torch.stack(atoms);edge_per_motif=torch.stack(edges)
+    per_motif=atom_weight*atom_per_motif+edge_weight*edge_per_motif
+    return per_motif.mean(), {'atom':float(atom_per_motif.detach().mean()),
+                             'edge':float(edge_per_motif.detach().mean()),
+                             'per_motif':per_motif.detach()}

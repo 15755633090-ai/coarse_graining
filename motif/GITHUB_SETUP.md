@@ -34,4 +34,8 @@ python -m motif.train_property --data motif/data/lipo.pt --checkpoint motif/runs
 
 `check_paper_adapters.py` 是原工作区集成检查脚本，其路径依赖原工作区的两套论文代码与既有 Windows 兼容副本，不能在缺少这些依赖的干净克隆上直接执行。独立的 `motif.checks` 不需要这两套仓库。
 
-内部预训练只使用二维数据；原模型其他分支的特征与依赖由原模型决定。当前代码状态是已完成实现与小规模运行检查，尚未进行正式训练或建立预测收益。
+修订后的 `train_paper.py`、`prepare_hmg.py`、`check_paper_data.py` 均通过 `--paper-root` 接受调用方的原项目路径，不依赖固定工作区层级。完整命令和环境说明见 [PAPER_TRAINING.md](PAPER_TRAINING.md)。`train_property.py` 仍是独立语境网络，不能用它的结果声称原论文＋模块收益。
+
+HMG-MRL 官方未提供现成特征缓存；`prepare_hmg.py` 复用官方 save_smiles_dicts 生成，保留其原始构象和描述符依赖。读取原缓存无需安装 DeepChem，生成则需要 DeepChem 2.8.0 及原预处理环境；可参考 requirements_paper.txt。不要把本机 vendor 目录上传到仓库。
+
+内部预训练只使用二维数据；原模型其他分支的特征与依赖由原模型决定。当前已完成修订后的实现检查，以及两套原模型各 6 个真实分子的完整小规模运行；尚未进行正式效果训练或建立预测收益。

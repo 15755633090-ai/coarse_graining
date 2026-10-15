@@ -4,6 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 from .data import load_dataset, collate_graphs, to_device, save_json, sha, SCHEMA, code_identity
 from .diffusion import MotifDenoiser, DiffusionSchedule, denoising_loss
+from .batching import SizeBucketSampler,validation_noise
 
 def load_encoder(path,device='cpu'):
     ck=torch.load(path,map_location='cpu',weights_only=True)
@@ -20,6 +21,7 @@ def main():
     p.add_argument('--steps',type=int,default=100); p.add_argument('--seed',type=int,default=0)
     p.add_argument('--lr',type=float,default=1e-3); p.add_argument('--device',default='cuda' if torch.cuda.is_available() else 'cpu')
     p.add_argument('--max-batches',type=int,default=0,help='Smoke only; cap batches per epoch')
+    p.add_argument('--pair-budget',type=int,default=0,help='Max padded N*N pairs per batch; 0 disables this extra cap')
     args=p.parse_args(); torch.manual_seed(args.seed); torch.set_num_threads(4)
     source_identity=code_identity()
     if args.epochs<1: raise ValueError('epochs must be positive')
@@ -32,30 +34,30 @@ def main():
     model=MotifDenoiser(args.hidden,args.layers,args.steps).to(args.device)
     schedule=DiffusionSchedule(args.steps).to(args.device)
     optimizer=torch.optim.AdamW(model.parameters(),lr=args.lr,weight_decay=1e-5)
-    loader=DataLoader(train,batch_size=args.batch_size,shuffle=True,collate_fn=collate_graphs,
-                      generator=torch.Generator().manual_seed(args.seed),num_workers=0)
-    val=DataLoader(valid,batch_size=args.batch_size,collate_fn=collate_graphs,num_workers=0)
+    sampler=SizeBucketSampler([len(g['x']) for g in train],args.batch_size,True,args.seed,args.pair_budget)
+    loader=DataLoader(train,batch_sampler=sampler,collate_fn=collate_graphs,num_workers=0)
+    val=DataLoader(valid,batch_sampler=SizeBucketSampler([len(g['x']) for g in valid],args.batch_size,pair_budget=args.pair_budget),
+                   collate_fn=list,num_workers=0)
     best=float('inf'); history=[]
     for epoch in range(args.epochs):
-        model.train(); values=[]
+        model.train(); values=[];sampler.set_epoch(epoch)
         for i,b in enumerate(loader):
             if args.max_batches and i>=args.max_batches: break
             b=to_device(b,args.device); t=schedule.sample_t(len(b['x']),args.device)
             xt,et=schedule(b,t); out=model(xt,et,t,b['mask']); loss,_=denoising_loss(out,b)
             if not torch.isfinite(loss): raise FloatingPointError('Non-finite denoising loss')
             optimizer.zero_grad(set_to_none=True); loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(),5); optimizer.step(); values.append(float(loss.detach()))
+            torch.nn.utils.clip_grad_norm_(model.parameters(),5); optimizer.step(); values.append((float(loss.detach()),len(b['x'])))
         model.eval(); scores=[]
         # Same noise/t for every validation pass, independent of training RNG.
-        rng=torch.Generator(device=args.device).manual_seed(args.seed+100000)
         with torch.no_grad():
-            for i,b in enumerate(val):
+            for i,graphs in enumerate(val):
                 if args.max_batches and i>=args.max_batches: break
-                b=to_device(b,args.device); t=schedule.sample_t(len(b['x']),args.device,rng)
-                xt,et=schedule(b,t,rng); loss,_=denoising_loss(model(xt,et,t,b['mask']),b)
+                b,xt,et,t=validation_noise(schedule,graphs,args.seed+100000,args.device)
+                loss,_=denoising_loss(model(xt,et,t,b['mask']),b)
                 scores.append((float(loss),len(b['x'])))
         score=sum(v*n for v,n in scores)/sum(n for _,n in scores)
-        history.append({'epoch':epoch+1,'train_loss':sum(values)/len(values),'valid_loss':score})
+        history.append({'epoch':epoch+1,'train_loss':sum(v*n for v,n in values)/sum(n for _,n in values),'valid_loss':score})
         if score<best:
             best=score
             torch.save({'schema':SCHEMA,'config':model.config,'model':{k:v.detach().cpu().clone() for k,v in model.state_dict().items()},
@@ -70,6 +72,7 @@ def main():
                'source_sha256':source_identity,'torch_version':str(torch.__version__),
                'args':{k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()},
                'test_used':False,'train_motifs':len(train),'valid_motifs':len(valid),
+               'loss_reduction':'mean_per_motif','validation_noise':'item_identity_seeded',
                'smoke':bool(args.max_batches or data['smoke'])})
 
 if __name__=='__main__': main()

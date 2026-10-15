@@ -3,6 +3,7 @@ from pathlib import Path
 import torch
 from .data import load_dataset,collate_graphs,to_device,save_json,sha
 from .pretrain import load_encoder
+from .batching import encode_motifs
 
 def main():
     p=argparse.ArgumentParser(description='Export deterministic clean motif features; no generation')
@@ -13,13 +14,10 @@ def main():
     if args.output.exists(): raise FileExistsError(args.output)
     model,ck=load_encoder(args.checkpoint,args.device);model.eval();data=load_dataset(args.data)
     if ck['data_sha256']!=sha(args.data): raise ValueError('Cache provenance mismatch')
-    features=[]
     with torch.no_grad():
-        for start in range(0,len(data['motifs']),args.batch_size):
-            b=to_device(collate_graphs(data['motifs'][start:start+args.batch_size]),args.device)
-            features.append(model.encode(b)['motif'].cpu())
+        features=encode_motifs(model,data['motifs'],args.device,args.batch_size).cpu()
     args.output.parent.mkdir(parents=True,exist_ok=True)
-    torch.save({'vectors':torch.cat(features) if features else torch.empty(0,model.config['hidden']),
+    torch.save({'vectors':features,
                 'index':[{'row':g['row'],'method':g['method'],'index':g['index'],'members':g['members'],'split':g['split']}
                          for g in data['motifs']],
                 'checkpoint_sha256':sha(args.checkpoint),'data_sha256':sha(args.data),

@@ -3,6 +3,7 @@ from torch import nn
 from torch.nn import functional as F
 from .data import ATOM_DIMS, BOND_CLASSES, collate_graphs, to_device
 from .diffusion import mlp
+from .batching import encode_motifs
 
 class ContextLayer(nn.Module):
     def __init__(self,d):
@@ -85,16 +86,9 @@ class MotifPropertyModel(nn.Module):
         if ids:
             # Bucketing avoids padding hundreds of tiny overlapping motifs to
             # one large scaffold. Restore exact original membership order.
-            order=sorted(range(len(ids)),key=lambda j:len(all_motifs[ids[j]]['x']))
-            features=[]
             # This is direct deterministic t=0 encoding, not reverse sampling.
             with torch.set_grad_enabled(self.training and not self.freeze_pretrained):
-                for start in range(0,len(order),self.motif_batch_size):
-                    indices=order[start:start+self.motif_batch_size]
-                    b=to_device(collate_graphs([all_motifs[ids[j]] for j in indices]),device)
-                    features.append(self.denoiser.encode(b)['motif'])
-                inverse=torch.argsort(torch.tensor(order,device=device))
-                s=torch.cat(features)[inverse]
+                s=encode_motifs(self.denoiser,[all_motifs[i] for i in ids],device,self.motif_batch_size)
         else: s=torch.empty(0,self.denoiser.config['hidden'],device=device)
         vectors=[]; start=0
         for mol in molecules:

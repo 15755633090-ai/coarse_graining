@@ -9,6 +9,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from .data import graph_features,collate_graphs,to_device
+from .batching import encode_motifs
 
 def hmg_motif_inputs(mols,fragment_maps,device='cpu'):
     """Use ORIGINAL RDKit atom order/maps, before upstream degree sorting.
@@ -24,7 +25,7 @@ def hmg_motif_inputs(mols,fragment_maps,device='cpu'):
         for token,key in enumerate(keys,1):
             members,bonds=mapping[key]
             graphs.append(graph_features(mol,members));positions.append([batch,token])
-    return (to_device(collate_graphs(graphs),device) if graphs else None),positions
+    return (graphs if graphs else None),positions
 
 def himnet_motif_inputs(mols,cliques,batch_graph,device='cpu'):
     """Bind BRICS clique order to original BatchMolGraph motif rows."""
@@ -35,7 +36,7 @@ def himnet_motif_inputs(mols,cliques,batch_graph,device='cpu'):
         if n!=mol.GetNumAtoms() or size!=n+len(groups)+1: raise ValueError('Original node order mismatch')
         for j,members in enumerate(groups):
             graphs.append(graph_features(mol,members));positions.append(start+n+j)
-    return (to_device(collate_graphs(graphs),device) if graphs else None),positions
+    return (graphs if graphs else None),positions
 
 def validate_positions(positions,count,shape,device):
     positions=torch.as_tensor(positions,dtype=torch.long,device=device)
@@ -70,9 +71,10 @@ class HMGMRLAdapter(nn.Module):
     backbone_inputs are exactly the original model's keyword arguments.
     positions[k] = [batch_index, original_token_index] for dense motif k.
     """
-    def __init__(self,backbone,denoiser,freeze_pretrained=False):
+    def __init__(self,backbone,denoiser,freeze_pretrained=False,motif_batch_size=32,pair_budget=0):
         super().__init__();self.backbone=backbone;self.denoiser=denoiser
         self.freeze_pretrained=freeze_pretrained
+        self.motif_batch_size=motif_batch_size;self.pair_budget=pair_budget
         base=backbone.frag_input_projection
         if isinstance(base,_BoundProjection): raise ValueError('Backbone already adapted')
         backbone.frag_input_projection=_BoundProjection(base,denoiser.config['hidden'])
@@ -84,7 +86,7 @@ class HMGMRLAdapter(nn.Module):
             return self.backbone(**backbone_inputs)
         projection=self.backbone.frag_input_projection
         with torch.set_grad_enabled(self.training and not self.freeze_pretrained):
-            s=self.denoiser.encode(motif_batch)['motif']
+            s=encode_motifs(self.denoiser,motif_batch,next(self.denoiser.parameters()).device,self.motif_batch_size,self.pair_budget)
         token=projection.override.set((s,positions))
         try: return self.backbone(**backbone_inputs)
         finally: projection.override.reset(token)
@@ -96,9 +98,10 @@ class HimNetAdapter(nn.Module):
     positions[k] is the GLOBAL f_atoms row of motif k, including padding offset.
     The caller must not bind atom, global, or padding nodes.
     """
-    def __init__(self,backbone,denoiser,freeze_pretrained=False):
+    def __init__(self,backbone,denoiser,freeze_pretrained=False,motif_batch_size=32,pair_budget=0):
         super().__init__();self.backbone=backbone;self.denoiser=denoiser
         self.freeze_pretrained=freeze_pretrained
+        self.motif_batch_size=motif_batch_size;self.pair_budget=pair_budget
         self.projection=nn.Linear(denoiser.config['hidden'],backbone.atom_fdim)
         if freeze_pretrained: denoiser.requires_grad_(False)
 
@@ -108,7 +111,7 @@ class HimNetAdapter(nn.Module):
             vectors=self.projection.weight.new_empty((0,self.denoiser.config['hidden']))
         else:
             with torch.set_grad_enabled(self.training and not self.freeze_pretrained):
-                vectors=self.denoiser.encode(motif_batch)['motif']
+                vectors=encode_motifs(self.denoiser,motif_batch,next(self.denoiser.parameters()).device,self.motif_batch_size,self.pair_budget)
         graph=copy.copy(mol_graph)
         x=mol_graph.f_atoms.to(vectors.device).clone()
         indices=validate_positions(torch.as_tensor(positions).reshape(-1,1),len(vectors),(len(x),),x.device)[:,0]

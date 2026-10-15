@@ -1,6 +1,6 @@
 # 二维 Motif 扩散预训练与分子语境学习
 
-独立克隆 GitHub 仓库时，先阅读 [GITHUB_SETUP.md](GITHUB_SETUP.md)，其中说明依赖、外部数据输入与工作区路径差异。
+独立克隆仓库时，先阅读 [GITHUB_SETUP.md](GITHUB_SETUP.md)；原论文真实数据训练见 [PAPER_TRAINING.md](PAPER_TRAINING.md)。
 
 当前为第一版可运行实现，不代表已经建立预测增益。全部新代码、缓存及小规模运行产物放在本目录；没有修改原论文仓库、既有 Encoder、划分及实验结果。
 
@@ -27,11 +27,16 @@
 | `data.py` | 诱导图特征、padding、有效无序原子对掩码 |
 | `diffusion.py` | 噪声日程、节点—边联合去噪、分类损失、干净图编码 |
 | `pretrain.py` | 单个共享模型预训练，验证集固定噪声选模，保存可重载权重 |
+| `batching.py` | 共用大小分桶、原子对预算、分块编码与逐样本固定验证噪声 |
 | `context.py` | 保留原子及所有化学键，处理重叠 Motif 和未覆盖原子 |
 | `train_property.py` | Lipo 回归入口，验证集选模后只做一次最终测试 |
+| `train_paper.py`、`paper_data.py` | 原论文模型类的真实分子训练入口与数据桥接；见 PAPER_TRAINING.md |
+| `prepare_hmg.py` | 调用官方 save_smiles_dicts 生成原模型特征缓存，校验缺失分子及特征维度 |
 | `adapters.py` | 两套论文模型的表示替换与原始节点/token 顺序绑定辅助函数 |
 | `export.py` | 导出 t=0 Motif 向量及 row/method/group/member 映射 |
 | `checks.py` | 数值、掩码、梯度、排列一致性和适配接口检查 |
+| `check_revisions.py` | 逐基序损失与验证噪声的分批不变性、预算及分块梯度检查 |
+| `check_paper_data.py` | 真实分子的 HimNet 输入与原版拼接逐位一致性检查 |
 | `check_paper_adapters.py` | 实际论文模型类的合成输入前向/反向接入检查 |
 
 ## 固定的实现选择
@@ -41,7 +46,8 @@
 - 键类别：无键、单、双、三、芳香、其他。第一版没有额外重建立体键类别。
 - 固定类别 one-hot 后加高斯噪声，余弦信号日程；默认 100 步，10% 输入为真正干净的 t=0。
 - 对每对原子只采一个边噪声，复制到反方向；不加自环，padding 不参与传播或损失。
-- 去噪网络不接收干净邻接表；所有有效原子对都进入网络。损失只计算上三角，有键与无键分别求均值，再等权组合。
+- 去噪网络不接收干净邻接表；所有有效原子对都进入网络。每个 Motif 单独计算原子属性平均损失，并在该 Motif 内对有键、无键分别求均值再等权组合；最后对 Motif 平均。单原子 Motif 的边项为零，缺失分层不补造样本。训练与验证采用同一口径。
+- 验证噪声按 row/method/index 固定 RNG，改变分批方式不改变该样本噪声；验证总分按实际 Motif 数累加，不平均不同大小 batch 的均值。
 - 节点、边池化均进入 Motif 表示；解码头使用该表示，保证读出参数实际受到预训练监督。仍不保证读出无损保留拓扑。
 - 下游以 t=0 一次前向提取表示；没有随机噪声生成或反向采样过程。
 - 重叠 Motif 原样保留；成员边按原子覆盖次数归一化。没有为了补齐覆盖而生成假 Motif，未覆盖原子仍走完整原子图。
@@ -75,6 +81,10 @@ $motifPython = 'C:/Users/12775/miniconda3/envs/polyolefin_ml/python.exe'
 以上性质入口训练的是独立原子+Motif 语境网络。默认联合微调；`--freeze-pretrained` 冻结内部去噪编码器。`--arm random` 使用相同配置的随机内部编码器，`--arm atom-only` 不使用 Motif；提供这些入口不代表本轮已开展新一轮消融。
 
 输出目录中已有 best.pt 时会报错，避免覆盖结果。默认不截断 Motif 原子数；稠密原子对复杂度是 O(N²)，显存不足时先减小 batch-size。下游内部编码按 Motif 大小排序、每 32 个一组，再恢复原顺序，可用 `--motif-batch-size` 调整，避免整批重叠 Motif 都 padding 到最大骨架。没有自动删除大 Motif 的行为。
+
+修订版已将同一大小分桶逻辑用于预训练、两个论文适配器和导出；适配器不再由辅助函数预先拼接整批 dense 图。有梯度时使用 activation checkpoint 减少保留的大型激活。预训练与论文入口可设置 `--pair-budget` 限制每个子批 padded 原子对数，单个 Motif 超预算会报错，不丢弃。
+
+原论文真实数据入口见 [PAPER_TRAINING.md](PAPER_TRAINING.md)。不能用上面的独立 `train_property` 命令结果声称原论文加模块的收益。
 
 ### 小规模流程检查
 
@@ -127,7 +137,7 @@ aux_loss = adapted.compute_contrastive_loss()
 
 `original_cliques` 必须按实际 BatchMolGraph 的 BRICS Motif 顺序提供。适配器复制图容器后替换 f_atoms 中的真实 Motif 行，不改原图、原子、全局节点、化学键、成员关系索引或指纹；再执行原 encoder、指纹融合与预测头。调用方负责原模型监督损失与辅助损失加权。支持整批无 Motif。
 
-**接口检查及实际模型类的合成输入前向/反向已完成；完整论文数据管线的正式训练尚未执行。** HMG 检查直接使用 research_code_audit 中模型类；HimNet 使用此前可运行的 Windows 兼容版类。两者输出均为 2×1，梯度均返回内部 Motif 编码器。单独进程执行命令如下，以避免原项目同名顶层模块冲突：
+**接口检查及实际模型类的合成输入前向/反向已完成；正式性能训练尚未执行。** 新增的真实数据入口及当前核验范围见 PAPER_TRAINING.md。HMG 合成检查直接使用 research_code_audit 中模型类；HimNet 使用此前可运行的 Windows 兼容版类。两者输出均为 2×1，梯度均返回内部 Motif 编码器。单独进程执行命令如下，以避免原项目同名顶层模块冲突：
 
 ```powershell
 & $motifPython -m motif.check_paper_adapters --paper hmg
@@ -143,4 +153,6 @@ aux_loss = adapted.compute_contrastive_loss()
 - 输入缓存、联合去噪器、干净表示提取、独立语境网络及回归训练入口：已实现。
 - 两套论文初始化替换适配器及顺序绑定辅助函数：已实现。
 - 实现检查、两套实际模型类适配，以及极小规模 GPU 前向/反向/保存/重载：已通过。
-- 大规模无标签预训练、完整论文模型接入后的端到端训练、预测增益结论：尚未完成；本轮不声称有效。
+- 修订后的逐 Motif 损失、验证噪声分批不变性，以及分桶/分块的输出和梯度一致性：已通过。
+- 原论文回归训练入口：已补充；HimNet 复用真实图构建，HMG-MRL 调用官方脚本生成并读取原版特征缓存。两者均已在 6 个真实 Lipo 分子上跑通 1 epoch 运行检查；不只是合成输入适配。实际核验状态见 PAPER_TRAINING.md。
+- 大规模无标签预训练、正式效果比较、预测增益结论：尚未完成；本轮不声称有效。

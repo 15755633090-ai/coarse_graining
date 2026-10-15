@@ -1,0 +1,9 @@
+# In addition to the original paper's own compatible environment.
+-r requirements.txt
+numpy
+pandas
+scikit-learn
+torch-geometric
+matplotlib
+tqdm
+deepchem==2.8.0
