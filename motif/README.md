@@ -36,6 +36,7 @@
 | `export.py` | 导出 t=0 Motif 向量及 row/method/group/member 映射 |
 | `checks.py` | 数值、掩码、梯度、排列一致性和适配接口检查 |
 | `check_revisions.py` | 逐基序损失与验证噪声的分批不变性、预算及分块梯度检查 |
+| `recovery.py`、`check_recovery.py` | 按噪声分层的恢复指标、完全恢复率及计数检查 |
 | `check_paper_data.py` | 真实分子的 HimNet 输入与原版拼接逐位一致性检查 |
 | `check_paper_adapters.py` | 实际论文模型类的合成输入前向/反向接入检查 |
 
@@ -85,6 +86,8 @@ $motifPython = 'C:/Users/12775/miniconda3/envs/polyolefin_ml/python.exe'
 修订版已将同一大小分桶逻辑用于预训练、两个论文适配器和导出；适配器不再由辅助函数预先拼接整批 dense 图。有梯度时使用 activation checkpoint 减少保留的大型激活。预训练与论文入口可设置 `--pair-budget` 限制每个子批 padded 原子对数，单个 Motif 超预算会报错，不丢弃。
 
 原论文真实数据入口见 [PAPER_TRAINING.md](PAPER_TRAINING.md)。不能用上面的独立 `train_property` 命令结果声称原论文加模块的收益。
+
+正式预训练同时输出 `recovery_metrics.json`：t=0 单独记录，低/中/高噪声分别报告原子属性、键召回、无键误报、键类型及完整 Motif 恢复率。指标定义、分母和解释边界见 [RECOVERY_METRICS.md](RECOVERY_METRICS.md)。它们不改变选模，不等同化学合法性、s_M 信息完整性或下游增益。
 
 ### 小规模流程检查
 

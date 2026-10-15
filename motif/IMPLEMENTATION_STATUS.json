@@ -6,6 +6,7 @@
     "batching.py": "c6ac547b16b47b855210b060be2594f1d5d97deac4456200ac6f371b631a8322",
     "check_paper_adapters.py": "7b842559bd141b9b65c56badf60bcc46e4afeb1650ff74131d71e3f5f4e0aa37",
     "check_paper_data.py": "8700f008a3e7e788b1c0fa772d716a7aae7d1cfc8e1e5afbe3041e14b232bf45",
+    "check_recovery.py": "73bb75b972a4a735fd82563a52230c33b781071222c4e277635f9bc8d5044612",
     "check_revisions.py": "20a160b589500627f0c564884d5daef5d592d5dd228bba13be36b0132f510147",
     "checks.py": "86c95f360cdd5c694d80e242161186142b8094a19148b7da437b260d2326abbc",
     "context.py": "3437c2d539bb5f5b081932c1ac1b7f6c393cef8343cc7cb55ed3b72f4c3ccdb4",
@@ -15,7 +16,8 @@
     "paper_data.py": "bcc132f83a8768ea9b2fccc9d9b101f749c0b10b19699e56a2fb6e6144b54c97",
     "prepare.py": "63ccc9a1056b40df076a9eb3c9bd5ff2ee0685733f3bb634d40d8079f76f50c5",
     "prepare_hmg.py": "3ad81030b06c1710271e64bf9f52ebce02119d7387d578882d22ee179bdef109",
-    "pretrain.py": "a5cf6c15d1789f08fe33eef24e6db9a724f911d8f58ef7573a93d7299189b31f",
+    "pretrain.py": "f38f0fd552c7c5ea0c35590cca8c81de498f96f6e75b7a04e78d426e9c7419b2",
+    "recovery.py": "084b07e4669b3554b1622fe3ed5c0f1edb18ffa4fc72c7b4410e2eba336230b3",
     "train_paper.py": "1ad4a8c4c541753dabf840767e6a7aa9f10b3dfdf21a75139665828b07c96de3",
     "train_property.py": "3f5b5659709badc0ee51fa7dab5901b8977ff50ff424704fbf446c1b2e3478c7"
   },
@@ -41,12 +43,19 @@
   "upstream_source_files_unchanged": true,
   "molecules": 4200,
   "motifs": 84766,
+  "recovery_logging": {
+    "counter_tests_passed": true,
+    "smoke_pipeline_passed": true,
+    "same_seed_weights_unchanged_by_logging": true,
+    "formal_recovery_quality_established": false
+  },
   "synced_source_sha256": {
     "__init__.py": "6c089f76d4126d8b5675018bcac0a6e01dc90cccf1eea1e07c67aa67ace545bb",
     "adapters.py": "54bbad57786c47d00213a675baf95d7c6ef1769ab2f1c32cc01bccea40016a94",
     "batching.py": "d759ebac768e5205ece48ce382d40cc47142c2ead5c8f131845c6b60aedf03c2",
     "check_paper_adapters.py": "ff8ad0a72cbde0e32cc632924ed7ae43555035b97f72488ff9dc47859f130abf",
     "check_paper_data.py": "e58e39ec414b06aa389518719b3069d84c068456cf32841546c1b96207a6cc2b",
+    "check_recovery.py": "ea45ddbc4c31738fe71bee4c90f4fa64fe13db0ebe383418912597fa3d274b43",
     "check_revisions.py": "dc10aec4e02ed327064bd571cb3bfe00dea791588c6911446c745011a865c11c",
     "checks.py": "adcadadeeb749bbed8fa0b53234ce1f8ffa35b29d3bb8cf722ceb522517fe692",
     "context.py": "6189beb41c44f533adeb8434ea8a3086970c4c0543178598e513aa35c7744ddb",
@@ -56,9 +65,10 @@
     "paper_data.py": "34b36a207cdbe5742d015a5c39071f164fc2e6b6a827e4d7e1c403a929cd66e7",
     "prepare.py": "bc326e9edb46c89dd16443ef9939e9e26630ae1c7f1b07edfc21c75dd5769d1c",
     "prepare_hmg.py": "0919c5be9226f9547a805f0b3f3bf73f030e0af3de76d7561a06dd3b5cdcd64d",
-    "pretrain.py": "b65243ce4e91a3a3b0ad3d949addf3cb269b0ec3a26190fa5f1f25166a878ee2",
+    "pretrain.py": "78d1d0a0e6f2a2e7ea89195021998db500892ad7b4882a78c5a97c4b2ad65204",
+    "recovery.py": "9235c4d3b8a48ac1a9c649c68cccc2292de61d49004683f5ebf198a0e4833444",
     "train_paper.py": "eaa7b61701752c1d6b18819dd63144c0c906a833fd6acbb7c3f7169a76cbb53a",
     "train_property.py": "7f7b8258f0d4184b9a42143842f30ce68c8058cb40d16ee831c03da01fee7206"
   },
-  "sync_note": "Only trailing blank lines normalized; AST matches tested workspace source."
+  "sync_note": "Trailing blank lines normalized; AST matches tested workspace source."
 }

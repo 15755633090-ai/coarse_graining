@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from .data import load_dataset, collate_graphs, to_device, save_json, sha, SCHEMA, code_identity
 from .diffusion import MotifDenoiser, DiffusionSchedule, denoising_loss
 from .batching import SizeBucketSampler,validation_noise
+from .recovery import RecoveryMeter,DEFINITIONS
 
 def load_encoder(path,device='cpu'):
     ck=torch.load(path,map_location='cpu',weights_only=True)
@@ -38,7 +39,7 @@ def main():
     loader=DataLoader(train,batch_sampler=sampler,collate_fn=collate_graphs,num_workers=0)
     val=DataLoader(valid,batch_sampler=SizeBucketSampler([len(g['x']) for g in valid],args.batch_size,pair_budget=args.pair_budget),
                    collate_fn=list,num_workers=0)
-    best=float('inf'); history=[]
+    best=float('inf'); history=[];recovery_history=[]
     for epoch in range(args.epochs):
         model.train(); values=[];sampler.set_epoch(epoch)
         for i,b in enumerate(loader):
@@ -48,21 +49,30 @@ def main():
             if not torch.isfinite(loss): raise FloatingPointError('Non-finite denoising loss')
             optimizer.zero_grad(set_to_none=True); loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(),5); optimizer.step(); values.append((float(loss.detach()),len(b['x'])))
-        model.eval(); scores=[]
+        model.eval(); scores=[];meter=RecoveryMeter(args.steps)
         # Same noise/t for every validation pass, independent of training RNG.
         with torch.no_grad():
             for i,graphs in enumerate(val):
                 if args.max_batches and i>=args.max_batches: break
                 b,xt,et,t=validation_noise(schedule,graphs,args.seed+100000,args.device)
-                loss,_=denoising_loss(model(xt,et,t,b['mask']),b)
+                output=model(xt,et,t,b['mask']);loss,_=denoising_loss(output,b)
                 scores.append((float(loss),len(b['x'])))
+                # t=0 gets its own complete validation pass, never double-count
+                # the clean items already sampled by the noisy loss evaluator.
+                meter.update(output,b,t,graphs,include_clean=False)
+                clean=model.encode(b)
+                meter.update(clean,b,torch.zeros(len(graphs),dtype=torch.long,device=args.device),graphs)
         score=sum(v*n for v,n in scores)/sum(n for _,n in scores)
         history.append({'epoch':epoch+1,'train_loss':sum(v*n for v,n in values)/sum(n for _,n in values),'valid_loss':score})
+        recovery=meter.report();recovery_history.append({'epoch':epoch+1,'bins':recovery})
+        save_json(args.output/'recovery_metrics.json',{'definitions':DEFINITIONS,'epochs':recovery_history,
+                  'smoke':bool(args.max_batches or data['smoke'])})
         if score<best:
             best=score
             torch.save({'schema':SCHEMA,'config':model.config,'model':{k:v.detach().cpu().clone() for k,v in model.state_dict().items()},
                         'epoch':epoch+1,'valid_loss':score,'data_sha256':sha(args.data),
                         'method':args.method,'seed':args.seed,'clean_probability':schedule.clean_probability,
+                        'recovery_metrics':recovery,
                         'train_molecules':sorted({g['row'] for g in train}),
                         'smoke':bool(args.max_batches or data['smoke'])},args.output/'best.pt')
         save_json(args.output/'history.json',history)
@@ -73,6 +83,7 @@ def main():
                'args':{k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()},
                'test_used':False,'train_motifs':len(train),'valid_motifs':len(valid),
                'loss_reduction':'mean_per_motif','validation_noise':'item_identity_seeded',
+               'recovery_metrics':'recovery_metrics.json','clean_metrics_pass':True,
                'smoke':bool(args.max_batches or data['smoke'])})
 
 if __name__=='__main__': main()
