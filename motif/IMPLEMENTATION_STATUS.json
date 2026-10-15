@@ -1,0 +1,36 @@
+{
+  "ready": true,
+  "formal_training_started": false,
+  "performance_gain_established": false,
+  "source_sha256": {
+    "__init__.py": "cbabd72c088eb8e6c801cd2378375f6dec521c40eced2d4e9e02d2ef0d5fd837",
+    "adapters.py": "9d19c82a32070e765212d586c7cb993245afc2df786011b9103bf0f55dc2332c",
+    "check_paper_adapters.py": "7b842559bd141b9b65c56badf60bcc46e4afeb1650ff74131d71e3f5f4e0aa37",
+    "checks.py": "86c95f360cdd5c694d80e242161186142b8094a19148b7da437b260d2326abbc",
+    "context.py": "a3c4f06f0a3a12851b2aed78df655d9a7c16003ad93546b3229cf62f70638b68",
+    "data.py": "21318160355a56cbe107c5665084451c39c0eb61227c9d9d4bd2b17e20f34e20",
+    "diffusion.py": "6c1949d0a47ba31eac91ec33a5883c031b93fdb9089dbdcb029aec1e199ac5eb",
+    "export.py": "adbf7a11f12dbface51080c214169258b6d683927ce1ddde7610da80d4c57f93",
+    "prepare.py": "63ccc9a1056b40df076a9eb3c9bd5ff2ee0685733f3bb634d40d8079f76f50c5",
+    "pretrain.py": "8a9ee5ce62fc03abadd1ced7a908b069f7cbee2d8e26419a6c6395c18a96f39c",
+    "train_property.py": "3f5b5659709badc0ee51fa7dab5901b8977ff50ff424704fbf446c1b2e3478c7"
+  },
+  "molecules": 4200,
+  "motifs": 84766,
+  "release_source_consistency": true,
+  "actual_paper_adapter_forward_backward": true,
+  "synced_source_sha256": {
+    "__init__.py": "6c089f76d4126d8b5675018bcac0a6e01dc90cccf1eea1e07c67aa67ace545bb",
+    "adapters.py": "9d19c82a32070e765212d586c7cb993245afc2df786011b9103bf0f55dc2332c",
+    "check_paper_adapters.py": "7b842559bd141b9b65c56badf60bcc46e4afeb1650ff74131d71e3f5f4e0aa37",
+    "checks.py": "86c95f360cdd5c694d80e242161186142b8094a19148b7da437b260d2326abbc",
+    "context.py": "a3c4f06f0a3a12851b2aed78df655d9a7c16003ad93546b3229cf62f70638b68",
+    "data.py": "577138e32c17e7891ecba34648bdb15d9289abc2d74733763f2483d12766c588",
+    "diffusion.py": "6c1949d0a47ba31eac91ec33a5883c031b93fdb9089dbdcb029aec1e199ac5eb",
+    "export.py": "adbf7a11f12dbface51080c214169258b6d683927ce1ddde7610da80d4c57f93",
+    "prepare.py": "bc326e9edb46c89dd16443ef9939e9e26630ae1c7f1b07edfc21c75dd5769d1c",
+    "pretrain.py": "8a9ee5ce62fc03abadd1ced7a908b069f7cbee2d8e26419a6c6395c18a96f39c",
+    "train_property.py": "3f5b5659709badc0ee51fa7dab5901b8977ff50ff424704fbf446c1b2e3478c7"
+  },
+  "sync_note": "Only trailing blank lines normalized; Python AST matches tested workspace sources."
+}

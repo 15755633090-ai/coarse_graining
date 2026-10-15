@@ -1,0 +1,4 @@
+# Standalone path. Original paper adapters additionally need their own environments.
+# Tested locally with torch 2.8.0+cu128 and RDKit 2025.03.5.
+torch>=2.2
+rdkit>=2024.9
