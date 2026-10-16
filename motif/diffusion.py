@@ -51,10 +51,13 @@ class JointLayer(nn.Module):
         return h,e
 
 class MotifDenoiser(nn.Module):
-    def __init__(self, hidden=128, layers=3, steps=100):
+    def __init__(self, hidden=128, layers=3, steps=100, structure_dim=0):
         super().__init__()
         if hidden<4: raise ValueError('hidden must be >=4')
         self.config={'hidden':hidden,'layers':layers,'steps':steps}
+        if structure_dim:
+            self.config['structure_dim']=structure_dim
+            self.structure_head=nn.Sequential(nn.Linear(hidden,hidden),nn.SiLU(),nn.Linear(hidden,structure_dim))
         self.x_in=nn.Linear(sum(ATOM_DIMS),hidden); self.e_in=nn.Linear(BOND_CLASSES,hidden)
         self.time=mlp(hidden,hidden)
         self.layers=nn.ModuleList(JointLayer(hidden) for _ in range(layers))

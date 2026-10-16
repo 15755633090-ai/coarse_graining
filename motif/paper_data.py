@@ -1,5 +1,6 @@
 """Bridge real molecular records to the original paper model input formats."""
 import ast
+from collections import Counter
 import importlib
 import pickle
 import sys
@@ -98,3 +99,46 @@ def hmg_inputs(rows,features,assemble,device):
         if tokens>inputs['frag_src_features'].shape[1]:raise ValueError('Original cache truncated motifs')
         if not bool((inputs['frag_src_valid_mask'][i,:tokens]>0).all()):raise ValueError('Invalid original motif token mask')
     return inputs,mols,maps
+
+def align_motif_graphs(data,rows,paper,him_graphs=None,hmg_features=None):
+    """Verify original-paper membership against pretraining, preserving paper order.
+
+    Returned graphs are the exact clean pretraining inputs, not fixed vectors;
+    the encoder remains trainable. HMG canonical SMILES may reorder atom indices.
+    """
+    aligned={};positions={};total=0;canonicalized=0
+    for row in rows:
+        original=Chem.MolFromSmiles(row['smiles']);n=original.GetNumAtoms()
+        raw=[data['motifs'][i] for i in row['motifs'][paper]]
+        lookup={tuple(sorted(g['members'])):g for g in raw}
+        if len(lookup)!=len(raw):raise ValueError('Duplicate pretraining membership signatures')
+        if paper=='HimNet':
+            graph=him_graphs[row['row']]
+            if int(graph['num_part'][0][0])!=n:raise ValueError('Original atom count mismatch')
+            groups=graph['cliques'];token_indices=list(range(len(groups)))
+        else:
+            canonical=Chem.MolToSmiles(original,isomericSmiles=True)
+            order=ast.literal_eval(original.GetProp('_smilesAtomOutputOrder'))
+            key=row['smiles'] if row['smiles'] in hmg_features['smiles_to_atom_info'] else canonical
+            mapping=hmg_features['smiles_to_frag_atom_bond_incices'][key]
+            if key==row['smiles']:order=list(range(n))
+            else:canonicalized+=1
+            keyed=Chem.MolFromSmiles(key)
+            if sorted(order)!=list(range(n)):raise ValueError('Canonical index mapping is not a permutation')
+            for j,i in enumerate(order):
+                if keyed.GetAtomWithIdx(j).GetAtomicNum()!=original.GetAtomWithIdx(i).GetAtomicNum():
+                    raise ValueError('Canonical atom mapping mismatch')
+            original_bonds={tuple(sorted((b.GetBeginAtomIdx(),b.GetEndAtomIdx()))):str(b.GetBondType()) for b in original.GetBonds()}
+            keyed_bonds={tuple(sorted((order[b.GetBeginAtomIdx()],order[b.GetEndAtomIdx()]))):str(b.GetBondType()) for b in keyed.GetBonds()}
+            if keyed_bonds!=original_bonds:raise ValueError('Canonical bond mapping mismatch')
+            keys=sorted((k for k in mapping if k!='whole_mol'),key=lambda k:int(k.split('_')[1]))
+            groups=[[order[i] for i in mapping[k][0]] for k in keys];token_indices=list(range(1,len(keys)+1))
+        signatures=[tuple(sorted(group)) for group in groups]
+        if Counter(signatures)!=Counter(lookup.keys()):
+            raise ValueError(f"Motif membership differs from pretraining: {paper} row {row['row']}")
+        aligned[row['row']]=[lookup[s] for s in signatures];positions[row['row']]=token_indices
+        total+=len(groups)
+    report={'passed':True,'paper':paper,'molecules':len(rows),'motifs':total,'canonicalized_rows':canonicalized,
+            'member_sets_match_pretraining':True,'original_token_order_preserved':True,
+            'input':'exact clean pretraining graphs, t=0; no cached frozen vectors'}
+    return aligned,positions,report

@@ -51,7 +51,10 @@ def collate_graphs(items):
     mask = torch.zeros(len(items), n, dtype=torch.bool)
     for k,g in enumerate(items):
         s = len(g['x']); x[k,:s] = g['x']; e[k,:s,:s] = g['edges']; mask[k,:s] = True
-    return {'x':x,'edges':e,'mask':mask}
+    batch={'x':x,'edges':e,'mask':mask}
+    if any('structure_target' in g for g in items):
+        batch['structure_target']=torch.stack([g['structure_target'] for g in items])
+    return batch
 
 def to_device(batch, device): return {k:v.to(device) for k,v in batch.items()}
 

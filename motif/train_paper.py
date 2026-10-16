@@ -4,6 +4,7 @@ Uses the original model classes and paper feature pipelines, not context.py.
 No claim to reproduce a paper's reported split/hyperparameter statistics.
 """
 import argparse
+import time
 from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
@@ -11,7 +12,7 @@ from rdkit import Chem
 from .data import load_dataset,save_json,sha,code_identity
 from .pretrain import load_encoder
 from .adapters import HMGMRLAdapter,HimNetAdapter,hmg_motif_inputs,himnet_motif_inputs
-from .paper_data import load_paper,source_inventory,prepare_him_graphs,HierarchicalBatch,load_hmg_features,hmg_inputs
+from .paper_data import load_paper,source_inventory,prepare_him_graphs,HierarchicalBatch,load_hmg_features,hmg_inputs,align_motif_graphs
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
@@ -45,6 +46,7 @@ def main():
         denoiser,ck=load_encoder(args.checkpoint,args.device)
         if ck['data_sha256']!=sha(args.data):raise ValueError('Pretraining data provenance mismatch')
         if ck['method'] not in ('both',args.paper):raise ValueError('Pretrained extraction family mismatch')
+        if ck['smoke'] and not args.smoke_per_split:raise ValueError('Smoke pretrained weights cannot be used for a formal comparison')
     provenance={'data_sha256':sha(args.data),'paper':args.paper,'paper_root':str(args.paper_root.resolve()),
                 'module_source_sha256':code,'paper_source_sha256':upstream,
                 'rows':{s:[m['row'] for m in rows] for s,rows in splits.items()},
@@ -61,6 +63,7 @@ def main():
         else:
             graphs=prepare_him_graphs(selected,loader)
             torch.save({'graphs':graphs,'data_sha256':sha(args.data),'paper_source_sha256':upstream},args.output/'him_graphs.pt')
+        internal,token_positions,alignment=align_motif_graphs(data,selected,args.paper,him_graphs=graphs)
         sample=graphs[selected[0]['row']]
         ad=len(sample['f_atoms'][0]);bd=len(sample['f_bonds'][0]);fd=sample['fp_x'].shape[-1]
         torch.manual_seed(args.seed+2000)
@@ -69,8 +72,9 @@ def main():
         def forward(rows,training):
             items=[graphs[m['row']] for m in rows];batch=HierarchicalBatch(items)
             if denoiser:
-                mb,positions=himnet_motif_inputs([Chem.MolFromSmiles(m['smiles']) for m in rows],
-                                               [g['cliques'] for g in items],batch,args.device)
+                mb=[g for m in rows for g in internal[m['row']]]
+                positions=[start+atoms+j for m,(start,_),atoms in zip(rows,batch.a_scope,batch.mol_atom_num) for j in token_positions[m['row']]]
+                if not mb:mb=None
                 pred=model(batch,mb,positions,training=training)
             else:
                 # Same original forward branches, bypassing only disk lookup.
@@ -86,6 +90,7 @@ def main():
         aux_weight=.2 if args.aux_weight is None else args.aux_weight
     else:
         features,assemble=load_hmg_features(args.hmg_feature_cache,args.paper_root)
+        internal,token_positions,alignment=align_motif_graphs(data,selected,args.paper,hmg_features=features)
         # Check all selected real records up front; no silent preprocessing drop.
         for start in range(0,len(selected),args.batch_size):hmg_inputs(selected[start:start+args.batch_size],features,assemble,args.device)
         sample,_,_=hmg_inputs(selected[:2],features,assemble,args.device)
@@ -96,12 +101,20 @@ def main():
         def forward(rows,training):
             inputs,mols,maps=hmg_inputs(rows,features,assemble,args.device)
             if denoiser:
-                mb,positions=hmg_motif_inputs(mols,maps,args.device);out=model(mb,positions,**inputs)
+                mb=[g for m in rows for g in internal[m['row']]]
+                positions=[[i,j] for i,m in enumerate(rows) for j in token_positions[m['row']]]
+                if not mb:mb=None
+                out=model(mb,positions,**inputs)
             else:out=backbone(**inputs)
             return out[1].reshape(-1),out[2]
         aux_weight=cfg.ct_loss_coff if args.aux_weight is None else args.aux_weight
         provenance['original_feature_cache_sha256']=sha(args.hmg_feature_cache)
         provenance['original_3d_features_retained']=True
+    save_json(args.output/'motif_alignment.json',alignment);provenance['motif_alignment']=alignment
+    initial={k.replace('frag_input_projection.base.','frag_input_projection.'):v.detach().cpu().clone()
+             for k,v in backbone.state_dict().items() if 'motif_projection' not in k}
+    torch.save(initial,args.output/'initial_backbone.pt')
+    if ck:provenance['pretrained_epoch']=ck['epoch'];provenance['pretrained_sha256']=sha(args.checkpoint)
     save_json(args.output/'manifest.json',provenance)
     if args.prepare_only:
         print('Original paper real-data inputs checked; prepare-only, no training');return
@@ -126,19 +139,22 @@ def main():
         return score,{'prediction':pred,'target':ys,'row_ids':ids}
     history=[];best=float('inf');best_epoch=0
     for epoch in range(1,args.epochs+1):
-        model.train()
-        for rows in train_batches(epoch):
+        started=time.perf_counter();model.train()
+        batches=train_batches(epoch)
+        for batch_index,rows in enumerate(batches):
             target=torch.tensor([m['label'] for m in rows],device=args.device)
             pred,aux=forward(rows,True);loss=(pred-(target-mean)/std).square().mean()+aux_weight*aux
             if not torch.isfinite(loss):raise FloatingPointError('Non-finite original-paper objective')
             optimizer.zero_grad(set_to_none=True);loss.backward();torch.nn.utils.clip_grad_norm_(model.parameters(),5);optimizer.step()
-        score,_=evaluate(splits['valid']);history.append({'epoch':epoch,'valid_rmse':score})
+            if (batch_index+1)%25==0:save_json(args.output/'progress.json',{'epoch':epoch,'batch':batch_index+1,'batches':len(batches),'phase':'train'})
+        score,_=evaluate(splits['valid']);history.append({'epoch':epoch,'valid_rmse':score,'seconds':time.perf_counter()-started})
         if score<best:
             best=score;best_epoch=epoch
             torch.save({'model':{k:v.detach().cpu().clone() for k,v in model.state_dict().items()},'target_mean':mean,'target_std':std,
                         'epoch':epoch,'paper':args.paper,'denoiser_config':denoiser.config if denoiser else None,
                         'manifest':provenance},args.output/'best.pt')
         save_json(args.output/'history.json',history);print(history[-1],flush=True)
+        save_json(args.output/'progress.json',{'phase':'epoch_complete',**history[-1]})
         if epoch-best_epoch>=args.patience:break
     model.load_state_dict(torch.load(args.output/'best.pt',map_location='cpu',weights_only=True)['model'],strict=True)
     test,pred=evaluate(splits['test']);save_json(args.output/'test_predictions.json',pred)
