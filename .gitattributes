@@ -1,0 +1,2 @@
+# Preserve exact experiment snapshots and manifest checksums on every platform.
+results/fullgraph_formal_seed0_20261016/** -text
