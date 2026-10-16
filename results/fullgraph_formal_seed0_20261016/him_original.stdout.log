@@ -1,0 +1,27 @@
+{'epoch': 1, 'valid_rmse': 0.8696369528770447, 'seconds': 38.4551062}
+{'epoch': 2, 'valid_rmse': 0.8509064316749573, 'seconds': 40.68450029999998}
+{'epoch': 3, 'valid_rmse': 0.7885815501213074, 'seconds': 40.118639099999996}
+{'epoch': 4, 'valid_rmse': 0.7496691942214966, 'seconds': 40.641615299999984}
+{'epoch': 5, 'valid_rmse': 0.796963632106781, 'seconds': 40.24311319999998}
+{'epoch': 6, 'valid_rmse': 0.7244206070899963, 'seconds': 40.0169578}
+{'epoch': 7, 'valid_rmse': 0.7419463992118835, 'seconds': 39.83271609999997}
+{'epoch': 8, 'valid_rmse': 0.7445021271705627, 'seconds': 40.09302590000004}
+{'epoch': 9, 'valid_rmse': 0.7368481159210205, 'seconds': 39.88001400000002}
+{'epoch': 10, 'valid_rmse': 0.7497310042381287, 'seconds': 39.93130530000002}
+{'epoch': 11, 'valid_rmse': 0.7506124377250671, 'seconds': 40.48063380000008}
+{'epoch': 12, 'valid_rmse': 0.7409874200820923, 'seconds': 40.07069010000009}
+{'epoch': 13, 'valid_rmse': 0.7922183871269226, 'seconds': 40.14424059999999}
+{'epoch': 14, 'valid_rmse': 0.7448952198028564, 'seconds': 40.40843129999996}
+{'epoch': 15, 'valid_rmse': 0.7348710894584656, 'seconds': 40.260420400000044}
+{'epoch': 16, 'valid_rmse': 0.7486559152603149, 'seconds': 40.391718600000104}
+{'epoch': 17, 'valid_rmse': 0.7540982961654663, 'seconds': 40.46465319999993}
+{'epoch': 18, 'valid_rmse': 0.7470467686653137, 'seconds': 40.252887999999984}
+{'epoch': 19, 'valid_rmse': 0.7413401007652283, 'seconds': 40.42633539999997}
+{'epoch': 20, 'valid_rmse': 0.7542591691017151, 'seconds': 40.50564680000002}
+{'epoch': 21, 'valid_rmse': 0.7533729672431946, 'seconds': 40.362056600000074}
+{'epoch': 22, 'valid_rmse': 0.7422738671302795, 'seconds': 41.08689519999996}
+{'epoch': 23, 'valid_rmse': 0.7716614007949829, 'seconds': 40.578777100000025}
+{'epoch': 24, 'valid_rmse': 0.7602074146270752, 'seconds': 40.51166809999995}
+{'epoch': 25, 'valid_rmse': 0.7467207908630371, 'seconds': 40.85018620000005}
+{'epoch': 26, 'valid_rmse': 0.7514609694480896, 'seconds': 40.72028769999997}
+{'paper': 'HimNet', 'arm': 'original', 'original_model_class': True, 'standalone_context_model': False, 'valid_rmse': 0.7244206070899963, 'test_rmse': 0.7256046533584595, 'best_epoch': 6, 'smoke': False, 'formal_performance_claim': False, 'test_evaluated_after_selection': True, 'pretrained_sha256': None}

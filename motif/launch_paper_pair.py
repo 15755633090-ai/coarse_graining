@@ -61,24 +61,26 @@ def worker(options):
     himroot=ROOT/'coarse_graining1/HimNet_reproduction_20261013/windows'
     prep=start('hmg_features','motif.prepare_hmg',[
         '--data',data,'--paper-root',hmgroot,'--output',RUN/'hmg_features',
-        '--dependency-path',ROOT/'motif/vendor/deepchem_runtime'])
+        '--dependency-path',ROOT/'motif/vendor/deepchem_runtime']) if 'HMG-MRL' in options.papers and not options.hmg_feature_cache else None
     common=['--data',data,'--epochs','100','--patience','20','--batch-size','16',
             '--motif-batch-size','32','--pair-budget','262144','--seed','0','--lr','0.0001']
     results=[]
     try:
         for paper, paperroot in [('HimNet',himroot),('HMG-MRL',hmgroot)]:
-            if paper=='HMG-MRL':finish('hmg_features',prep)
+            if paper not in options.papers:continue
+            if paper=='HMG-MRL' and prep is not None:finish('hmg_features',prep)
             for arm in ['original','pretrained']:
                 name=('him' if paper=='HimNet' else 'hmg')+'_'+arm
                 args=['--paper',paper,'--paper-root',paperroot,'--arm',arm,'--output',RUN/name,*common]
                 if arm=='pretrained':args+=['--checkpoint',checkpoint]
                 if paper=='HimNet' and arm=='pretrained':args+=['--him-graph-cache',RUN/'him_original/him_graphs.pt']
-                if paper=='HMG-MRL':args+=['--hmg-feature-cache',RUN/'hmg_features/features.pickle']
+                if paper=='HMG-MRL':args+=['--hmg-feature-cache',options.hmg_feature_cache or RUN/'hmg_features/features.pickle']
                 finish(name,start(name,'motif.train_paper',args))
                 results.append(json.loads((RUN/name/'results.json').read_text(encoding='utf-8')))
                 save(RUN/'completed_results.json',results)
         comparisons=[]
         for prefix in ['him','hmg']:
+            if ('HimNet' if prefix=='him' else 'HMG-MRL') not in options.papers:continue
             a=RUN/(prefix+'_original');b=RUN/(prefix+'_pretrained')
             sa=torch.load(a/'initial_backbone.pt',weights_only=True)
             sb=torch.load(b/'initial_backbone.pt',weights_only=True)
@@ -100,9 +102,12 @@ def main(argv=None):
     parser.add_argument('--output',type=Path,required=True,help='New experiment directory; never overwrite existing runs')
     parser.add_argument('--workspace-root',type=Path,default=ROOT,help='Workspace containing motif data and original paper sources')
     parser.add_argument('--prepare-only',action='store_true',help='Create and validate snapshot without starting training')
+    parser.add_argument('--papers',nargs='+',choices=['HimNet','HMG-MRL'],default=['HimNet','HMG-MRL'])
+    parser.add_argument('--hmg-feature-cache',type=Path,help='Reuse an existing original feature cache; completeness is still checked')
     parser.add_argument('--worker',action='store_true',help=argparse.SUPPRESS)
     options=parser.parse_args(argv)
     for name in ('checkpoint','output','workspace_root'):setattr(options,name,getattr(options,name).resolve())
+    if options.hmg_feature_cache:options.hmg_feature_cache=options.hmg_feature_cache.resolve()
     if options.worker:
         worker(options);return
     info=checkpoint_info(options.checkpoint)
@@ -112,6 +117,8 @@ def main(argv=None):
     command=[sys.executable,'-X','utf8','-u','-m','motif.launch_paper_pair','--worker',
              '--checkpoint',str(options.checkpoint),'--output',str(options.output),
              '--workspace-root',str(options.workspace_root)]
+    command+=['--papers',*options.papers]
+    if options.hmg_feature_cache:command+=['--hmg-feature-cache',str(options.hmg_feature_cache)]
     save(options.output/'launch.json',dict(checkpoint_info=info,worker_command=command,
          worker_cwd=str(target.parent),prepare_only=options.prepare_only))
     print(json.dumps(info,ensure_ascii=False),flush=True)

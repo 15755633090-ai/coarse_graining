@@ -1,0 +1,28 @@
+{
+  "pid": 17320,
+  "command": [
+    "C:\\Users\\12775\\miniconda3\\envs\\polyolefin_ml\\python.exe",
+    "-X",
+    "utf8",
+    "-u",
+    "-m",
+    "motif.pretrain_fullgraph",
+    "--data",
+    "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\data\\lipo.pt",
+    "--output",
+    "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\runs\\fullgraph_formal_seed0_20261016\\him_pretrain",
+    "--method",
+    "HimNet",
+    "--epochs",
+    "50",
+    "--batch-size",
+    "4",
+    "--hidden",
+    "128",
+    "--layers",
+    "3",
+    "--seed",
+    "0"
+  ],
+  "started": 1792139284.5042572
+}

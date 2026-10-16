@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "paper": "HimNet",
+  "molecules": 4200,
+  "motifs": 23900,
+  "canonicalized_rows": 0,
+  "member_sets_match_pretraining": true,
+  "original_token_order_preserved": true,
+  "input": "clean full molecular graph + unnoised motif type conditions; mean member pooling"
+}

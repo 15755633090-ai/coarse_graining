@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "paper": "HMG-MRL",
+  "molecules": 4200,
+  "motifs": 60866,
+  "canonicalized_rows": 3846,
+  "member_sets_match_pretraining": true,
+  "original_token_order_preserved": true,
+  "input": "clean full molecular graph + unnoised motif type conditions; mean member pooling"
+}

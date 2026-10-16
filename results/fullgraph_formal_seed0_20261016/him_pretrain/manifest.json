@@ -1,0 +1,9 @@
+{
+  "condition": "clean motif type embeddings; never corrupted",
+  "test_used": false,
+  "noise": "original DiscreteGraphDiffusion",
+  "loss": "original ChemicalDiffusionLoss",
+  "data_sha256": "6c1a93b2b836b8d26e1465bc1c7609d0876b70a6f93d568967cb7ebee6c432b7",
+  "smoke": false,
+  "performance_gain_established": false
+}

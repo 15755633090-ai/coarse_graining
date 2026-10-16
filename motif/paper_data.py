@@ -90,6 +90,10 @@ def hmg_inputs(rows,features,assemble,device):
     inputs={name:torch.as_tensor(arrays[k],device=device,dtype=torch.long if 3<=k<=6 else torch.float)
             for k,name in enumerate(HMG_NAMES)}
     inputs['molecule_descriptor']=torch.as_tensor(arrays[11],device=device,dtype=torch.float)
+    for name,value in inputs.items():
+        if value.is_floating_point() and not bool(torch.isfinite(value).all()):
+            bad=(~torch.isfinite(value)).reshape(len(rows),-1).any(1).nonzero().flatten().tolist()
+            raise FloatingPointError(f"Non-finite HMG input {name}; molecule rows {[rows[i]['row'] for i in bad]}")
     if inputs['molecule_descriptor'].shape[-1]!=200:raise ValueError('Original HMG model expects 200 descriptor features')
     maps=[features['smiles_to_frag_atom_bond_incices'][key] for key in keys]
     for i,(mol,mapping) in enumerate(zip(mols,maps)):

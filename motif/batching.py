@@ -34,6 +34,8 @@ def as_graphs(batch):
     return [{'x':x[m], 'edges':e[m][:,m]} for x,e,m in zip(batch['x'],batch['edges'],batch['mask'])]
 
 def encode_motifs(model,graphs,device,batch_size=32,pair_budget=0,checkpoint_grad=True):
+    if hasattr(model,'encode_records'):
+        return model.encode_records(graphs,batch_size,pair_budget)
     graphs=as_graphs(graphs)
     if not graphs:return next(model.parameters()).new_empty((0,model.config['hidden']))
     sampler=SizeBucketSampler([len(g['x']) for g in graphs],batch_size,pair_budget=pair_budget)

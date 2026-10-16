@@ -66,3 +66,32 @@ entry fix does not repair missing HMG molecular features.
 
 Routing/provenance checks: `python -m motif.check_launcher` (training subprocess
 mocked; no full training or preprocessing is launched by this check).
+
+Use `--papers HimNet` or `--papers HMG-MRL` to run only one framework while
+another framework is blocked. The default remains both frameworks. Existing
+HMG features may be reused via `--hmg-feature-cache PATH`; all molecules and
+Motif membership mappings are still checked before training.
+
+`repair_hmg.py` can retry only missing original HMG records with RDKit
+`useRandomCoords=True, randomSeed=0`, retaining MMFF settings and the original
+feature extractor. This is an explicit preprocessing deviation from the default
+embedding path. It writes a separate cache, expands padding/sentinel indices
+consistently, and checks full row coverage and Motif alignment. It never deletes
+failed rows or overwrites the old cache. Both arms must use the same repaired
+cache; record the repair manifest when reporting results.
+
+For this Lipo cache, a separate scan found four undefined normalized descriptors
+for a selenium-containing molecule (row 1561, validation). `finite_hmg.py`
+replaces nonfinite descriptor entries only, using column medians computed from
+unique training molecules. It writes a new cache and a manifest with affected
+columns/rows, replacement values and hashes. Existing finite entries, graph
+features, labels, and all split memberships are retained. This preprocessing
+correction is shared by both arms and must be disclosed alongside the conformer
+repair. No validation/test values are used to fit imputation statistics.
+
+`diagnose_hmg.py` scans all cache arrays and labels for nonfinite values, then
+checks initial original-model forward passes over the full validation split.
+Forward hooks record the first module emitting nonfinite outputs if necessary.
+`train_paper.py` now rejects nonfinite input features, predictions, auxiliary or
+total loss, gradients and evaluation RMSE; runtime diagnostics record phase,
+epoch and batch row IDs. A missing finite validation checkpoint cancels testing.

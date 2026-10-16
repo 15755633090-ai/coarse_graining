@@ -87,6 +87,9 @@ class HMGMRLAdapter(nn.Module):
         projection=self.backbone.frag_input_projection
         with torch.set_grad_enabled(self.training and not self.freeze_pretrained):
             s=encode_motifs(self.denoiser,motif_batch,next(self.denoiser.parameters()).device,self.motif_batch_size,self.pair_budget)
+        if len(s)==0:
+            if len(positions): raise ValueError('Positions without motifs')
+            return self.backbone(**backbone_inputs)
         token=projection.override.set((s,positions))
         try: return self.backbone(**backbone_inputs)
         finally: projection.override.reset(token)

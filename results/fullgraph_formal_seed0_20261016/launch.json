@@ -1,0 +1,14 @@
+{
+  "seed": 0,
+  "pretrain_epochs": 50,
+  "property_epochs": 100,
+  "patience": 20,
+  "wait_pids": [
+    34620,
+    22548
+  ],
+  "root": "C:\\Users\\12775\\Desktop\\GNN课题1",
+  "source": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\runs\\fullgraph_formal_seed0_20261016\\source",
+  "single_seed": true,
+  "started": 1792139043.97347
+}
