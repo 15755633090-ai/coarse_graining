@@ -5,6 +5,7 @@
     "adapters.py": "faac43a601b9c7d7cb305060ab41dd0c3f43a7d74b1e0e12943d909423e120fa",
     "batching.py": "f26ed987889f6d6e782c7c83fcf33d47becfc8b45a2ecfe58788696c04de9aaf",
     "check_acceleration.py": "16e3be37258285f24e1e1d150f72e22874df30bb6f5993fe53551957ab29aae9",
+    "check_launcher.py": "15ec26e61f799de63f14a02dbad2cc2954dbbd3495c533c0aa610f826aaf7e89",
     "check_paper_adapters.py": "7b842559bd141b9b65c56badf60bcc46e4afeb1650ff74131d71e3f5f4e0aa37",
     "check_paper_data.py": "8700f008a3e7e788b1c0fa772d716a7aae7d1cfc8e1e5afbe3041e14b232bf45",
     "check_recovery.py": "73bb75b972a4a735fd82563a52230c33b781071222c4e277635f9bc8d5044612",
@@ -15,7 +16,7 @@
     "data.py": "be32100560f6957dc6b974e356c3f829d2937aae5db2b6beb2afdc2d92e6e72a",
     "diffusion.py": "46e5189e3e5b38d833b706f16b1f39c2615144e3192e6e22e425089a19ca8b6c",
     "export.py": "57bad767a5c457611d2e9163e692c8f393e0c05c6d181f74083846a73b2c4452",
-    "launch_paper_pair.py": "4ba5444966d3a14cc4aa7fcebe4e724dce857a979ebdf62cfd2e91a22f9f6ce2",
+    "launch_paper_pair.py": "d3578ec0c10b1071c4a224ff41deb6342a5ebe3bff5ba03fc653c88fc209f4b9",
     "paper_data.py": "0405402d1f89952e0c89b0424cf6301f2d02fe62bb26b1c697c4ff111b520362",
     "prepare.py": "63ccc9a1056b40df076a9eb3c9bd5ff2ee0685733f3bb634d40d8079f76f50c5",
     "prepare_hmg.py": "3ad81030b06c1710271e64bf9f52ebce02119d7387d578882d22ee179bdef109",
@@ -73,6 +74,7 @@
     "adapters.py": "faac43a601b9c7d7cb305060ab41dd0c3f43a7d74b1e0e12943d909423e120fa",
     "batching.py": "f26ed987889f6d6e782c7c83fcf33d47becfc8b45a2ecfe58788696c04de9aaf",
     "check_acceleration.py": "16e3be37258285f24e1e1d150f72e22874df30bb6f5993fe53551957ab29aae9",
+    "check_launcher.py": "15ec26e61f799de63f14a02dbad2cc2954dbbd3495c533c0aa610f826aaf7e89",
     "check_paper_adapters.py": "7b842559bd141b9b65c56badf60bcc46e4afeb1650ff74131d71e3f5f4e0aa37",
     "check_paper_data.py": "8700f008a3e7e788b1c0fa772d716a7aae7d1cfc8e1e5afbe3041e14b232bf45",
     "check_recovery.py": "73bb75b972a4a735fd82563a52230c33b781071222c4e277635f9bc8d5044612",
@@ -83,7 +85,7 @@
     "data.py": "91944306f72fc748f1008c7515ecd8a1a61d67c66a265db9eece8dd0c3616b5b",
     "diffusion.py": "46e5189e3e5b38d833b706f16b1f39c2615144e3192e6e22e425089a19ca8b6c",
     "export.py": "57bad767a5c457611d2e9163e692c8f393e0c05c6d181f74083846a73b2c4452",
-    "launch_paper_pair.py": "4ba5444966d3a14cc4aa7fcebe4e724dce857a979ebdf62cfd2e91a22f9f6ce2",
+    "launch_paper_pair.py": "d3578ec0c10b1071c4a224ff41deb6342a5ebe3bff5ba03fc653c88fc209f4b9",
     "paper_data.py": "0405402d1f89952e0c89b0424cf6301f2d02fe62bb26b1c697c4ff111b520362",
     "prepare.py": "d82bafd435f0e88814a37697f416924fe5027e183c56fde95ff8cf988146ea67",
     "prepare_hmg.py": "3ad81030b06c1710271e64bf9f52ebce02119d7387d578882d22ee179bdef109",
@@ -101,5 +103,6 @@
     "unit_checks_passed": true,
     "smoke_and_resume_passed": true,
     "details": "STRUCTURE_SUPERVISION.md"
-  }
+  },
+  "paired_launcher_checks_passed": true
 }

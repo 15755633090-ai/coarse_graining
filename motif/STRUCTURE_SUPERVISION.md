@@ -40,3 +40,29 @@ downstream prediction and receives no downstream-only supervision.
 
 Checks: `python -m motif.check_structure`. A smoke run is an implementation
 check, not evidence of improved representations or property prediction.
+
+## Paired downstream entry
+
+After formal pretraining finishes, explicitly select its validation-best weight:
+
+```
+python -m motif.launch_paper_pair --checkpoint motif/runs/pretrain_structure_seed0/best.pt --output motif/runs/paper_structure_pair_seed0
+```
+
+This command creates an immutable source snapshot and **starts training** in it,
+waiting for completion. Use a new output directory for each experiment. It never
+defaults to an old checkpoint or a fixed epoch. It verifies the checkpoint against
+the adjacent `history.json`, rejects smoke weights and records the SHA256, actual
+epoch, structure weight, and label definitions in `launch.json`/`protocol.json`.
+An old checkpoint remains permitted when explicitly selected; its recorded
+structure supervision weight is zero, so it is not a new-supervision experiment.
+
+For snapshot preparation without training, add `--prepare-only`. `launch.json`
+then contains the exact worker argument list and working directory for a later
+manual launch. Default operation needs no `--worker` argument. `--workspace-root`
+may specify the workspace containing the dataset and original paper sources.
+The original HMG preprocessing completeness requirement still applies; this
+entry fix does not repair missing HMG molecular features.
+
+Routing/provenance checks: `python -m motif.check_launcher` (training subprocess
+mocked; no full training or preprocessing is launched by this check).
