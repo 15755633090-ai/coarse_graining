@@ -1,0 +1,13 @@
+{
+  "paper": "HimNet",
+  "arm": "pretrained",
+  "original_model_class": true,
+  "standalone_context_model": false,
+  "valid_rmse": 1.9104610681533813,
+  "test_rmse": 1.4208855628967285,
+  "best_epoch": 1,
+  "smoke": true,
+  "formal_performance_claim": false,
+  "test_evaluated_after_selection": true,
+  "pretrained_sha256": "26902d1812243b2e2b8ec77fc90d62bc7ace83435fc31c858597f869054e45fe"
+}

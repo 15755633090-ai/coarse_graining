@@ -1,0 +1,20 @@
+[
+  {
+    "seed": 0,
+    "arm": "original",
+    "output": "motif\\runs\\fixed_him_three_arm_smoke_20261018\\seed_0\\original",
+    "initial_backbone_matched": true
+  },
+  {
+    "seed": 0,
+    "arm": "random",
+    "output": "motif\\runs\\fixed_him_three_arm_smoke_20261018\\seed_0\\random",
+    "initial_backbone_matched": true
+  },
+  {
+    "seed": 0,
+    "arm": "pretrained",
+    "output": "motif\\runs\\fixed_him_three_arm_smoke_20261018\\seed_0\\pretrained",
+    "initial_backbone_matched": true
+  }
+]

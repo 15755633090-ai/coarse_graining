@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "paper": "HimNet",
+  "molecules": 6,
+  "motifs": 25,
+  "canonicalized_rows": 0,
+  "member_sets_match_pretraining": true,
+  "original_token_order_preserved": true,
+  "input": "clean fixed topology; no motif conditions; member mean; lowest trained time t=1"
+}

@@ -18,10 +18,15 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--paper',required=True,choices=['HMG-MRL','HimNet']);p.add_argument('--paper-root',required=True,type=Path)
     p.add_argument('--fullgraph',action='store_true',help='Clean fullgraph conditional encoder then motif pooling')
+    p.add_argument('--fixed-topology',action='store_true',help='Motif-independent attribute diffusion; motif-only residual injection')
+    p.add_argument('--encoder-lr',type=float,default=None)
+    p.add_argument('--fast-fullgraph',action='store_true',help='Vectorized condition and readout; same parameters and batching')
+    p.add_argument('--fusion',choices=['replace','residual'],default='replace')
+    p.add_argument('--gate-init',type=float,default=.1)
     p.add_argument('--data',required=True,type=Path);p.add_argument('--checkpoint',type=Path)
     p.add_argument('--output',required=True,type=Path);p.add_argument('--hmg-feature-cache',type=Path)
     p.add_argument('--him-graph-cache',type=Path);p.add_argument('--prepare-only',action='store_true')
-    p.add_argument('--arm',choices=['pretrained','original'],default='pretrained')
+    p.add_argument('--arm',choices=['pretrained','random','original'],default='pretrained')
     p.add_argument('--freeze-pretrained',action='store_true');p.add_argument('--epochs',type=int,default=100)
     p.add_argument('--patience',type=int,default=20);p.add_argument('--batch-size',type=int,default=16)
     p.add_argument('--motif-batch-size',type=int,default=32);p.add_argument('--pair-budget',type=int,default=0)
@@ -30,9 +35,17 @@ def main():
     p.add_argument('--smoke-per-split',type=int,default=0,help='Real-data implementation check only; first N per split')
     p.add_argument('--device',default='cuda:0' if torch.cuda.is_available() else 'cpu')
     args=p.parse_args();torch.manual_seed(args.seed);torch.set_num_threads(4)
+    if args.lr<=0 or (args.encoder_lr is not None and args.encoder_lr<=0):raise ValueError('Learning rates must be positive')
+    if args.fixed_topology:
+        if args.fullgraph or args.fast_fullgraph:raise ValueError('Choose exactly one encoder family')
+        if args.fusion!='residual':raise ValueError('Fixed topology first version requires --fusion residual')
+        if args.aux_weight not in (None,0):raise ValueError('First fixed-topology version has no auxiliary objective')
+        args.aux_weight=0.
+    if args.arm=='random' and not args.fixed_topology:raise ValueError('Random control is implemented for --fixed-topology')
+    if args.fast_fullgraph and not args.fullgraph:raise ValueError('--fast-fullgraph requires --fullgraph')
     if args.epochs<1 or args.batch_size<2:raise ValueError('Need epochs>=1, batch-size>=2 (paper BatchNorm)')
     if args.paper=='HMG-MRL' and not args.hmg_feature_cache:raise ValueError('Require --hmg-feature-cache from original HMG preprocessing; no substitute features')
-    if args.arm=='pretrained' and not args.checkpoint and not args.prepare_only:raise ValueError('Require pretrained checkpoint')
+    if args.arm in ('pretrained','random') and not args.checkpoint and not args.prepare_only:raise ValueError('Require checkpoint for weights/config provenance')
     args.output.mkdir(parents=True,exist_ok=True)
     if (args.output/'best.pt').exists():raise FileExistsError('Choose a new output directory')
     code=code_identity();upstream=source_inventory(args.paper_root);data=load_dataset(args.data)
@@ -45,9 +58,16 @@ def main():
         raise FloatingPointError('Non-finite molecule target labels')
     cls,loader,cfg=load_paper(args.paper_root,args.paper,args.device,args.hidden)
     denoiser=ck=None
-    if not args.prepare_only and args.arm=='pretrained':
-        if args.fullgraph:
-            from .fullgraph import load_encoder as load_fullgraph
+    if not args.prepare_only and args.arm in ('pretrained','random'):
+        if args.fixed_topology:
+            from .fixed_topology import load_encoder as load_fixed
+            torch.manual_seed(args.seed+1000)
+            denoiser,ck=load_fixed(args.checkpoint,args.device,random=args.arm=='random')
+        elif args.fullgraph:
+            if args.fast_fullgraph:
+                from .fullgraph_fast import load_encoder as load_fullgraph
+            else:
+                from .fullgraph import load_encoder as load_fullgraph
             denoiser,ck=load_fullgraph(args.checkpoint,args.device)
         else:
             denoiser,ck=load_encoder(args.checkpoint,args.device)
@@ -71,19 +91,22 @@ def main():
             graphs=prepare_him_graphs(selected,loader)
             torch.save({'graphs':graphs,'data_sha256':sha(args.data),'paper_source_sha256':upstream},args.output/'him_graphs.pt')
         internal,token_positions,alignment=align_motif_graphs(data,selected,args.paper,him_graphs=graphs)
-        if args.fullgraph and denoiser:
+        if args.fixed_topology and denoiser:
+            from .fixed_topology import records
+            full_records={r['row']:r for r in records(data,selected,args.paper,internal)}
+        elif args.fullgraph and denoiser:
             from .fullgraph import records
             full_records={r['row']:r for r in records(data,selected,args.paper,denoiser.vocab,internal)}
         sample=graphs[selected[0]['row']]
         ad=len(sample['f_atoms'][0]);bd=len(sample['f_bonds'][0]);fd=sample['fp_x'].shape[-1]
         torch.manual_seed(args.seed+2000)
         backbone=cls('in_memory',ad,bd,fd,hidden_size=args.hidden or 256,device=args.device,out_dim=1).to(args.device)
-        model=HimNetAdapter(backbone,denoiser,args.freeze_pretrained,args.motif_batch_size,args.pair_budget).to(args.device) if denoiser else backbone
+        model=HimNetAdapter(backbone,denoiser,args.freeze_pretrained,args.motif_batch_size,args.pair_budget,args.fusion,args.gate_init).to(args.device) if denoiser else backbone
         def forward(rows,training):
             items=[graphs[m['row']] for m in rows];batch=HierarchicalBatch(items)
             if denoiser:
                 mb=[g for m in rows for g in internal[m['row']]]
-                if args.fullgraph: mb=[full_records[m['row']] for m in rows]
+                if args.fullgraph or args.fixed_topology: mb=[full_records[m['row']] for m in rows]
                 positions=[start+atoms+j for m,(start,_),atoms in zip(rows,batch.a_scope,batch.mol_atom_num) for j in token_positions[m['row']]]
                 if not mb:mb=None
                 pred=model(batch,mb,positions,training=training)
@@ -102,7 +125,10 @@ def main():
     else:
         features,assemble=load_hmg_features(args.hmg_feature_cache,args.paper_root)
         internal,token_positions,alignment=align_motif_graphs(data,selected,args.paper,hmg_features=features)
-        if args.fullgraph and denoiser:
+        if args.fixed_topology and denoiser:
+            from .fixed_topology import records
+            full_records={r['row']:r for r in records(data,selected,args.paper,internal)}
+        elif args.fullgraph and denoiser:
             from .fullgraph import records
             full_records={r['row']:r for r in records(data,selected,args.paper,denoiser.vocab,internal)}
         # Check all selected real records up front; no silent preprocessing drop.
@@ -111,12 +137,12 @@ def main():
         cfg.atom_dim_in=sample['x_atoms'].shape[-1];cfg.bond_dim_in=sample['x_bonds'].shape[-1]
         torch.manual_seed(args.seed+2000)
         backbone=cls(cfg.atom_dim_in,cfg.bond_dim_in,1).to(args.device)
-        model=HMGMRLAdapter(backbone,denoiser,args.freeze_pretrained,args.motif_batch_size,args.pair_budget).to(args.device) if denoiser else backbone
+        model=HMGMRLAdapter(backbone,denoiser,args.freeze_pretrained,args.motif_batch_size,args.pair_budget,args.fusion,args.gate_init).to(args.device) if denoiser else backbone
         def forward(rows,training):
             inputs,mols,maps=hmg_inputs(rows,features,assemble,args.device)
             if denoiser:
                 mb=[g for m in rows for g in internal[m['row']]]
-                if args.fullgraph: mb=[full_records[m['row']] for m in rows]
+                if args.fullgraph or args.fixed_topology: mb=[full_records[m['row']] for m in rows]
                 positions=[[i,j] for i,m in enumerate(rows) for j in token_positions[m['row']]]
                 if not mb:mb=None
                 out=model(mb,positions,**inputs)
@@ -127,16 +153,29 @@ def main():
         provenance['original_3d_features_retained']=True
     if args.fullgraph:
         alignment['input']='clean full molecular graph + unnoised motif type conditions; mean member pooling'
+    if args.fixed_topology:
+        alignment['input']='clean fixed topology; no motif conditions; member mean; lowest trained time t=1'
+        provenance['auxiliary_objectives_enabled']=False
+        provenance['readout_note']='member mean, preserving original membership/order; not claimed identical to original feature construction'
     save_json(args.output/'motif_alignment.json',alignment);provenance['motif_alignment']=alignment
     initial={k.replace('frag_input_projection.base.','frag_input_projection.'):v.detach().cpu().clone()
-             for k,v in backbone.state_dict().items() if 'motif_projection' not in k}
+             for k,v in backbone.state_dict().items() if 'motif_projection' not in k and 'motif_gate' not in k}
     torch.save(initial,args.output/'initial_backbone.pt')
-    if ck:provenance['pretrained_epoch']=ck['epoch'];provenance['pretrained_sha256']=sha(args.checkpoint)
+    if ck:
+        provenance['encoder_config_checkpoint_sha256']=sha(args.checkpoint)
+        provenance['encoder_weights_loaded']=args.arm=='pretrained'
+        if args.arm=='pretrained':
+            provenance['pretrained_epoch']=ck['epoch'];provenance['pretrained_sha256']=sha(args.checkpoint)
     save_json(args.output/'manifest.json',provenance)
     if args.prepare_only:
         print('Original paper real-data inputs checked; prepare-only, no training');return
     y=torch.tensor([m['label'] for m in splits['train']]);mean=float(y.mean());std=float(y.std(unbiased=False).clamp_min(1e-6))
-    optimizer=torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],lr=args.lr,weight_decay=1e-5)
+    encoder_ids={id(p) for p in denoiser.parameters()} if denoiser else set()
+    groups=[{'params':[p for p in model.parameters() if p.requires_grad and id(p) not in encoder_ids],'lr':args.lr}]
+    if denoiser and not args.freeze_pretrained:
+        groups.append({'params':[p for p in denoiser.parameters() if p.requires_grad],
+                       'lr':args.encoder_lr if args.encoder_lr is not None else (args.lr*.1 if args.fixed_topology else args.lr)})
+    optimizer=torch.optim.AdamW(groups,weight_decay=1e-5)
     torch.manual_seed(args.seed+4000)
     n=len(splits['train']);train_batch=args.batch_size
     # Do not discard a singleton remainder: merge it into the preceding batch.
@@ -194,7 +233,7 @@ def main():
     result={'paper':args.paper,'arm':args.arm,'original_model_class':True,'standalone_context_model':False,
             'valid_rmse':best,'test_rmse':test,'best_epoch':best_epoch,'smoke':provenance['smoke'],
             'formal_performance_claim':False,'test_evaluated_after_selection':True,
-            'pretrained_sha256':sha(args.checkpoint) if denoiser else None}
+            'pretrained_sha256':sha(args.checkpoint) if denoiser and args.arm=='pretrained' else None}
     save_json(args.output/'results.json',result);print(result)
 
 if __name__=='__main__':main()

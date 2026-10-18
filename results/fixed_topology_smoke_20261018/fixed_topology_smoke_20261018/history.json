@@ -1,0 +1,17 @@
+[
+  {
+    "epoch": 1,
+    "train": 5.401680752635002,
+    "valid": 5.329250156879425,
+    "counts": {
+      "train": {
+        "masked_atoms": 341,
+        "masked_bonds": 577
+      },
+      "valid": {
+        "masked_atoms": 350,
+        "masked_bonds": 620
+      }
+    }
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "paper": "him",
+  "passed": true,
+  "device": "cuda",
+  "source": "C:\\Users\\12775\\Desktop\\GNN课题1\\coarse_graining1\\HimNet_reproduction_20261013\\windows\\model\\HimNet.py",
+  "source_sha256": "bf3c472b1a1be7a31354e7bc43a10e7dca2f120eb38d25d356d116df5b91c63c",
+  "output_shape": [
+    2,
+    1
+  ],
+  "pretrained_readout_grad_l1": 0.04470144584774971,
+  "synthetic_only": true,
+  "formal_dataset_training": false
+}

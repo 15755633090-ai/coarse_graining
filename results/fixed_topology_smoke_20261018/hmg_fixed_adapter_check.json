@@ -1,0 +1,14 @@
+{
+  "paper": "hmg",
+  "passed": true,
+  "device": "cuda",
+  "source": "C:\\Users\\12775\\Desktop\\GNN课题1\\research_code_audit\\HMG-MRL\\model\\bipartite_transformer.py",
+  "source_sha256": "21e4f1f4d88c0c2658f3b983bed3095674edfcc4c57a1b6caf805f1584e4847e",
+  "output_shape": [
+    2,
+    1
+  ],
+  "pretrained_readout_grad_l1": 0.11562727391719818,
+  "synthetic_only": true,
+  "formal_dataset_training": false
+}

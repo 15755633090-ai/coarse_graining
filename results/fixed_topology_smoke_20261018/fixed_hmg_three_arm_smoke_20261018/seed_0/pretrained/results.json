@@ -1,0 +1,13 @@
+{
+  "paper": "HMG-MRL",
+  "arm": "pretrained",
+  "original_model_class": true,
+  "standalone_context_model": false,
+  "valid_rmse": 7.24923038482666,
+  "test_rmse": 6.505893230438232,
+  "best_epoch": 1,
+  "smoke": true,
+  "formal_performance_claim": false,
+  "test_evaluated_after_selection": true,
+  "pretrained_sha256": "26902d1812243b2e2b8ec77fc90d62bc7ace83435fc31c858597f869054e45fe"
+}

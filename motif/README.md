@@ -1,5 +1,7 @@
 # 二维 Motif 扩散预训练与分子语境学习
 
+**2026-10-18 当前方案：无基序条件的固定拓扑全图属性扩散 → 既定成员读出 → 基序残差融合 → 性质联合微调。新入口与验证范围见 [FIXED_TOPOLOGY.md](FIXED_TOPOLOGY.md)。下面的类型条件与孤立基序版本为历史路径。**
+
 **2026-10-16 新方案：带基序结构类型条件的全图离散扩散，见 [FULLGRAPH.md](FULLGRAPH.md)。下文保留旧孤立基序路径说明；两条路径权重和入口不同。**
 
 独立克隆仓库时，先阅读 [GITHUB_SETUP.md](GITHUB_SETUP.md)；原论文真实数据训练见 [PAPER_TRAINING.md](PAPER_TRAINING.md)。

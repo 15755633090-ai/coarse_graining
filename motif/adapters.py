@@ -4,6 +4,7 @@ Ordering is explicit: bindings MUST be built from the caller's token/node map.
 No attempt is made to infer correspondence from matching feature vectors.
 """
 import copy
+import math
 from contextvars import ContextVar
 import torch
 from torch import nn
@@ -49,9 +50,13 @@ def validate_positions(positions,count,shape,device):
     return positions
 
 class _BoundProjection(nn.Module):
-    def __init__(self,base,motif_dim):
+    def __init__(self,base,motif_dim,fusion='replace',gate_init=.1):
         super().__init__();self.base=base
+        if fusion not in ('replace','residual') or not 0<gate_init<1: raise ValueError('Invalid fusion configuration')
+        self.fusion=fusion
         self.motif_projection=nn.Linear(motif_dim,base.out_features)
+        if fusion=='residual':
+            self.motif_gate=nn.Parameter(torch.full((base.out_features,),math.log(gate_init/(1-gate_init))))
         self.override=ContextVar('motif_projection_override',default=None)
 
     def forward(self,x):
@@ -61,7 +66,10 @@ class _BoundProjection(nn.Module):
         vectors,positions=bound
         positions=validate_positions(positions,len(vectors),output.shape[:2],output.device)
         output=output.clone()
-        output[positions[:,0],positions[:,1]]=self.motif_projection(vectors)
+        extra=self.motif_projection(vectors)
+        if self.fusion=='residual':
+            extra=output[positions[:,0],positions[:,1]]+self.motif_gate.sigmoid()*extra
+        output[positions[:,0],positions[:,1]]=extra
         return output
 
 class HMGMRLAdapter(nn.Module):
@@ -71,13 +79,13 @@ class HMGMRLAdapter(nn.Module):
     backbone_inputs are exactly the original model's keyword arguments.
     positions[k] = [batch_index, original_token_index] for dense motif k.
     """
-    def __init__(self,backbone,denoiser,freeze_pretrained=False,motif_batch_size=32,pair_budget=0):
+    def __init__(self,backbone,denoiser,freeze_pretrained=False,motif_batch_size=32,pair_budget=0,fusion='replace',gate_init=.1):
         super().__init__();self.backbone=backbone;self.denoiser=denoiser
         self.freeze_pretrained=freeze_pretrained
         self.motif_batch_size=motif_batch_size;self.pair_budget=pair_budget
         base=backbone.frag_input_projection
         if isinstance(base,_BoundProjection): raise ValueError('Backbone already adapted')
-        backbone.frag_input_projection=_BoundProjection(base,denoiser.config['hidden'])
+        backbone.frag_input_projection=_BoundProjection(base,denoiser.config['hidden'],fusion,gate_init)
         if freeze_pretrained: denoiser.requires_grad_(False)
 
     def forward(self,motif_batch,positions,**backbone_inputs):
@@ -101,11 +109,15 @@ class HimNetAdapter(nn.Module):
     positions[k] is the GLOBAL f_atoms row of motif k, including padding offset.
     The caller must not bind atom, global, or padding nodes.
     """
-    def __init__(self,backbone,denoiser,freeze_pretrained=False,motif_batch_size=32,pair_budget=0):
+    def __init__(self,backbone,denoiser,freeze_pretrained=False,motif_batch_size=32,pair_budget=0,fusion='replace',gate_init=.1):
         super().__init__();self.backbone=backbone;self.denoiser=denoiser
         self.freeze_pretrained=freeze_pretrained
         self.motif_batch_size=motif_batch_size;self.pair_budget=pair_budget
         self.projection=nn.Linear(denoiser.config['hidden'],backbone.atom_fdim)
+        if fusion not in ('replace','residual') or not 0<gate_init<1: raise ValueError('Invalid fusion configuration')
+        self.fusion=fusion
+        if fusion=='residual':
+            self.motif_gate=nn.Parameter(torch.full((backbone.atom_fdim,),math.log(gate_init/(1-gate_init))))
         if freeze_pretrained: denoiser.requires_grad_(False)
 
     def forward(self,mol_graph,motif_batch,positions,training=False):
@@ -123,7 +135,9 @@ class HimNetAdapter(nn.Module):
             n=int(mol_graph.mol_atom_num[k])
             allowed.update(range(start+n,start+size-1))
         if any(int(i) not in allowed for i in indices): raise ValueError('Binding is not a motif node')
-        x[indices]=self.projection(vectors);graph.f_atoms=x
+        extra=self.projection(vectors)
+        if self.fusion=='residual':extra=x[indices]+self.motif_gate.sigmoid()*extra
+        x[indices]=extra;graph.f_atoms=x
         ligand=self.backbone.encoder(graph)
         if training:
             fp,fp_proj,views=self.backbone.fp_encoder(graph.fp_x.to(vectors.device).float(),training=True)

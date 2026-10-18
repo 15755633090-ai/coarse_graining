@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "paper": "HMG-MRL",
+  "molecules": 6,
+  "motifs": 61,
+  "canonicalized_rows": 6,
+  "member_sets_match_pretraining": true,
+  "original_token_order_preserved": true,
+  "input": "clean fixed topology; no motif conditions; member mean; lowest trained time t=1"
+}
