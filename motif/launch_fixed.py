@@ -23,6 +23,11 @@ def main():
     p.add_argument('--hidden', type=int)
     a = p.parse_args()
     a.output.mkdir(parents=True, exist_ok=False)
+    save_json(a.output/'protocol.json',{
+        'comparison':'initialization under the same training protocol; not separately optimized random baseline',
+        'lr':a.lr,'encoder_lr':a.encoder_lr,'auxiliary_weight':0,
+        'baseline':'original architecture under unified protocol; not full paper reproduction',
+        'seeds':a.seeds})
     outcomes = []
     for seed in a.seeds:
         reference = None

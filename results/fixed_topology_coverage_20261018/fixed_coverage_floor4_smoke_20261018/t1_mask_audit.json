@@ -1,0 +1,28 @@
+{
+  "diagnostic_only_not_training": true,
+  "base_probability": 0.050197375853707364,
+  "splits": {
+    "train": {
+      "sampled_graphs": 128,
+      "atom_supervised_graphs": 94,
+      "bond_supervised_graphs": 119,
+      "effective_graphs": 119,
+      "zero_target_graphs": 9,
+      "atoms": 3408,
+      "bonds": 3692,
+      "masked_atoms": 182,
+      "masked_bonds": 553
+    },
+    "valid": {
+      "sampled_graphs": 128,
+      "atom_supervised_graphs": 95,
+      "bond_supervised_graphs": 120,
+      "effective_graphs": 120,
+      "zero_target_graphs": 8,
+      "atoms": 3606,
+      "bonds": 3962,
+      "masked_atoms": 179,
+      "masked_bonds": 576
+    }
+  }
+}

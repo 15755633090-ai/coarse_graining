@@ -5,7 +5,8 @@ from pathlib import Path
 import torch
 from rdkit import Chem
 from .data import load_dataset, save_json, sha, code_identity
-from .fixed_topology import Encoder, Config, SCHEMA, records
+from .fixed_topology import Encoder, Config, SCHEMA, records, corrupt, noise_probability
+from .supervision import SupervisionCounter
 
 
 def main():
@@ -17,6 +18,7 @@ def main():
     p.add_argument('--region-probability', type=float, default=.2)
     p.add_argument('--region-fraction', type=float, default=.2)
     p.add_argument('--max-noise', type=float, default=.85)
+    p.add_argument('--min-noise', type=float, default=.05, help='Explicit floor; 0 reproduces the old schedule')
     p.add_argument('--bond-weight', type=float, default=1.)
     p.add_argument('--lr', type=float, default=2e-4)
     p.add_argument('--device', default='cuda' if torch.cuda.is_available() else 'cpu')
@@ -36,7 +38,7 @@ def main():
     if a.smoke_per_split: rows = {s: rs[:a.smoke_per_split] for s, rs in rows.items()}
     if any(not rs for rs in rows.values()): raise ValueError('Empty split')
     sets = {s: records(data, rs) for s, rs in rows.items()}
-    cfg = Config(hidden=a.hidden, layers=a.layers, steps=a.steps, max_noise=a.max_noise,
+    cfg = Config(hidden=a.hidden, layers=a.layers, steps=a.steps, min_noise=a.min_noise, max_noise=a.max_noise,
                  region_probability=a.region_probability, region_fraction=a.region_fraction, bond_weight=a.bond_weight)
     model = Encoder(asdict(cfg)).to(a.device)
     opt = torch.optim.AdamW(model.parameters(), lr=a.lr, weight_decay=1e-5)
@@ -48,16 +50,35 @@ def main():
                 'motif_condition': False, 'property_labels_used': False,
                 'smoke': bool(a.smoke_per_split or data['smoke']),
                 'objective': 'uniform-t masked-attribute CE surrogate, graph mean; not exact ELBO',
-                'config': asdict(cfg), 'seed': a.seed, 'lr': a.lr, 'batch_size': a.batch_size}
+                'config': asdict(cfg), 'seed': a.seed, 'lr': a.lr, 'batch_size': a.batch_size,
+                't1_base_mask_probability': noise_probability(cfg,1),
+                'noise_schedule': 'q(0)=0; q(t>=1)=min+(max-min)*(1-cos(pi*t/T))/2',
+                'floor_rationale': 'engineering coverage setting; not selected using property labels or test performance'}
     save_json(a.output/'manifest.json', manifest)
+    # Prospective t=1 mask diagnostic. Does not train or alter the training RNG.
+    audit = {}
+    for split, items in sets.items():
+        counter = SupervisionCounter(cfg.steps, cfg.bond_weight)
+        for item in items:
+            g = item['graph']
+            gen = torch.Generator().manual_seed(a.seed+200000+int(item['row']))
+            _, _, nm, em, t = corrupt(g,cfg,gen,timestep=1)
+            counter.add({'t':t,'atoms':len(g['x']),'bonds':len(g['e']),
+                         'masked_atoms':int(nm.sum()),'masked_bonds':int(em.sum())})
+        audit[split] = counter.report()['t1']
+    save_json(a.output/'t1_mask_audit.json', {'diagnostic_only_not_training':True,
+              'base_probability':noise_probability(cfg,1),'splits':audit})
     rng = torch.Generator().manual_seed(a.seed)
     history = []; best = float('inf')
+    cumulative = SupervisionCounter(cfg.steps,cfg.bond_weight)
+    supervision = {'epochs':[], 'note':'cumulative_train counts actual draws; validation is repeated fixed noise, not independent draws'}
     for epoch in range(1, a.epochs+1):
-        scores = {}; counts = {}
+        scores = {}; counts = {}; epoch_reports = {}
         for split, items in sets.items():
             training = split == 'train'; model.train(training)
             order = torch.randperm(len(items), generator=rng).tolist() if training else list(range(len(items)))
             total = 0.; atoms = bonds = 0
+            counter = SupervisionCounter(cfg.steps,cfg.bond_weight)
             for start in range(0, len(items), a.batch_size):
                 selected = order[start:start+a.batch_size]
                 if training: opt.zero_grad(set_to_none=True)
@@ -69,10 +90,14 @@ def main():
                         if not torch.isfinite(loss): raise FloatingPointError('Nonfinite pretraining loss')
                         if training: (loss/len(selected)).backward()
                     total += float(loss.detach()); atoms += detail['masked_atoms']; bonds += detail['masked_bonds']
+                    counter.add(detail)
                 if training:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), 5., error_if_nonfinite=True); opt.step()
             if not atoms: raise RuntimeError('No masked validation/train atoms; increase smoke size or steps/noise')
             scores[split] = total/len(items); counts[split] = {'masked_atoms': atoms, 'masked_bonds': bonds}
+            epoch_reports[split] = counter.report()
+            counts[split].update({k:epoch_reports[split][k] for k in ('bins','t1')})
+            if training: cumulative.merge(counter)
         history.append({'epoch': epoch, **scores, 'counts': counts})
         if scores['valid'] < best:
             best = scores['valid']
@@ -80,7 +105,11 @@ def main():
                         'method': 'both', 'epoch': epoch}, a.output/'best.pt')
         torch.save({'model': model.state_dict(), 'optimizer': opt.state_dict(), 'rng': rng.get_state(),
                     'torch_rng': torch.get_rng_state(), 'epoch': epoch, 'manifest': manifest}, a.output/'last.pt')
-        save_json(a.output/'history.json', history); print(history[-1], flush=True)
+        supervision['epochs'].append({'epoch':epoch,**epoch_reports})
+        supervision['cumulative_train'] = cumulative.report()
+        save_json(a.output/'supervision.json', supervision)
+        save_json(a.output/'history.json', history)
+        print({'epoch':epoch,**scores,'t1_train':epoch_reports['train']['t1']}, flush=True)
     if code_identity() != source: raise RuntimeError('Source changed during training')
 
 

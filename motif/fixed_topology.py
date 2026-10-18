@@ -4,7 +4,7 @@ Only element and formal charge are node inputs. Aromaticity, hybridization,
 valence and H counts are omitted to avoid revealing masked bond attributes.
 Degree/connectivity remain observable by design, not reconstruction targets.
 """
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 import math
 import torch
 from torch import nn
@@ -21,6 +21,7 @@ class Config:
     hidden: int = 128
     layers: int = 3
     steps: int = 100
+    min_noise: float = .05
     max_noise: float = .85
     region_probability: float = .2
     region_fraction: float = .2
@@ -29,7 +30,7 @@ class Config:
     def __post_init__(self):
         if min(self.hidden, self.layers, self.steps) < 1:
             raise ValueError('Positive dimensions and steps required')
-        if not 0 < self.max_noise <= 1 or not 0 <= self.region_probability <= 1:
+        if not 0 <= self.min_noise < self.max_noise <= 1 or not 0 <= self.region_probability <= 1:
             raise ValueError('Invalid noise probabilities')
         if not 0 < self.region_fraction <= 1 or self.bond_weight < 0:
             raise ValueError('Invalid region fraction or loss weight')
@@ -62,7 +63,14 @@ def records(data, rows, method=None, aligned=None):
     return result
 
 
-def corrupt(g, cfg, generator):
+def noise_probability(cfg, t):
+    if not 0 <= t <= cfg.steps: raise ValueError('Time outside schedule')
+    # Clean state at t=0, followed by an explicit first-step jump to the floor.
+    if t == 0: return 0.
+    return cfg.min_noise + (cfg.max_noise-cfg.min_noise)*(1-math.cos(math.pi*t/cfg.steps))/2
+
+
+def corrupt(g, cfg, generator, timestep=None):
     """Nested absorbing masks; correlated neighborhood component has same t schedule.
 
     Region is selected independently of t; activation uses q(t). Every incident
@@ -70,8 +78,9 @@ def corrupt(g, cfg, generator):
     Each physical bond is stored once and only duplicated during propagation.
     """
     n, m = len(g['x']), len(g['e'])
-    t = int(torch.randint(1, cfg.steps+1, (), generator=generator))
-    q = cfg.max_noise * (1-math.cos(math.pi*t/cfg.steps))/2
+    t = int(torch.randint(1, cfg.steps+1, (), generator=generator)) if timestep is None else timestep
+    if not 1 <= t <= cfg.steps: raise ValueError('Corruption time must be in 1..T')
+    q = noise_probability(cfg, t)
     nodes = torch.rand(n, generator=generator) < q
     edges = torch.rand(m, generator=generator) < q
     if float(torch.rand((), generator=generator)) < cfg.region_probability:
@@ -132,7 +141,8 @@ class Encoder(nn.Module):
         zero = h.sum()*0
         node = torch.stack([F.cross_entropy(logits[nm], g['x'][:, k].to(h.device)[nm]) for k, logits in enumerate(atoms)]).mean() if nm.any() else zero
         edge = F.cross_entropy(bonds[em], g['e'].to(h.device)[em]) if em.any() else zero
-        return node+self.cfg.bond_weight*edge, {'masked_atoms': int(nm.sum()), 'masked_bonds': int(em.sum()), 't': t}
+        return node+self.cfg.bond_weight*edge, {'masked_atoms': int(nm.sum()), 'masked_bonds': int(em.sum()),
+                'atoms': len(g['x']), 'bonds': len(g['e']), 't': t}
 
     def encode_records(self, items, batch_size=8, pair_budget=0):
         # Per-molecule sparse propagation: no padding, no cross-molecule edges.
@@ -149,6 +159,9 @@ class Encoder(nn.Module):
 def load_encoder(path, device='cpu', random=False):
     ck = torch.load(path, map_location='cpu', weights_only=True)
     if ck['schema'] != SCHEMA: raise ValueError('Fixed topology schema mismatch')
-    model = Encoder(ck['model_config'])
+    config = dict(ck['model_config'])
+    # Pre-floor checkpoints retain their original training noise semantics.
+    config.setdefault('min_noise', 0.)
+    model = Encoder(config)
     if not random: model.load_state_dict(ck['model'], strict=True)
     return model.to(device), ck

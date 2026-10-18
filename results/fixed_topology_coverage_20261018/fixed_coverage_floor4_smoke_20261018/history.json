@@ -1,0 +1,430 @@
+[
+  {
+    "epoch": 1,
+    "train": 5.817366915754974,
+    "valid": 5.423288493417203,
+    "counts": {
+      "train": {
+        "masked_atoms": 1739,
+        "masked_bonds": 2812,
+        "bins": {
+          "low": {
+            "sampled_graphs": 39,
+            "atom_supervised_graphs": 35,
+            "bond_supervised_graphs": 37,
+            "effective_graphs": 37,
+            "zero_target_graphs": 2,
+            "atoms": 1053,
+            "bonds": 1133,
+            "masked_atoms": 158,
+            "masked_bonds": 427
+          },
+          "mid": {
+            "sampled_graphs": 37,
+            "atom_supervised_graphs": 37,
+            "bond_supervised_graphs": 37,
+            "effective_graphs": 37,
+            "zero_target_graphs": 0,
+            "atoms": 989,
+            "bonds": 1065,
+            "masked_atoms": 494,
+            "masked_bonds": 903
+          },
+          "high": {
+            "sampled_graphs": 52,
+            "atom_supervised_graphs": 52,
+            "bond_supervised_graphs": 52,
+            "effective_graphs": 52,
+            "zero_target_graphs": 0,
+            "atoms": 1366,
+            "bonds": 1494,
+            "masked_atoms": 1087,
+            "masked_bonds": 1482
+          }
+        },
+        "t1": {
+          "sampled_graphs": 0,
+          "atom_supervised_graphs": 0,
+          "bond_supervised_graphs": 0,
+          "effective_graphs": 0,
+          "zero_target_graphs": 0,
+          "atoms": 0,
+          "bonds": 0,
+          "masked_atoms": 0,
+          "masked_bonds": 0
+        }
+      },
+      "valid": {
+        "masked_atoms": 1753,
+        "masked_bonds": 2890,
+        "bins": {
+          "low": {
+            "sampled_graphs": 39,
+            "atom_supervised_graphs": 37,
+            "bond_supervised_graphs": 39,
+            "effective_graphs": 39,
+            "zero_target_graphs": 0,
+            "atoms": 1076,
+            "bonds": 1178,
+            "masked_atoms": 125,
+            "masked_bonds": 363
+          },
+          "mid": {
+            "sampled_graphs": 42,
+            "atom_supervised_graphs": 42,
+            "bond_supervised_graphs": 42,
+            "effective_graphs": 42,
+            "zero_target_graphs": 0,
+            "atoms": 1135,
+            "bonds": 1252,
+            "masked_atoms": 497,
+            "masked_bonds": 1000
+          },
+          "high": {
+            "sampled_graphs": 47,
+            "atom_supervised_graphs": 47,
+            "bond_supervised_graphs": 47,
+            "effective_graphs": 47,
+            "zero_target_graphs": 0,
+            "atoms": 1395,
+            "bonds": 1532,
+            "masked_atoms": 1131,
+            "masked_bonds": 1527
+          }
+        },
+        "t1": {
+          "sampled_graphs": 2,
+          "atom_supervised_graphs": 2,
+          "bond_supervised_graphs": 2,
+          "effective_graphs": 2,
+          "zero_target_graphs": 0,
+          "atoms": 66,
+          "bonds": 72,
+          "masked_atoms": 7,
+          "masked_bonds": 18
+        }
+      }
+    }
+  },
+  {
+    "epoch": 2,
+    "train": 4.839252442121506,
+    "valid": 4.524212944786996,
+    "counts": {
+      "train": {
+        "masked_atoms": 1568,
+        "masked_bonds": 2622,
+        "bins": {
+          "low": {
+            "sampled_graphs": 46,
+            "atom_supervised_graphs": 40,
+            "bond_supervised_graphs": 45,
+            "effective_graphs": 45,
+            "zero_target_graphs": 1,
+            "atoms": 1136,
+            "bonds": 1229,
+            "masked_atoms": 129,
+            "masked_bonds": 357
+          },
+          "mid": {
+            "sampled_graphs": 41,
+            "atom_supervised_graphs": 41,
+            "bond_supervised_graphs": 41,
+            "effective_graphs": 41,
+            "zero_target_graphs": 0,
+            "atoms": 1175,
+            "bonds": 1270,
+            "masked_atoms": 593,
+            "masked_bonds": 1093
+          },
+          "high": {
+            "sampled_graphs": 41,
+            "atom_supervised_graphs": 41,
+            "bond_supervised_graphs": 41,
+            "effective_graphs": 41,
+            "zero_target_graphs": 0,
+            "atoms": 1097,
+            "bonds": 1193,
+            "masked_atoms": 846,
+            "masked_bonds": 1172
+          }
+        },
+        "t1": {
+          "sampled_graphs": 5,
+          "atom_supervised_graphs": 5,
+          "bond_supervised_graphs": 5,
+          "effective_graphs": 5,
+          "zero_target_graphs": 0,
+          "atoms": 131,
+          "bonds": 142,
+          "masked_atoms": 8,
+          "masked_bonds": 22
+        }
+      },
+      "valid": {
+        "masked_atoms": 1753,
+        "masked_bonds": 2890,
+        "bins": {
+          "low": {
+            "sampled_graphs": 39,
+            "atom_supervised_graphs": 37,
+            "bond_supervised_graphs": 39,
+            "effective_graphs": 39,
+            "zero_target_graphs": 0,
+            "atoms": 1076,
+            "bonds": 1178,
+            "masked_atoms": 125,
+            "masked_bonds": 363
+          },
+          "mid": {
+            "sampled_graphs": 42,
+            "atom_supervised_graphs": 42,
+            "bond_supervised_graphs": 42,
+            "effective_graphs": 42,
+            "zero_target_graphs": 0,
+            "atoms": 1135,
+            "bonds": 1252,
+            "masked_atoms": 497,
+            "masked_bonds": 1000
+          },
+          "high": {
+            "sampled_graphs": 47,
+            "atom_supervised_graphs": 47,
+            "bond_supervised_graphs": 47,
+            "effective_graphs": 47,
+            "zero_target_graphs": 0,
+            "atoms": 1395,
+            "bonds": 1532,
+            "masked_atoms": 1131,
+            "masked_bonds": 1527
+          }
+        },
+        "t1": {
+          "sampled_graphs": 2,
+          "atom_supervised_graphs": 2,
+          "bond_supervised_graphs": 2,
+          "effective_graphs": 2,
+          "zero_target_graphs": 0,
+          "atoms": 66,
+          "bonds": 72,
+          "masked_atoms": 7,
+          "masked_bonds": 18
+        }
+      }
+    }
+  },
+  {
+    "epoch": 3,
+    "train": 4.041914242785424,
+    "valid": 3.726351783145219,
+    "counts": {
+      "train": {
+        "masked_atoms": 1613,
+        "masked_bonds": 2696,
+        "bins": {
+          "low": {
+            "sampled_graphs": 37,
+            "atom_supervised_graphs": 33,
+            "bond_supervised_graphs": 35,
+            "effective_graphs": 35,
+            "zero_target_graphs": 2,
+            "atoms": 1024,
+            "bonds": 1108,
+            "masked_atoms": 129,
+            "masked_bonds": 358
+          },
+          "mid": {
+            "sampled_graphs": 46,
+            "atom_supervised_graphs": 46,
+            "bond_supervised_graphs": 46,
+            "effective_graphs": 46,
+            "zero_target_graphs": 0,
+            "atoms": 1241,
+            "bonds": 1346,
+            "masked_atoms": 577,
+            "masked_bonds": 1108
+          },
+          "high": {
+            "sampled_graphs": 45,
+            "atom_supervised_graphs": 45,
+            "bond_supervised_graphs": 45,
+            "effective_graphs": 45,
+            "zero_target_graphs": 0,
+            "atoms": 1143,
+            "bonds": 1238,
+            "masked_atoms": 907,
+            "masked_bonds": 1230
+          }
+        },
+        "t1": {
+          "sampled_graphs": 4,
+          "atom_supervised_graphs": 4,
+          "bond_supervised_graphs": 4,
+          "effective_graphs": 4,
+          "zero_target_graphs": 0,
+          "atoms": 109,
+          "bonds": 118,
+          "masked_atoms": 10,
+          "masked_bonds": 31
+        }
+      },
+      "valid": {
+        "masked_atoms": 1753,
+        "masked_bonds": 2890,
+        "bins": {
+          "low": {
+            "sampled_graphs": 39,
+            "atom_supervised_graphs": 37,
+            "bond_supervised_graphs": 39,
+            "effective_graphs": 39,
+            "zero_target_graphs": 0,
+            "atoms": 1076,
+            "bonds": 1178,
+            "masked_atoms": 125,
+            "masked_bonds": 363
+          },
+          "mid": {
+            "sampled_graphs": 42,
+            "atom_supervised_graphs": 42,
+            "bond_supervised_graphs": 42,
+            "effective_graphs": 42,
+            "zero_target_graphs": 0,
+            "atoms": 1135,
+            "bonds": 1252,
+            "masked_atoms": 497,
+            "masked_bonds": 1000
+          },
+          "high": {
+            "sampled_graphs": 47,
+            "atom_supervised_graphs": 47,
+            "bond_supervised_graphs": 47,
+            "effective_graphs": 47,
+            "zero_target_graphs": 0,
+            "atoms": 1395,
+            "bonds": 1532,
+            "masked_atoms": 1131,
+            "masked_bonds": 1527
+          }
+        },
+        "t1": {
+          "sampled_graphs": 2,
+          "atom_supervised_graphs": 2,
+          "bond_supervised_graphs": 2,
+          "effective_graphs": 2,
+          "zero_target_graphs": 0,
+          "atoms": 66,
+          "bonds": 72,
+          "masked_atoms": 7,
+          "masked_bonds": 18
+        }
+      }
+    }
+  },
+  {
+    "epoch": 4,
+    "train": 3.3322518304921687,
+    "valid": 3.0335702705197036,
+    "counts": {
+      "train": {
+        "masked_atoms": 1548,
+        "masked_bonds": 2614,
+        "bins": {
+          "low": {
+            "sampled_graphs": 41,
+            "atom_supervised_graphs": 37,
+            "bond_supervised_graphs": 40,
+            "effective_graphs": 40,
+            "zero_target_graphs": 1,
+            "atoms": 1145,
+            "bonds": 1254,
+            "masked_atoms": 135,
+            "masked_bonds": 414
+          },
+          "mid": {
+            "sampled_graphs": 43,
+            "atom_supervised_graphs": 43,
+            "bond_supervised_graphs": 43,
+            "effective_graphs": 43,
+            "zero_target_graphs": 0,
+            "atoms": 1076,
+            "bonds": 1160,
+            "masked_atoms": 493,
+            "masked_bonds": 942
+          },
+          "high": {
+            "sampled_graphs": 44,
+            "atom_supervised_graphs": 44,
+            "bond_supervised_graphs": 44,
+            "effective_graphs": 44,
+            "zero_target_graphs": 0,
+            "atoms": 1187,
+            "bonds": 1278,
+            "masked_atoms": 920,
+            "masked_bonds": 1258
+          }
+        },
+        "t1": {
+          "sampled_graphs": 2,
+          "atom_supervised_graphs": 2,
+          "bond_supervised_graphs": 2,
+          "effective_graphs": 2,
+          "zero_target_graphs": 0,
+          "atoms": 53,
+          "bonds": 57,
+          "masked_atoms": 2,
+          "masked_bonds": 8
+        }
+      },
+      "valid": {
+        "masked_atoms": 1753,
+        "masked_bonds": 2890,
+        "bins": {
+          "low": {
+            "sampled_graphs": 39,
+            "atom_supervised_graphs": 37,
+            "bond_supervised_graphs": 39,
+            "effective_graphs": 39,
+            "zero_target_graphs": 0,
+            "atoms": 1076,
+            "bonds": 1178,
+            "masked_atoms": 125,
+            "masked_bonds": 363
+          },
+          "mid": {
+            "sampled_graphs": 42,
+            "atom_supervised_graphs": 42,
+            "bond_supervised_graphs": 42,
+            "effective_graphs": 42,
+            "zero_target_graphs": 0,
+            "atoms": 1135,
+            "bonds": 1252,
+            "masked_atoms": 497,
+            "masked_bonds": 1000
+          },
+          "high": {
+            "sampled_graphs": 47,
+            "atom_supervised_graphs": 47,
+            "bond_supervised_graphs": 47,
+            "effective_graphs": 47,
+            "zero_target_graphs": 0,
+            "atoms": 1395,
+            "bonds": 1532,
+            "masked_atoms": 1131,
+            "masked_bonds": 1527
+          }
+        },
+        "t1": {
+          "sampled_graphs": 2,
+          "atom_supervised_graphs": 2,
+          "bond_supervised_graphs": 2,
+          "effective_graphs": 2,
+          "zero_target_graphs": 0,
+          "atoms": 66,
+          "bonds": 72,
+          "masked_atoms": 7,
+          "masked_bonds": 18
+        }
+      }
+    }
+  }
+]
