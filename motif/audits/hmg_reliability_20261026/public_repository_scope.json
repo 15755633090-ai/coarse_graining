@@ -1,0 +1,32 @@
+{
+  "retrieved_date": "2026-10-26",
+  "repository": "AKZstar/HMG-MRL",
+  "branches": [
+    {
+      "name": "main",
+      "commit": {
+        "sha": "6ad69261eb1af36c8c0b96594d79a7639b969223",
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/commits/6ad69261eb1af36c8c0b96594d79a7639b969223"
+      },
+      "protected": false
+    }
+  ],
+  "issues": [],
+  "releases": [],
+  "commits": [
+    {
+      "sha": "6ad69261eb1af36c8c0b96594d79a7639b969223",
+      "message": "Simplify README wording",
+      "date": "2026-09-07T13:06:45Z"
+    },
+    {
+      "sha": "ba9dabee58eba53c28a4f26a57526fbba99d8d42",
+      "message": "Initial public release of HMG-MRL core implementation",
+      "date": "2026-09-07T12:46:08Z"
+    }
+  ],
+  "changed_files_since_initial": [
+    "README.md"
+  ],
+  "notes": "Read-only public material review. No author contact. The tags endpoint was not supported by the connector and is not asserted checked."
+}

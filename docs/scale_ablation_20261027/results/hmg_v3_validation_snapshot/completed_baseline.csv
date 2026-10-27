@@ -1,0 +1,3 @@
+seed,arm,epochs_run,best_epoch,valid_rmse,test_evaluated,stop_reason
+2020,ASD,100,92,0.5915790240059738,False,budget_capped
+2021,ASD,100,78,0.6554590938631146,False,budget_capped

@@ -1,0 +1,19 @@
+{
+  "phase": "paused",
+  "user_requested": true,
+  "paused_at": "2026-10-26T16:28:48.1928445+08:00",
+  "process_id": 20404,
+  "completed": 19,
+  "total": 21,
+  "previous_status": {
+    "phase": "training",
+    "seed": 2,
+    "arm": "AD",
+    "epoch": 44,
+    "batch": 150,
+    "completed": 19,
+    "total": 21
+  },
+  "reason": "User requested pause and protocol corrections; incomplete arm not optimizer-resumable",
+  "preserve_existing_results": true
+}

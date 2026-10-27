@@ -1,0 +1,8 @@
+arm,n,paired_complete_seeds,test_rmse_mean,test_rmse_sd,interpretation
+A,2,"0,1",0.6954213298445376,0.008750783568915137,legacy exploratory; not paper-protocol replication
+S,2,"0,1",0.7457125321880869,0.018198187978480322,legacy exploratory; not paper-protocol replication
+D,2,"0,1",0.7596379782489441,0.00785233512289747,legacy exploratory; not paper-protocol replication
+AS,2,"0,1",0.7118510442758315,0.017930596754369147,legacy exploratory; not paper-protocol replication
+AD,2,"0,1",0.7298187918476173,0.03318924653710605,legacy exploratory; not paper-protocol replication
+SD,2,"0,1",0.7343990244403527,0.00027594830659515083,legacy exploratory; not paper-protocol replication
+ASD,2,"0,1",0.7275364370621066,0.008926828574635328,legacy exploratory; not paper-protocol replication

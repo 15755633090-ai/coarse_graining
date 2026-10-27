@@ -1,0 +1,8 @@
+{
+  "local_rows": 4200,
+  "official_rows": 4200,
+  "canonical_isomeric_smiles_and_labels_multiset_equal": true,
+  "unmatched_local_rows": 0,
+  "unmatched_official_rows": 0,
+  "comparison": "structure-label multiset, labels rounded to 8 decimal places; does not validate the split"
+}

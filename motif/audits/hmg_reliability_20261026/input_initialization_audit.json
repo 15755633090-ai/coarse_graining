@@ -1,0 +1,131 @@
+{
+  "split_counts": {
+    "train": 3360,
+    "valid": 420,
+    "test": 420
+  },
+  "scaffold_definition": "RDKit Bemis-Murcko, includeChirality=False",
+  "scaffold_overlap": [
+    {
+      "splits": [
+        "train",
+        "valid"
+      ],
+      "shared_scaffolds": 9,
+      "shared_nonempty_scaffolds": 9,
+      "examples": [
+        "C(=Cc1ccccc1)Sc1ccccc1",
+        "O=C(Cc1ccccc1)NC1CCN(CCC(c2ccccc2)C2CCNCC2)CC1",
+        "O=C(NC1CN2CCC1CC2)c1ccc(-c2ccccc2)s1",
+        "O=C(Nc1nccs1)C(CC1CCCC1)c1ccccc1",
+        "c1ccc(C(OCCC2CCCN2)c2ccccc2)cc1"
+      ],
+      "identical_smiles_shared": 0
+    },
+    {
+      "splits": [
+        "train",
+        "test"
+      ],
+      "shared_scaffolds": 3,
+      "shared_nonempty_scaffolds": 3,
+      "examples": [
+        "O=C(Nc1ccccc1)N1CCN(CC2CCCNC2)CC1",
+        "O=C1NC(=O)C(=Cc2ccccc2)S1",
+        "c1cc2c3c(c[nH]c3c1)CC1NCCCC21"
+      ],
+      "identical_smiles_shared": 0
+    },
+    {
+      "splits": [
+        "valid",
+        "test"
+      ],
+      "shared_scaffolds": 0,
+      "shared_nonempty_scaffolds": 0,
+      "examples": [],
+      "identical_smiles_shared": 0
+    }
+  ],
+  "descriptors": {
+    "shape": [
+      3360,
+      200
+    ],
+    "all_finite": true,
+    "train_mean_min": 0.0,
+    "train_mean_max": 0.9999999999992013,
+    "train_mean_abs_median": 0.40099962574537595,
+    "train_sd_median_nonconstant": 0.27885721386339424,
+    "nonconstant_columns": 185,
+    "approximately_zero_mean_columns": 4,
+    "approximately_unit_sd_columns": 0,
+    "cache_transform": "official DeepChem RDKitDescriptors(is_normalized=True), plus one documented validation-row median imputation",
+    "train_fitted_zscore_in_current_runner": false,
+    "adapter_descriptor_array_matches_cache_exact": true
+  },
+  "initialization": {
+    "source": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\runs\\scale_pairs_3seeds_20261018\\hmg_seed0\\initial_states.pt",
+    "motif_transformer_norm_tensors": [
+      {
+        "name": "motif_encoder.layers.0.sublayer.0.norm.weight",
+        "unique_values": [
+          1.0
+        ],
+        "mean": 1.0
+      },
+      {
+        "name": "motif_encoder.layers.0.sublayer.0.norm.bias",
+        "unique_values": [
+          0.0
+        ],
+        "mean": 0.0
+      },
+      {
+        "name": "motif_encoder.layers.0.sublayer.1.norm.weight",
+        "unique_values": [
+          1.0
+        ],
+        "mean": 1.0
+      },
+      {
+        "name": "motif_encoder.layers.0.sublayer.1.norm.bias",
+        "unique_values": [
+          0.0
+        ],
+        "mean": 0.0
+      },
+      {
+        "name": "motif_encoder.layers.1.sublayer.0.norm.weight",
+        "unique_values": [
+          1.0
+        ],
+        "mean": 1.0
+      },
+      {
+        "name": "motif_encoder.layers.1.sublayer.0.norm.bias",
+        "unique_values": [
+          0.0
+        ],
+        "mean": 0.0
+      },
+      {
+        "name": "motif_encoder.layers.1.sublayer.1.norm.weight",
+        "unique_values": [
+          1.0
+        ],
+        "mean": 1.0
+      },
+      {
+        "name": "motif_encoder.layers.1.sublayer.1.norm.bias",
+        "unique_values": [
+          0.0
+        ],
+        "mean": 0.0
+      }
+    ],
+    "all_2d_weights_are_default_uniform_bounded": true,
+    "runner_calls_official_initialize_weights": false
+  },
+  "limitations": "Descriptor statistics establish a protocol discrepancy, not its causal performance impact. Scaffold overlap does not establish the exact historical split generator."
+}

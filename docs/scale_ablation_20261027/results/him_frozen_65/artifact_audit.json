@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "checkpoints": 65,
+  "prediction_files": 130,
+  "rows_per_prediction_file": {
+    "valid": 420,
+    "test": 420
+  },
+  "max_metric_recomputation_error": 1.0266089489618935e-07,
+  "model_test_rerun": false
+}

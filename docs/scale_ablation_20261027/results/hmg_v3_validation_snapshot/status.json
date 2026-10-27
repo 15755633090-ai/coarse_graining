@@ -1,0 +1,9 @@
+{
+  "phase": "training",
+  "seed": 2022,
+  "arm": "ASD",
+  "epoch": 37,
+  "batch": 39,
+  "completed": 2,
+  "total": 5
+}

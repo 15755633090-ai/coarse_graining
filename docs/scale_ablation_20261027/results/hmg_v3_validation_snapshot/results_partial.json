@@ -1,0 +1,145 @@
+[
+  {
+    "seed": 2020,
+    "arm": "ASD",
+    "best_epoch": 92,
+    "epochs_run": 100,
+    "valid_rmse": 0.5915790240059738,
+    "protocol_version": "hmg-paper-informed-v2",
+    "design_version": "hmg-design-v3",
+    "case_id": "native/ASD",
+    "study": "native",
+    "prepared_fingerprint": "5e91bb76b5e69ae10c5803b639d2a34fa0c41416810a5244cb3437572a71f560",
+    "reused_v2_baseline": false,
+    "test_evaluated": false,
+    "checkpoint_sha256": "a965bd66f77bb377932fc37037840460fe88c7b65d7e2dcde70e619985f3e1d3",
+    "capacity_matched": false,
+    "convergence": {
+      "stop_reason": "budget_capped",
+      "selected_epoch": 92,
+      "best_valid_rmse": 0.5915790240059738,
+      "last_epoch": 100,
+      "budget": 100,
+      "patience": 50,
+      "hit_budget": true,
+      "operational_stopping_criterion_satisfied": false,
+      "needs_budget_review": true,
+      "mathematical_convergence_claim": false,
+      "near_optimal_tolerance": 0.005,
+      "near_optimal_epochs": [
+        88,
+        89,
+        92,
+        93
+      ],
+      "selection_margin": 0.0008578585564424923
+    },
+    "shared_training_choices": {
+      "target_scaling": "raw",
+      "scheduler": "constant",
+      "loss_units": "raw target MSE",
+      "lr": 0.001,
+      "batch_size": 64,
+      "patience": 50,
+      "budget_ladder": [
+        100,
+        200,
+        400
+      ],
+      "gradient_clip": null,
+      "contrastive_temperature": 0.3,
+      "head_width": 128,
+      "feature_cache_sha256": "efdba0e8fb69b78f6dc88f9158a9c763bd90f3bf2743e6530b372feeeaa5dfe7",
+      "paper_source_sha256": {
+        "config.py": "a8ba23a881ca5cc17e32b383546ef9622cf3172b646136eb6306f4885a08ca43",
+        "model\\act_func.py": "0a18d908fc69e1d9f55e41bbaeb76588df659af476ef769871a4d471609ab220",
+        "model\\bipartite_transformer.py": "21e4f1f4d88c0c2658f3b983bed3095674edfcc4c57a1b6caf805f1584e4847e",
+        "model\\layer_utils.py": "20d2fa60b0d74353e9378d58ba33aadb26825d6785fca9d49a38652d8b98d2b6",
+        "other_utils.py": "a4c692f8f1fce73fcacabfccac1053de4a87bf1f65798e3f4efd604fe620773b",
+        "preprocess\\__init__.py": "a8ce5151cbeebae35b8a132914fa0fefb827e078ca7ccb7370710a5c8b98b132",
+        "preprocess\\Featurizer_atom_bond.py": "35f52d8fe8dc5eadff47e5bb05f7fd7bc3a71c20f5387a67da30ad30e0774c79",
+        "preprocess\\get_atom_bond_frag_info.py": "4dc1eb9b14086ed8d92cb16f5bac287dfdb50f53e12b9b7bf39a465ddbf23f6d",
+        "preprocess\\motif_utils.py": "c43de1f46ec0704f2efaed7a628a9b44c08178debcfb9e696bbec0d998ad2c9f",
+        "run_main.py": "41b6ad70d03ab93ebf5009e79cd35babd12ad8e4a9892bbc87c1d790cf44353b"
+      },
+      "implementation_sha256": {
+        "train_hmg_design.py": "3565df9496568212c063ac92227375d9c7d1ee7fbe70111045139847fe9746f5",
+        "hmg_protocol_v2.py": "3dce04e659593561fb4ddaef98760b795661d70fcbd4194f277e67290385eca3",
+        "hmg_fusion_ablation.py": "11352edbbcd92557d8a74701bfe8b79a9a7e051a9400871cf87da2491de34d7b",
+        "paper_data.py": "c67c8e8ebcc56ca3465b33cb04f2f35a28e07c956dff552a078edecfd57b0e0b",
+        "hmg_design_models.py": "6177e5b9d55bf8f1b19abbdeac76096447dad3d1e3703d7fd2a4828fbcc8960d",
+        "hmg_study_controls.py": "6a1edff9a076788ce4393cb2a5003b880bd6fd8ce0ea93ea2c775dd3bea47a7c"
+      }
+    }
+  },
+  {
+    "seed": 2021,
+    "arm": "ASD",
+    "best_epoch": 78,
+    "epochs_run": 100,
+    "valid_rmse": 0.6554590938631146,
+    "protocol_version": "hmg-paper-informed-v2",
+    "design_version": "hmg-design-v3",
+    "case_id": "native/ASD",
+    "study": "native",
+    "prepared_fingerprint": "5e91bb76b5e69ae10c5803b639d2a34fa0c41416810a5244cb3437572a71f560",
+    "reused_v2_baseline": false,
+    "test_evaluated": false,
+    "checkpoint_sha256": "627fcacc9318c0a25c972e95a2ea03d05d965b4dde4f3dcbb1c65bf59d6ec0b6",
+    "capacity_matched": false,
+    "convergence": {
+      "stop_reason": "budget_capped",
+      "selected_epoch": 78,
+      "best_valid_rmse": 0.6554590938631146,
+      "last_epoch": 100,
+      "budget": 100,
+      "patience": 50,
+      "hit_budget": true,
+      "operational_stopping_criterion_satisfied": false,
+      "needs_budget_review": true,
+      "mathematical_convergence_claim": false,
+      "near_optimal_tolerance": 0.005,
+      "near_optimal_epochs": [
+        78
+      ],
+      "selection_margin": 0.005231840558386325
+    },
+    "shared_training_choices": {
+      "target_scaling": "raw",
+      "scheduler": "constant",
+      "loss_units": "raw target MSE",
+      "lr": 0.001,
+      "batch_size": 64,
+      "patience": 50,
+      "budget_ladder": [
+        100,
+        200,
+        400
+      ],
+      "gradient_clip": null,
+      "contrastive_temperature": 0.3,
+      "head_width": 128,
+      "feature_cache_sha256": "efdba0e8fb69b78f6dc88f9158a9c763bd90f3bf2743e6530b372feeeaa5dfe7",
+      "paper_source_sha256": {
+        "config.py": "a8ba23a881ca5cc17e32b383546ef9622cf3172b646136eb6306f4885a08ca43",
+        "model\\act_func.py": "0a18d908fc69e1d9f55e41bbaeb76588df659af476ef769871a4d471609ab220",
+        "model\\bipartite_transformer.py": "21e4f1f4d88c0c2658f3b983bed3095674edfcc4c57a1b6caf805f1584e4847e",
+        "model\\layer_utils.py": "20d2fa60b0d74353e9378d58ba33aadb26825d6785fca9d49a38652d8b98d2b6",
+        "other_utils.py": "a4c692f8f1fce73fcacabfccac1053de4a87bf1f65798e3f4efd604fe620773b",
+        "preprocess\\__init__.py": "a8ce5151cbeebae35b8a132914fa0fefb827e078ca7ccb7370710a5c8b98b132",
+        "preprocess\\Featurizer_atom_bond.py": "35f52d8fe8dc5eadff47e5bb05f7fd7bc3a71c20f5387a67da30ad30e0774c79",
+        "preprocess\\get_atom_bond_frag_info.py": "4dc1eb9b14086ed8d92cb16f5bac287dfdb50f53e12b9b7bf39a465ddbf23f6d",
+        "preprocess\\motif_utils.py": "c43de1f46ec0704f2efaed7a628a9b44c08178debcfb9e696bbec0d998ad2c9f",
+        "run_main.py": "41b6ad70d03ab93ebf5009e79cd35babd12ad8e4a9892bbc87c1d790cf44353b"
+      },
+      "implementation_sha256": {
+        "train_hmg_design.py": "3565df9496568212c063ac92227375d9c7d1ee7fbe70111045139847fe9746f5",
+        "hmg_protocol_v2.py": "3dce04e659593561fb4ddaef98760b795661d70fcbd4194f277e67290385eca3",
+        "hmg_fusion_ablation.py": "11352edbbcd92557d8a74701bfe8b79a9a7e051a9400871cf87da2491de34d7b",
+        "paper_data.py": "c67c8e8ebcc56ca3465b33cb04f2f35a28e07c956dff552a078edecfd57b0e0b",
+        "hmg_design_models.py": "6177e5b9d55bf8f1b19abbdeac76096447dad3d1e3703d7fd2a4828fbcc8960d",
+        "hmg_study_controls.py": "6a1edff9a076788ce4393cb2a5003b880bd6fd8ce0ea93ea2c775dd3bea47a7c"
+      }
+    }
+  }
+]

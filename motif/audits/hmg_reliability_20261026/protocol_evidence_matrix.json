@@ -1,0 +1,134 @@
+{
+  "date": "2026-10-26",
+  "official_commit": "6ad69261eb1af36c8c0b96594d79a7639b969223",
+  "paper_url": "https://academic.oup.com/bioinformatics/article/42/8/btag600/8758503",
+  "primary_text_characters": 53196,
+  "supplement_pages": 16,
+  "target_scaling_keyword_hits": 0,
+  "public_reference": {
+    "task_name": "bace",
+    "tasks": [
+      "Class"
+    ],
+    "epochs": 100,
+    "max_epochs": 100,
+    "batch_size": 64,
+    "warmup_epochs": 2,
+    "max_lr": 0.001,
+    "final_lr": 0.0001,
+    "early_roc_epochs": 50,
+    "early_loss_epochs": 20,
+    "lr_scheduler_type": "noam",
+    "weight_decay": 1e-05,
+    "temperature": 0.15,
+    "ct_loss_coff": 0.15,
+    "grid_learning_rate": [
+      0.001
+    ],
+    "grid_seeds": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "noam_init_lr": 0.0001,
+    "noam_step_timing": "after each training batch",
+    "stopping": "both ROC stagnation >50 and loss stagnation >20",
+    "target_loss": "weighted CrossEntropyLoss; classification reference, not regression"
+  },
+  "official_history": [
+    {
+      "sha": "6ad69261eb1af36c8c0b96594d79a7639b969223",
+      "message": "Simplify README wording",
+      "date": "2026-09-07T13:06:45Z"
+    },
+    {
+      "sha": "ba9dabee58eba53c28a4f26a57526fbba99d8d42",
+      "message": "Initial public release of HMG-MRL core implementation",
+      "date": "2026-09-07T12:46:08Z"
+    }
+  ],
+  "official_history_changed_files": [
+    "README.md"
+  ],
+  "branches_checked": [
+    "main"
+  ],
+  "releases_checked": 0,
+  "issues_checked": 0,
+  "source_sha256": {
+    "config.py": "a8ba23a881ca5cc17e32b383546ef9622cf3172b646136eb6306f4885a08ca43",
+    "run_main.py": "41b6ad70d03ab93ebf5009e79cd35babd12ad8e4a9892bbc87c1d790cf44353b",
+    "other_utils.py": "a4c692f8f1fce73fcacabfccac1053de4a87bf1f65798e3f4efd604fe620773b",
+    "model\\bipartite_transformer.py": "21e4f1f4d88c0c2658f3b983bed3095674edfcc4c57a1b6caf805f1584e4847e"
+  },
+  "settings": [
+    {
+      "setting": "regression_alignment_hyperparameters",
+      "paper": "supplement section 5: alpha=.15 and tau=.30 for all regression datasets",
+      "public_code": "classification default alpha=.15, tau=.15",
+      "conclusion": "v2 explicitly applies tau=.30 before model construction; runtime InfoNCE must be checked",
+      "status": "paper_regression_confirmed"
+    },
+    {
+      "setting": "regression_prediction_loss",
+      "paper": "MSE, equation 12 explanation",
+      "public_code": "classification CrossEntropyLoss",
+      "conclusion": "MSE confirmed; raw vs train-standardized regression targets not specified",
+      "status": "partial"
+    },
+    {
+      "setting": "regression_target_scaling",
+      "paper": "no explicit target/label scaling statement found in inspected full text and supplement",
+      "public_code": "no regression training entry found",
+      "conclusion": "must remain an explicit assumption",
+      "status": "unresolved"
+    },
+    {
+      "setting": "regression_scheduler",
+      "paper": "initial learning rate 1e-3, scheduler not specified",
+      "public_code": "classification Noam: init 1e-4, peak 1e-3, final 1e-4, warmup 2 epochs",
+      "conclusion": "public Noam is known; not evidence of the regression schedule",
+      "status": "classification_reference_only"
+    },
+    {
+      "setting": "regression_max_epochs",
+      "paper": "patience 50; no maximum epoch budget identified",
+      "public_code": "classification epochs=100 and max_epochs=100",
+      "conclusion": "100 is explicit in public classification config, not confirmed for regression",
+      "status": "classification_reference_only"
+    },
+    {
+      "setting": "paper_scaffold_rows",
+      "paper": "8:1:1 scaffold, five runs",
+      "public_code": "wrapper calls external scaffold_split; train/valid repool uses random_state=8",
+      "conclusion": "exact implementation and five row lists not supplied; new strict splits are project splits",
+      "status": "unresolved"
+    },
+    {
+      "setting": "single_granularity_definition",
+      "paper": "supplement section 12 gives single-granularity and capacity-matched variants",
+      "public_code": "only full model and classification entry; variant scripts not found",
+      "conclusion": "current fusion-subset variants are not verified author variants",
+      "status": "unresolved"
+    },
+    {
+      "setting": "fusion_formula_vs_code",
+      "paper": "equation 11 displays weighted sum",
+      "public_code": "weighted context plus unweighted view-sum residual, then activation",
+      "conclusion": "preserve official forward; ask whether formula is abbreviated",
+      "status": "clarification_needed"
+    },
+    {
+      "setting": "CLS_construction",
+      "paper": "describes a learnable CLS token",
+      "public_code": "first token initialized by whole-molecule atom/bond statistics, then learned projections/attention",
+      "conclusion": "do not invent a free nn.Parameter CLS; ask intended token construction",
+      "status": "clarification_needed"
+    }
+  ],
+  "exact_paper_regression_recipe_recovered": false,
+  "formal_training_remains_paused": true,
+  "limitation": "Keyword absence and lack of public scripts do not establish what was used privately; no author contact."
+}

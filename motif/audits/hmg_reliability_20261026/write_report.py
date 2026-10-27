@@ -1,0 +1,102 @@
+"""Collect reproducible audit records; do not reinterpret test rankings."""
+import json
+from pathlib import Path
+
+OUT=Path(__file__).resolve().parent;ROOT=OUT.parents[2]
+def read(name):return json.loads((OUT/name).read_text(encoding='utf-8-sig'))
+sources=read('source_comparison.json');inputs=read('input_initialization_audit.json')
+parity=read('full_numerical_parity.json');dataset=read('dataset_identity.json')
+assert sources['local_checkout_verified_against_remote_git_blobs'] and parity['passed']
+assert all(x['sha256_matches_protocol'] for x in sources['runtime_source_files'])
+assert all(x['sha256_matches_protocol'] for x in sources['worker_implementation'])
+paper='https://academic.oup.com/bioinformatics/article/42/8/btag600/8758503'
+official='https://github.com/AKZstar/HMG-MRL/tree/'+sources['official_commit']
+policy=dict(assessment_date='2026-10-26',run='motif/runs/hmg_fusion_7arms_3seeds_20261025',
+    official_commit=sources['official_commit'],official_source_parity_verified=True,
+    full_forward_backward_step_parity_verified=True,paper_training_protocol_verified=False,
+    descriptor_train_zscore_matches_paper=False,initialization_matches_public_training_entry=False,
+    exact_paper_split_reproduced=False,causal_explanation_of_ranking_established=False,
+    result_scope='exploratory results under the recorded local protocol; not a paper reproduction or evidence against the paper',
+    required_before_reproduction_claim=['train-fitted descriptor z-score','public initializer and regression configuration',
+        'Adam/lr/batch/patience aligned to primary source','five verified scaffold-based runs',
+        'explicit ablation/auxiliary/capacity definition','new protocol version, new Full baseline before new ablations'],
+    no_current_training_source_modified=True,no_new_test_forward_in_audit=True,
+    report=str((OUT/'REPORT_CN.md').relative_to(ROOT)))
+(OUT/'RESULT_USAGE.json').write_text(json.dumps(policy,ensure_ascii=False,indent=2),encoding='utf-8')
+job=ROOT/'motif/runs/hmg_fusion_7arms_3seeds_20261025/results'
+(job/'reliability_audit.json').write_text(json.dumps(policy,ensure_ascii=False,indent=2),encoding='utf-8')
+lines=['# HMG-MRL 实验可信性核验','',
+    '日期：2026-10-26。结论：原模型实现一致性检查通过；论文实验协议一致性未通过。'
+    '当前性能排名不能作为论文融合无效、尺度冗余或某分支无用的证据。','',
+    '## 1. 官方版本与代码一致性','',
+    f'作者仓库固定为 [{sources["official_commit"]}]({official})。经 GitHub API 读取远端提交和完整 Git 树，'
+    f'将本地 {len(sources["files"])} 个仓库文件按 Git blob SHA 核对，允许仅 CRLF/LF 的检出差异。'
+    '当前运行归档中的 10 个上游 Python 文件与官方版本文本及 AST 一致；运行快照也与锁定哈希一致。'
+    '未发现本次自定义代码改写原编码器、分支注意力、残差或分类头。','',
+    '数据文件、SMARTS 词典和电负性资源在作者检出副本中也通过远端 blob 核验。'
+    '这些资源不位于运行归档并不表示模型运行缺少缓存；训练实际读取事先生成的特征缓存。','',
+    '## 2. 数值一致性','',
+    '仅用训练行 0、1，在相同权重、缓存输入、RNG、监督 MSE+0.15 对齐目标和 AdamW 单步条件下，'
+    '比较官方原类与当前 ASD：','',
+    '| 检查 | 最大绝对差 |','|---|---:|',
+    f'| eval 前向 | {parity["eval_output_max_error"]} |',
+    f'| train 前向 | {parity["train_output_max_error"]} |',
+    f'| 总损失 | {parity["total_loss_error"]} |',
+    f'| 参数梯度 | {parity["gradient_max_error"]} |',
+    f'| 单步更新后的参数 | {parity["one_adamw_step_parameter_max_error"]} |','',
+    '这是相同本地协议下的有限样本数值等价检查，不是 AdamW、目标标准化或训练参数符合论文的证明。'
+    '审计没有执行任何新的测试集 forward。','',
+    '## 3. 已证实的协议偏差','',
+    f'依据[论文正文 §2.1、§2.2.3、训练段落]({paper})及[公开训练入口]({official}/run_main.py)：','',
+    '| 项目 | 论文/公开入口 | 当前队列 | 判定 |','|---|---|---|---|',
+    '| 优化器 | 正文 Adam | AdamW | 不一致 |',
+    '| 学习率 | 正文初始 1e-3 | 固定 1e-4 | 不一致 |',
+    '| batch | 正文 64 | 16 | 不一致；对齐损失的批内负例数也改变 |',
+    '| 早停 | 正文 patience 50 | 20，且 100 epoch 上限 | 不一致 |',
+    '| 重复与划分 | 正文五次 scaffold-based runs | 三个训练种子、同一历史划分 | 不等价 |',
+    '| 描述符 | 正文要求训练集均值/标准差标准化 | DeepChem 固定归一化缓存直接输入，无训练集 z-score | 不一致 |',
+    '| 初始化 | 公开 run_main 调用 initialize_weights | 保存初值等于默认构造器 seed 2000，未调用该函数 | 不一致 |','',
+    '上表区分正文与公开入口，不把默认分类脚本配置直接冒充作者 Lipo 回归配置。'
+    '公开分类入口还有 Noam/Reduce 调度分支，当前无学习率调度；正文与代码对初始学习率表述也需结合具体回归配置澄清。'
+    '完整回归训练入口和准确的五份论文划分未在已查公开文件中给出，不能自行补齐后称逐项复现。','',
+    '### 描述符的实测证据','',
+    f'训练缓存为 {inputs["descriptors"]["shape"]}；列均值绝对值的中位数为 '
+    f'{inputs["descriptors"]["train_mean_abs_median"]:.6f}，非常数列标准差中位数为 '
+    f'{inputs["descriptors"]["train_sd_median_nonconstant"]:.6f}。'
+    '官方组装函数输出与缓存逐值相同，当前入口没有隐藏的训练集 z-score。'
+    'DeepChem 的 is_normalized=True 不能等同于本任务训练集拟合的标准化。','',
+    '既有缓存另对验证行 1561 的四个未定义描述符用训练集列中位数填补；该处理已记录且未删除分子。'
+    '这是本地输入处理差异，不直接证明它造成当前结果。','',
+    '### 初始化的实测证据','',
+    '保存初始状态与相同种子的 PyTorch 默认构造器逐值相同。'
+    f'应用官方 initialize_weights 后有 {parity["tensors_different_after_official_initializer"]} 个 state tensor 不同。'
+    '因此原 Full 与各消融虽使用相同初值，但不能说初值遵循公开训练入口。','',
+    '## 4. 数据身份和划分','',
+    f'本地 {dataset["local_rows"]} 行与官方 {dataset["official_rows"]} 行的“规范化含立体化学 SMILES、标签”多重集合'
+    f'{"完全一致" if dataset["canonical_isomeric_smiles_and_labels_multiset_equal"] else "不完全一致"}（标签保留 8 位小数）。'
+    '这核验数据身份，不核验划分。','']
+for x in inputs['scaffold_overlap']:
+    lines.append(f'- {" / ".join(x["splits"])}：共享非空、无手性 Murcko 骨架 {x["shared_nonempty_scaffolds"]} 个；'
+                 f'完全相同规范 SMILES 跨集合 {x["identical_smiles_shared"]} 个。')
+lines+=['',
+    '故当前划分不满足本次严格的无手性 Murcko 骨架完全隔离定义；其历史划分算法及手性处理还需追溯。'
+    '不能仅凭骨架交集认定标签泄漏，也不能声称它与作者五份划分一致。','',
+    '## 5. 消融定义与证据范围','',
+    f'[补充材料 §12]({paper}#supplementary-data)已报告单粒度和参数匹配对照。'
+    '当前任务仅切换最终预测融合视图，保留全部分支计算与原 A/S 对齐目标；尚无作者单粒度变体源码证明两者定义相同。'
+    '注册参数相同不代表有效训练容量匹配。现有 A/S/D 结果不能替代论文单粒度变体或独立信息源实验。','',
+    '## 6. 处置与修正顺序','',
+    '1. 现有结果保留为锁定本地协议的探索记录，撤回论文复现、论文融合无效、尺度冗余等外推。',
+    '2. 先建立新协议版本：训练集描述符标准化、官方初始化、正文优化参数、可追溯 scaffold 划分；明确公开分类入口与论文回归配置仍存的缺口。',
+    '3. 新版本先验证 Full 的数据处理和训练行为，再运行定义一致的消融。不能将新预处理或新初始化施加给旧 checkpoint 后称修正后的训练结果。',
+    '4. 每项差异对排名的因果影响仍需固定条件的独立对照，当前审计没有证明某一项足以解释排名反转。',
+    '5. 原队列源码、权重和协议未修改；仅增加 reliability_audit.json 标明用途限制。本次未启动新的性能训练。','',
+    '## 机器记录','',
+    '- official_tree.json：远端官方 Git 树。',
+    '- source_comparison.json：文件级 blob、文本/AST、运行哈希核验。',
+    '- full_numerical_parity.json：训练样本上的输出、损失、梯度和一步更新。',
+    '- input_initialization_audit.json：描述符、骨架交集、保存初值检查。',
+    '- dataset_identity.json：官方数据与本地结构/标签集合比较。',
+    '- RESULT_USAGE.json：现有结果可以支持和不能支持的范围。','']
+(OUT/'REPORT_CN.md').write_text('\n'.join(lines),encoding='utf-8')
+print(json.dumps(policy,ensure_ascii=False,indent=2))

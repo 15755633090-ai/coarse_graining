@@ -1,0 +1,24 @@
+{
+  "assessment_date": "2026-10-26",
+  "run": "motif/runs/hmg_fusion_7arms_3seeds_20261025",
+  "official_commit": "6ad69261eb1af36c8c0b96594d79a7639b969223",
+  "official_source_parity_verified": true,
+  "full_forward_backward_step_parity_verified": true,
+  "paper_training_protocol_verified": false,
+  "descriptor_train_zscore_matches_paper": false,
+  "initialization_matches_public_training_entry": false,
+  "exact_paper_split_reproduced": false,
+  "causal_explanation_of_ranking_established": false,
+  "result_scope": "exploratory results under the recorded local protocol; not a paper reproduction or evidence against the paper",
+  "required_before_reproduction_claim": [
+    "train-fitted descriptor z-score",
+    "public initializer and regression configuration",
+    "Adam/lr/batch/patience aligned to primary source",
+    "five verified scaffold-based runs",
+    "explicit ablation/auxiliary/capacity definition",
+    "new protocol version, new Full baseline before new ablations"
+  ],
+  "no_current_training_source_modified": true,
+  "no_new_test_forward_in_audit": true,
+  "report": "motif\\audits\\hmg_reliability_20261026\\REPORT_CN.md"
+}

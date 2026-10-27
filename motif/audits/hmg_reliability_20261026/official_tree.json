@@ -1,0 +1,216 @@
+{
+  "repository": "AKZstar/HMG-MRL",
+  "commit": "6ad69261eb1af36c8c0b96594d79a7639b969223",
+  "tree": {
+    "sha": "6ad69261eb1af36c8c0b96594d79a7639b969223",
+    "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/trees/6ad69261eb1af36c8c0b96594d79a7639b969223",
+    "tree": [
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "eb1fe9ede09d943fb6df02ad24ed61df1a85c96b",
+        "size": 3467,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/eb1fe9ede09d943fb6df02ad24ed61df1a85c96b"
+      },
+      {
+        "path": "config.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b24bf9f02c317c967788aa3804897e4031bcfc4a",
+        "size": 1903,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/b24bf9f02c317c967788aa3804897e4031bcfc4a"
+      },
+      {
+        "path": "data",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "461effaf67a627e027d9d7894cfbfe5fba97aca7",
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/trees/461effaf67a627e027d9d7894cfbfe5fba97aca7"
+      },
+      {
+        "path": "data/BBBP.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2a42688eed77085816f439c2ce721235a63620a3",
+        "size": 113735,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/2a42688eed77085816f439c2ce721235a63620a3"
+      },
+      {
+        "path": "data/ESOL.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "970b0d32771f1d67175d4f4a630e13f446ba97a8",
+        "size": 96699,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/970b0d32771f1d67175d4f4a630e13f446ba97a8"
+      },
+      {
+        "path": "data/FreeSolv.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9c49daeebde4d30c6412504cc265d98e436a999f",
+        "size": 32060,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/9c49daeebde4d30c6412504cc265d98e436a999f"
+      },
+      {
+        "path": "data/HIV.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "301e081dcf0e1ea8a3e22ecbf1833ffa890c036f",
+        "size": 2193844,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/301e081dcf0e1ea8a3e22ecbf1833ffa890c036f"
+      },
+      {
+        "path": "data/Lipophilicity.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9943c3e1b024a326b89000a7baffdd7fe811ae1d",
+        "size": 282606,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/9943c3e1b024a326b89000a7baffdd7fe811ae1d"
+      },
+      {
+        "path": "data/bace.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "000e71840f58e326b3b6d27dc6dd6ae059dcc287",
+        "size": 4058490,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/000e71840f58e326b3b6d27dc6dd6ae059dcc287"
+      },
+      {
+        "path": "data/clintox.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "92a89ed2189ec788cfdd88d7c3da6e18279f1e90",
+        "size": 95512,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/92a89ed2189ec788cfdd88d7c3da6e18279f1e90"
+      },
+      {
+        "path": "data/sider.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b55e82fd07ad67563579230f726c141a2509706c",
+        "size": 184502,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/b55e82fd07ad67563579230f726c141a2509706c"
+      },
+      {
+        "path": "data/tox21.csv",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5382a57f609df1d35699d8af700e6f2fdec81840",
+        "size": 525119,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/5382a57f609df1d35699d8af700e6f2fdec81840"
+      },
+      {
+        "path": "environment.yml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "eb4dae8bfe8245e8d227ff3ec58b35ba3ad9bce4",
+        "size": 5368,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/eb4dae8bfe8245e8d227ff3ec58b35ba3ad9bce4"
+      },
+      {
+        "path": "model",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "3e3c1a4ba7539ab57a98906ec6fb64422132de9f",
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/trees/3e3c1a4ba7539ab57a98906ec6fb64422132de9f"
+      },
+      {
+        "path": "model/act_func.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5d103a892985508a065531e54c5c4274af291fe4",
+        "size": 294,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/5d103a892985508a065531e54c5c4274af291fe4"
+      },
+      {
+        "path": "model/bipartite_transformer.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "018a3a0a16b174531ac2b3e6643c00c0d39b9377",
+        "size": 28706,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/018a3a0a16b174531ac2b3e6643c00c0d39b9377"
+      },
+      {
+        "path": "model/layer_utils.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c8137d354a35c73b725b0a61b06e2de75159fbc8",
+        "size": 14844,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/c8137d354a35c73b725b0a61b06e2de75159fbc8"
+      },
+      {
+        "path": "other_utils.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "13e7cc821480ca2ac1bd19bd6a5e8b78f26a42f4",
+        "size": 8855,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/13e7cc821480ca2ac1bd19bd6a5e8b78f26a42f4"
+      },
+      {
+        "path": "preprocess",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "c4b3a923eafc1b6bbe210ec9e5f4c750b9f0c979",
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/trees/c4b3a923eafc1b6bbe210ec9e5f4c750b9f0c979"
+      },
+      {
+        "path": "preprocess/Electronegativity.pkl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ea27f5a41ba26e19888bc287caf707f369804621",
+        "size": 1866,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/ea27f5a41ba26e19888bc287caf707f369804621"
+      },
+      {
+        "path": "preprocess/Featurizer_atom_bond.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f6cb1efadde9cc33e5ce82bc5a8a361072cde757",
+        "size": 6015,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/f6cb1efadde9cc33e5ce82bc5a8a361072cde757"
+      },
+      {
+        "path": "preprocess/__init__.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a08c8ff1305603883f43fea49d0dfe1292f33076",
+        "size": 562,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/a08c8ff1305603883f43fea49d0dfe1292f33076"
+      },
+      {
+        "path": "preprocess/fg_dicts.txt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "df8f038468b37eec2d2d003d6731e74d1826bc07",
+        "size": 21250,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/df8f038468b37eec2d2d003d6731e74d1826bc07"
+      },
+      {
+        "path": "preprocess/get_atom_bond_frag_info.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "99b5d6723d819da315bb0d1ad22b2b218f19ed23",
+        "size": 32045,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/99b5d6723d819da315bb0d1ad22b2b218f19ed23"
+      },
+      {
+        "path": "preprocess/motif_utils.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "37a71de8a9a91dfe0c3faba8b2dd9592d4e486f8",
+        "size": 24053,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/37a71de8a9a91dfe0c3faba8b2dd9592d4e486f8"
+      },
+      {
+        "path": "run_main.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "097d45d614998afb078303270b7ee1cb9414ceee",
+        "size": 16152,
+        "url": "https://api.github.com/repos/AKZstar/HMG-MRL/git/blobs/097d45d614998afb078303270b7ee1cb9414ceee"
+      }
+    ],
+    "truncated": false
+  }
+}

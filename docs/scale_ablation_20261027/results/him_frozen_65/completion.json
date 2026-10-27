@@ -1,0 +1,145 @@
+{
+  "passed": true,
+  "runs": 65,
+  "no_motif": {
+    "train": 117,
+    "valid": 25,
+    "test": 18
+  },
+  "test_evaluations": 65,
+  "historical_test_seen": true,
+  "encoder_seed": 0,
+  "interpretation": "fixed task-adapted encoder; head-seed variation only",
+  "summary": [
+    {
+      "name": "A",
+      "arm": "A",
+      "width": 128,
+      "control": "main",
+      "parameters": 33025,
+      "n": 5,
+      "test_rmse_mean": 0.99694744348526,
+      "test_rmse_sd": 0.005668764222123149
+    },
+    {
+      "name": "S",
+      "arm": "S",
+      "width": 128,
+      "control": "main",
+      "parameters": 33025,
+      "n": 5,
+      "test_rmse_mean": 0.9708051204681396,
+      "test_rmse_sd": 0.017471161163042957
+    },
+    {
+      "name": "G",
+      "arm": "G",
+      "width": 128,
+      "control": "main",
+      "parameters": 33025,
+      "n": 5,
+      "test_rmse_mean": 0.9949740886688232,
+      "test_rmse_sd": 0.007542937688666634
+    },
+    {
+      "name": "AS",
+      "arm": "AS",
+      "width": 128,
+      "control": "main",
+      "parameters": 65793,
+      "n": 5,
+      "test_rmse_mean": 0.9688222885131836,
+      "test_rmse_sd": 0.016001441187351972
+    },
+    {
+      "name": "AG",
+      "arm": "AG",
+      "width": 128,
+      "control": "main",
+      "parameters": 65793,
+      "n": 5,
+      "test_rmse_mean": 0.9681007146835328,
+      "test_rmse_sd": 0.010963570047305266
+    },
+    {
+      "name": "SG",
+      "arm": "SG",
+      "width": 128,
+      "control": "main",
+      "parameters": 65793,
+      "n": 5,
+      "test_rmse_mean": 0.9473011016845703,
+      "test_rmse_sd": 0.008360003650111407
+    },
+    {
+      "name": "ASG",
+      "arm": "ASG",
+      "width": 128,
+      "control": "main",
+      "parameters": 98561,
+      "n": 5,
+      "test_rmse_mean": 0.9460808992385864,
+      "test_rmse_sd": 0.01627803966356791
+    },
+    {
+      "name": "A_matched_2",
+      "arm": "A",
+      "width": 255,
+      "control": "matched_2",
+      "parameters": 65791,
+      "n": 5,
+      "test_rmse_mean": 1.0012345433235168,
+      "test_rmse_sd": 0.00828737352024274
+    },
+    {
+      "name": "S_matched_2",
+      "arm": "S",
+      "width": 255,
+      "control": "matched_2",
+      "parameters": 65791,
+      "n": 5,
+      "test_rmse_mean": 0.9704831004142761,
+      "test_rmse_sd": 0.012031855949615916
+    },
+    {
+      "name": "G_matched_2",
+      "arm": "G",
+      "width": 255,
+      "control": "matched_2",
+      "parameters": 65791,
+      "n": 5,
+      "test_rmse_mean": 0.9813228011131286,
+      "test_rmse_sd": 0.008137341210764468
+    },
+    {
+      "name": "A_matched_3",
+      "arm": "A",
+      "width": 382,
+      "control": "matched_3",
+      "parameters": 98557,
+      "n": 5,
+      "test_rmse_mean": 0.9922206044197083,
+      "test_rmse_sd": 0.009092953715393618
+    },
+    {
+      "name": "S_matched_3",
+      "arm": "S",
+      "width": 382,
+      "control": "matched_3",
+      "parameters": 98557,
+      "n": 5,
+      "test_rmse_mean": 0.9732569456100464,
+      "test_rmse_sd": 0.006171394485534445
+    },
+    {
+      "name": "G_matched_3",
+      "arm": "G",
+      "width": 382,
+      "control": "matched_3",
+      "parameters": 98557,
+      "n": 5,
+      "test_rmse_mean": 0.9847679376602173,
+      "test_rmse_sd": 0.0072434671194053744
+    }
+  ]
+}
