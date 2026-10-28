@@ -1,0 +1,22 @@
+{
+  "molecules": 384,
+  "single_motif": 36,
+  "mean_motifs": 5.1015625,
+  "max_motifs": 21,
+  "smoke_only": true,
+  "protocol_sha256": "ae24e7011c9488c86036bbdd6f8a1808c36bc384a280767ef170422eeca89c62",
+  "by_split": {
+    "train": {
+      "molecules": 128,
+      "single_motif": 16
+    },
+    "valid": {
+      "molecules": 128,
+      "single_motif": 5
+    },
+    "test": {
+      "molecules": 128,
+      "single_motif": 15
+    }
+  }
+}

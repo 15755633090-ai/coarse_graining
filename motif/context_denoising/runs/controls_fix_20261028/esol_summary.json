@@ -1,0 +1,124 @@
+[
+  {
+    "variant": "context",
+    "seed": 0,
+    "best_epoch": 1,
+    "validation": {
+      "rmse": 3.477875262374602,
+      "mae": 3.170741081237793,
+      "evaluated_tasks": 1.0
+    },
+    "elapsed_seconds": 0.17219339999999939,
+    "protocol_sha256": "495610a99cdb1ddb17d6b5a9965d25225785447e47f65f1f16b8bf6c01bd9681",
+    "parameter_counts": {
+      "instantiated": 16612,
+      "optimized": 15235,
+      "optimized_modules": [
+        "atom_convs",
+        "atom_encoder",
+        "bond_encoder",
+        "clean_relation",
+        "context_layers",
+        "damage_condition",
+        "property_head",
+        "static_relation",
+        "time_condition"
+      ]
+    },
+    "parameters_with_grad_max": 15235,
+    "smoke_only": true
+  },
+  {
+    "variant": "fixed",
+    "seed": 0,
+    "best_epoch": 1,
+    "validation": {
+      "rmse": 3.477976582146152,
+      "mae": 3.170851707458496,
+      "evaluated_tasks": 1.0
+    },
+    "elapsed_seconds": 0.15248689999999954,
+    "protocol_sha256": "495610a99cdb1ddb17d6b5a9965d25225785447e47f65f1f16b8bf6c01bd9681",
+    "parameter_counts": {
+      "instantiated": 16612,
+      "optimized": 16323,
+      "optimized_modules": [
+        "atom_convs",
+        "atom_encoder",
+        "bond_encoder",
+        "clean_relation",
+        "context_layers",
+        "damage_condition",
+        "denoise_head",
+        "noisy_relation",
+        "property_head",
+        "static_relation",
+        "time_condition"
+      ]
+    },
+    "parameters_with_grad_max": 16323,
+    "smoke_only": true
+  },
+  {
+    "variant": "no_communication",
+    "seed": 0,
+    "best_epoch": 1,
+    "validation": {
+      "rmse": 3.477892948988514,
+      "mae": 3.1707701683044434,
+      "evaluated_tasks": 1.0
+    },
+    "elapsed_seconds": 0.20439020000000063,
+    "protocol_sha256": "495610a99cdb1ddb17d6b5a9965d25225785447e47f65f1f16b8bf6c01bd9681",
+    "parameter_counts": {
+      "instantiated": 16612,
+      "optimized": 16323,
+      "optimized_modules": [
+        "atom_convs",
+        "atom_encoder",
+        "bond_encoder",
+        "clean_relation",
+        "context_layers",
+        "damage_condition",
+        "denoise_head",
+        "noisy_relation",
+        "property_head",
+        "static_relation",
+        "time_condition"
+      ]
+    },
+    "parameters_with_grad_max": 15779,
+    "smoke_only": true
+  },
+  {
+    "variant": "random",
+    "seed": 0,
+    "best_epoch": 1,
+    "validation": {
+      "rmse": 3.4779680818186662,
+      "mae": 3.170840263366699,
+      "evaluated_tasks": 1.0
+    },
+    "elapsed_seconds": 0.324894200000001,
+    "protocol_sha256": "495610a99cdb1ddb17d6b5a9965d25225785447e47f65f1f16b8bf6c01bd9681",
+    "parameter_counts": {
+      "instantiated": 16612,
+      "optimized": 16323,
+      "optimized_modules": [
+        "atom_convs",
+        "atom_encoder",
+        "bond_encoder",
+        "clean_relation",
+        "context_layers",
+        "damage_condition",
+        "denoise_head",
+        "noisy_relation",
+        "property_head",
+        "static_relation",
+        "time_condition"
+      ]
+    },
+    "parameters_with_grad_max": 16323,
+    "smoke_only": true
+  }
+]

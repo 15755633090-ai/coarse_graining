@@ -7,6 +7,7 @@ from torch import nn
 from torch.nn import functional as F
 from torch_geometric.nn import GINEConv, global_add_pool, global_mean_pool
 from ogb.graphproppred.mol_encoder import AtomEncoder, BondEncoder
+from .diagnostics import denoise_statistics
 
 
 VARIANTS = ("atom", "motif", "context", "fixed", "random", "no_communication", "mask", "shuffle")
@@ -57,6 +58,25 @@ class ContextLayer(nn.Module):
 
 
 class MotifContextModel(nn.Module):
+    def configure_training(self, variant, auxiliary_weight):
+        """Freeze modules outside this variant's optimized paths; keep initialization identical."""
+        if variant not in VARIANTS:
+            raise ValueError(variant)
+        enabled = {"atom_encoder", "bond_encoder", "atom_convs"}
+        enabled.add("atom_head" if variant == "atom" else "property_head")
+        if variant not in ("atom", "motif"):
+            enabled.update(("static_relation", "clean_relation", "time_condition",
+                            "damage_condition", "context_layers"))
+        if variant in ("fixed", "random", "no_communication", "mask", "shuffle") and auxiliary_weight > 0:
+            enabled.update(("noisy_relation", "denoise_head"))
+        for name, parameter in self.named_parameters():
+            parameter.requires_grad_(name.split(".")[0] in enabled)
+        return {
+            "instantiated": sum(p.numel() for p in self.parameters()),
+            "optimized": sum(p.numel() for p in self.parameters() if p.requires_grad),
+            "optimized_modules": sorted(enabled),
+        }
+
     def __init__(self, num_tasks, config=None):
         super().__init__()
         self.config = config or Config()
@@ -150,6 +170,7 @@ class MotifContextModel(nn.Module):
             return prediction
         loss = q.sum() * 0
         selected = 0
+        group_statistics = {}
         if variant in ("fixed", "random", "no_communication", "mask", "shuffle"):
             z, steps, damaged = self.corrupt(q, graph_id, variant, generator)
             # Only static bond categories enter this branch: no clean attachment states.
@@ -169,11 +190,14 @@ class MotifContextModel(nn.Module):
                 z, edges, relation, steps, damaged, communicate=variant != "no_communication"
             ))
             # Mean of squared L2 norms over selected motifs, as in the method definition.
-            loss = (restored[damaged] - q.detach()[damaged]).square().sum(-1).mean()
+            target_errors = (restored[damaged] - q.detach()[damaged]).square().sum(-1)
+            loss = target_errors.mean()
+            group_statistics = denoise_statistics(target_errors, graph_id[damaged], data.motif_count)
             selected = int(damaged.sum())
         diagnostics = {
             "q_norm": q.detach().norm(dim=-1).mean(),
             "q_dimension_variance": q.detach().var(dim=0, unbiased=False).mean(),
             "selected_motifs": selected,
+            **group_statistics,
         }
         return prediction, loss, diagnostics

@@ -13,6 +13,11 @@ import torch
 
 from .data import MotifDataset
 from .model import Config, MotifContextModel, VARIANTS
+from .diagnostics import gradient_diagnostics, summarize_steps
+from .reporting import (
+    collect_provenance, fingerprint, output_session, prepare_cohort,
+    refresh_summaries, save_partition_audit, write_json,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "model"))
@@ -23,11 +28,7 @@ from benchmark import (  # noqa: E402
 )
 
 
-def write_json(path, value):
-    path.write_text(json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
-
-
-def run(args, source, splits, spec, dataset, variant, seed):
+def run(args, source, splits, spec, dataset, variant, seed, runtime, protocol_sha256):
     out = args.output_dir / args.dataset / variant / f"seed_{seed}"
     out.mkdir(parents=True, exist_ok=True)
     if (out / "config.json").exists():
@@ -40,6 +41,8 @@ def run(args, source, splits, spec, dataset, variant, seed):
         corruption_rate=args.corruption_rate,
     )
     model = MotifContextModel(spec.num_tasks, config).to(args.device)
+    parameter_counts = model.configure_training(variant, args.denoise_weight)
+    optimized_parameters = tuple(p for p in model.parameters() if p.requires_grad)
     provenance = {
         "args": {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()},
         "model": asdict(config), "variant": variant, "seed": seed,
@@ -48,7 +51,9 @@ def run(args, source, splits, spec, dataset, variant, seed):
         "splits": splits,
         "split_sha256": hashlib.sha256(json.dumps(splits, sort_keys=True).encode()).hexdigest(),
         "data_sha256": hashlib.sha256((args.data_root / spec.directory / "mapping" / "mol.csv.gz").read_bytes()).hexdigest(),
-        "source_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in Path(__file__).parent.glob("*.py")},
+        **runtime,
+        "protocol_sha256": protocol_sha256,
+        "parameter_counts": parameter_counts,
         "torch": torch.__version__, "parameters": sum(p.numel() for p in model.parameters()),
         "cuda_deterministic": False if args.device.startswith("cuda") else None,
     }
@@ -56,13 +61,15 @@ def run(args, source, splits, spec, dataset, variant, seed):
     train_y, train_mask = source.targets[splits["train"]], source.target_mask[splits["train"]]
     scaler = TargetScaler.fit(train_y, train_mask) if spec.task_type == "regression" else None
     weight = classification_positive_weight(train_y, train_mask) if spec.task_type == "classification" else None
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
+    optimizer = torch.optim.AdamW(optimized_parameters, lr=args.learning_rate, weight_decay=args.weight_decay)
     loaders = {s: make_loader(dataset, ids, args.batch_size, s == "train", seed) for s, ids in splits.items()}
     best_score, state, best_epoch, stale = None, None, 0, 0
     history = []
     start = time.perf_counter()
     # A separate generator keeps corruption RNG from changing clean-branch dropout draws.
     noise_generator = torch.Generator(device=args.device).manual_seed(seed + 7919)
+    optimizer_steps = 0
+    auxiliary_weight = args.denoise_weight if variant in ("fixed", "random", "no_communication", "mask", "shuffle") else 0.0
     for epoch in range(1, args.epochs + 1):
         model.train()
         logs = []
@@ -76,11 +83,23 @@ def run(args, source, splits, spec, dataset, variant, seed):
             loss = supervised + args.denoise_weight * auxiliary
             if not torch.isfinite(loss):
                 raise RuntimeError("Non-finite joint loss")
+            gradients = {}
+            if optimizer_steps % args.gradient_diagnostics_every == 0:
+                gradients = gradient_diagnostics(supervised, auxiliary, optimized_parameters, auxiliary_weight)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
+            pre_clip_norm = float(torch.nn.utils.clip_grad_norm_(
+                optimized_parameters, args.grad_clip, error_if_nonfinite=True
+            ))
+            clip_scale = min(1.0, args.grad_clip / (pre_clip_norm + 1e-6))
+            gradient_parameters = sum(p.numel() for p in optimized_parameters if p.grad is not None)
             optimizer.step()
+            optimizer_steps += 1
             logs.append({"loss": float(loss.detach()), "property_loss": float(supervised.detach()),
                          "denoise_loss": float(auxiliary.detach()),
+                         "pre_clip_gradient_norm": pre_clip_norm,
+                         "clip_triggered": float(clip_scale < 1.0), "clip_scale": clip_scale,
+                         "parameters_with_grad": gradient_parameters,
+                         **gradients,
                          **{k: float(v) for k, v in diagnostic.items()}})
         if not logs:
             raise RuntimeError("No observed training labels")
@@ -94,8 +113,9 @@ def run(args, source, splits, spec, dataset, variant, seed):
         score = primary_score(metrics, spec)
         if not np.isfinite(score):
             raise RuntimeError("Validation primary metric is not finite; check split size and labels")
-        history.append({"epoch": epoch, **{k: float(np.mean([r[k] for r in logs])) for k in logs[0]},
+        history.append({"epoch": epoch, **summarize_steps(logs),
                         "validation": metrics})
+        write_json(out / "history.json", history)
         print(f"{variant} seed={seed} epoch={epoch} valid_{spec.primary_metric}={score:.5f}", flush=True)
         if best_score is None or better_score(score, best_score, spec):
             best_score, state, best_epoch, stale = score, deepcopy(model.state_dict()), epoch, 0
@@ -111,6 +131,9 @@ def run(args, source, splits, spec, dataset, variant, seed):
     result = {"variant": variant, "seed": seed, "best_epoch": best_epoch,
               "validation": history[best_epoch - 1]["validation"],
               "elapsed_seconds": time.perf_counter() - start,
+              "protocol_sha256": protocol_sha256,
+              "parameter_counts": parameter_counts,
+              "parameters_with_grad_max": max(r["parameters_with_grad_max"] for r in history),
               "smoke_only": bool(args.limit_per_split)}
     # Test is read once, after validation selection, and can be omitted during development.
     if args.evaluate_test:
@@ -148,6 +171,8 @@ def main():
     parser.add_argument("--learning-rate", type=float, default=1e-3)
     parser.add_argument("--weight-decay", type=float, default=1e-5)
     parser.add_argument("--grad-clip", type=float, default=5.)
+    parser.add_argument("--gradient-diagnostics-every", type=int, default=10,
+                        help="Sample loss-component gradients every N optimizer steps; total clipping logged every step")
     parser.add_argument("--denoise-weight", type=float, default=0.01)
     parser.add_argument("--noise-steps", type=int, default=100)
     parser.add_argument("--fixed-step", type=int, default=50)
@@ -155,35 +180,42 @@ def main():
     parser.add_argument("--limit-per-split", type=int, default=0, help="Smoke only: first N official indices per split")
     parser.add_argument("--evaluate-test", action="store_true", help="Evaluate test once after validation selection")
     args = parser.parse_args()
-    if min(args.epochs, args.patience, args.batch_size) < 1 or args.limit_per_split < 0 or args.denoise_weight < 0:
+    if (min(args.epochs, args.patience, args.batch_size, args.gradient_diagnostics_every) < 1
+            or args.limit_per_split < 0 or args.denoise_weight < 0 or args.grad_clip <= 0):
         parser.error("Invalid training budget or loss weight")
     source, splits, spec = build_property_data(args.data_root, args.dataset)
     if args.limit_per_split:
         splits = {k: v[:args.limit_per_split] for k, v in splits.items()}
-    dataset = MotifDataset(source)
-    # Materialize once, before model training, and retain partition audit statistics.
-    selected = sorted({i for indices in splits.values() for i in indices})
-    counts = [int(dataset[i].motif_count.item()) for i in selected]
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    write_json(args.output_dir / f"{args.dataset}_partition_audit.json", {
-        "molecules": len(counts), "single_motif": counts.count(1),
-        "mean_motifs": float(np.mean(counts)), "max_motifs": max(counts),
-        "smoke_only": bool(args.limit_per_split),
-    })
-    rows = []
-    for seed in args.seeds:
-        for variant in args.variants:
-            rows.append(run(args, source, splits, spec, dataset, variant, seed))
-    write_json(args.output_dir / f"{args.dataset}_summary.json", rows)
-    import pandas as pd
-    flat = [{"variant": r["variant"], "seed": r["seed"], "best_epoch": r["best_epoch"],
-             **{f"valid_{k}": v for k, v in r["validation"].items()},
-             **{f"test_{k}": v for k, v in r.get("test", {}).items()}} for r in rows]
-    frame = pd.DataFrame(flat)
-    frame.to_csv(args.output_dir / f"{args.dataset}_seeds.csv", index=False)
-    metric_columns = [k for k in frame if k.startswith(("valid_", "test_"))]
-    frame.groupby("variant")[metric_columns].agg(["mean", "std", "count"]).to_csv(
-        args.output_dir / f"{args.dataset}_aggregate.csv")
+    runtime = collect_provenance(ROOT)
+    settings = {k: v for k, v in vars(args).items()
+                if k not in ("variants", "seeds", "output_dir", "data_root")}
+    protocol = {
+        "schema_version": 2, "settings": settings,
+        "data_sha256": hashlib.sha256((args.data_root / spec.directory / "mapping" / "mol.csv.gz").read_bytes()).hexdigest(),
+        "split_sha256": fingerprint(splits), "source_sha256": runtime["source_sha256"],
+        "software": runtime["software"], "partition": "nonoverlapping_brics_components_v1",
+    }
+    with output_session(args.output_dir, args.dataset):
+        protocol_sha256 = prepare_cohort(args, protocol)
+        dataset = MotifDataset(source)
+        # Materialize once and retain counts for each official split.
+        selected = sorted({i for indices in splits.values() for i in indices})
+        counts = [int(dataset[i].motif_count.item()) for i in selected]
+        save_partition_audit(args.output_dir, args.dataset, {
+            "molecules": len(counts), "single_motif": counts.count(1),
+            "mean_motifs": float(np.mean(counts)), "max_motifs": max(counts),
+            "smoke_only": bool(args.limit_per_split), "protocol_sha256": protocol_sha256,
+            "by_split": {name: {"molecules": len(ids), "single_motif": sum(
+                int(dataset[i].motif_count.item()) == 1 for i in ids
+            )} for name, ids in splits.items()},
+        })
+        try:
+            for seed in args.seeds:
+                for variant in args.variants:
+                    run(args, source, splits, spec, dataset, variant, seed, runtime, protocol_sha256)
+                    refresh_summaries(args.output_dir, args.dataset, protocol_sha256)
+        finally:
+            refresh_summaries(args.output_dir, args.dataset, protocol_sha256)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,4 @@
+,valid_roc_auc,valid_roc_auc,valid_roc_auc,valid_average_precision,valid_average_precision,valid_average_precision,valid_evaluated_tasks,valid_evaluated_tasks,valid_evaluated_tasks
+,mean,std,count,mean,std,count,mean,std,count
+variant,,,,,,,,,
+random,0.9554597701149425,,1,0.7014232295482296,,1,1.0,,1

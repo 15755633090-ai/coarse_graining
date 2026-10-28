@@ -40,7 +40,7 @@ shuffle 使用分子内基序节点随机置换来改变边与基序内容的对
 
 ```powershell
 $py = 'C:/Users/12775/miniconda3/envs/polyolefin_ml/python.exe'
-& $py -m unittest motif.context_denoising.test_method -v
+& $py -m unittest motif.context_denoising.test_method motif.context_denoising.test_controls -v
 
 # 小样本验收；这些指标不能用作方法性能结论。
 & $py -m motif.context_denoising.train --dataset esol --seeds 0 --epochs 2 --patience 2 --hidden-dim 16 --atom-layers 2 --batch-size 16 --limit-per-split 32 --device cpu --output-dir motif/context_denoising/runs/my_smoke
@@ -52,7 +52,23 @@ $py = 'C:/Users/12775/miniconda3/envs/polyolefin_ml/python.exe'
 & $py -m motif.context_denoising.train --dataset esol --variants context fixed random no_communication mask shuffle --seeds 0 1 2 3 4 --output-dir motif/context_denoising/runs/stage1_auxiliary
 ```
 
-输出目录不可覆盖已有 run。保存分解审计、配置、数据／代码／split 哈希、每轮性质与去噪损失、q 范数与批内维度方差、最佳权重及标准化参数、各随机种子指标与均值／标准差。q 范数受 LayerNorm 控制，维度方差为批内诊断，不能代替全数据表示分析。测试默认关闭；启用后每个 run 在验证选模结束时只评价一次。
+同一输出目录可分次追加新的 variant/seed；同一个 run 禁止覆盖。每个数据集先保存 cohort 协议，核对数据／split 哈希、源码与依赖版本及训练设置，设置不一致则要求换目录。旧版没有 cohort 协议的目录也不能追加。审计文件一致时复用，不一致时拒绝；汇总扫描目录内所有已完成运行，保留之前调用的结果，另列出未完成运行。文件以临时文件替换方式写入，每个数据集有独占会话锁，避免并行调用相互覆盖。
+
+保存分解审计、配置、数据／代码／split 哈希、每轮性质与去噪损失、q 范数与批内维度方差、最佳权重及标准化参数、各随机种子指标与均值／标准差。源码追溯包括 `model/benchmark.py`、它导入的基线模块和 `bond_diffusion` 依赖；记录 Python、RDKit、PyG、OGB 等版本。Git SHA 只有在源码逐文件匹配时才标记为对应版本；从工作区导出的源码若不匹配已有提交，则 SHA 仅作参考，精确内容以源码哈希为准。参数量分为已实例化、实际优化路径参数和运行时收到梯度的参数；无关模块从优化器中排除，不改变随机初始化次序。
+
+q 范数受 LayerNorm 控制，维度方差为批内诊断，不能代替全数据表示分析。测试默认关闭；启用后每个 run 在验证选模结束时只评价一次。
+
+## 梯度与损失分组诊断（正式训练前修订）
+
+联合损失与全局梯度裁剪方式不变，不根据诊断自动调整 lambda。每步记录裁剪前总梯度范数、裁剪系数，`history.json` 的 `clip_triggered` 为该 epoch 的裁剪触发比例。`--gradient-diagnostics-every 10` 默认每十个优化器步抽样一次（第一步必采），设为 1 可每步采样：
+
+- 性质梯度、原始辅助梯度和乘 lambda 后的辅助梯度 L2 范数及加权辅助／性质梯度比；
+- 两个损失在当前 batch 共同到达的参数上的梯度范数、比值及参数量；
+- `gradient_diagnostic_samples` 和 `optimizer_steps`，明确抽样覆盖率。
+
+这些范数在裁剪前通过 `autograd.grad` 计算；不累积到 `.grad`，不消耗 RNG，但会增加运行时间。epoch 内梯度比为已采样 step 的比值均值；分母为零时不计入比值均值。诊断不证明两个目标协调，也不能代替验证集选权重。
+
+去噪目标仍按所选基序平均。另记录 `denoise_single/multi_{sum,count,mean}`，区分单基序与多基序分子中的目标；`denoise_selected_mean` 以所有所选目标计权；`denoise_molecule_mean` 先对每个分子所选目标求均值，再按分子等权汇总。跨 batch 按 sum/count 汇总，空组 mean 为 null。后者只是诊断，不改变训练目标。多基序也可能包含不连通片段，不能把该组直接解释为所有目标都有邻居。完整原子 GNN 预先传播目标信息的限制仍然存在。
 
 ## 重载预测
 

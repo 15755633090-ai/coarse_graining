@@ -1,0 +1,2 @@
+variant,seed,best_epoch,valid_roc_auc,valid_average_precision,valid_evaluated_tasks
+random,0,1,0.9554597701149425,0.7014232295482296,1.0

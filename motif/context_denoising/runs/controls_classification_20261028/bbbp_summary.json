@@ -1,0 +1,33 @@
+[
+  {
+    "variant": "random",
+    "seed": 0,
+    "best_epoch": 1,
+    "validation": {
+      "roc_auc": 0.9554597701149425,
+      "average_precision": 0.7014232295482296,
+      "evaluated_tasks": 1.0
+    },
+    "elapsed_seconds": 0.47174850000000035,
+    "protocol_sha256": "ae24e7011c9488c86036bbdd6f8a1808c36bc384a280767ef170422eeca89c62",
+    "parameter_counts": {
+      "instantiated": 16612,
+      "optimized": 16323,
+      "optimized_modules": [
+        "atom_convs",
+        "atom_encoder",
+        "bond_encoder",
+        "clean_relation",
+        "context_layers",
+        "damage_condition",
+        "denoise_head",
+        "noisy_relation",
+        "property_head",
+        "static_relation",
+        "time_condition"
+      ]
+    },
+    "parameters_with_grad_max": 16323,
+    "smoke_only": true
+  }
+]

@@ -1,0 +1,41 @@
+[
+  {
+    "epoch": 1,
+    "auxiliary_gradient_norm_raw": 20.151938438415527,
+    "auxiliary_gradient_norm_weighted": 0.2015193843841553,
+    "auxiliary_to_property_gradient_ratio": 0.0034033195745607195,
+    "clip_scale": 0.08444878981614559,
+    "clip_triggered": 1.0,
+    "denoise_loss": 19.100646018981934,
+    "denoise_molecule_count": 32.0,
+    "denoise_molecule_sum": 610.8564147949219,
+    "denoise_multi_count": 30.0,
+    "denoise_multi_sum": 575.6375579833984,
+    "denoise_single_count": 16.0,
+    "denoise_single_sum": 303.8478469848633,
+    "loss": 3.42812180519104,
+    "parameters_with_grad": 15779.0,
+    "pre_clip_gradient_norm": 60.64190483093262,
+    "property_gradient_norm": 60.62079429626465,
+    "property_loss": 3.237115263938904,
+    "q_dimension_variance": 0.22744446247816086,
+    "q_norm": 3.999968647956848,
+    "selected_motifs": 23.0,
+    "shared_auxiliary_gradient_norm_weighted": 0.11457178115844727,
+    "shared_auxiliary_to_property_gradient_ratio": 0.004388422946647623,
+    "shared_gradient_parameters": 8194.0,
+    "shared_property_gradient_norm": 27.381112098693848,
+    "denoise_single_mean": 18.990490436553955,
+    "denoise_multi_mean": 19.187918599446615,
+    "denoise_molecule_mean": 19.08926296234131,
+    "denoise_selected_mean": 19.119247934092645,
+    "gradient_diagnostic_samples": 2,
+    "optimizer_steps": 2,
+    "parameters_with_grad_max": 15779,
+    "validation": {
+      "rmse": 3.477892948988514,
+      "mae": 3.1707701683044434,
+      "evaluated_tasks": 1.0
+    }
+  }
+]

@@ -1,0 +1,40 @@
+[
+  {
+    "epoch": 1,
+    "auxiliary_gradient_norm_raw": 0.0,
+    "auxiliary_gradient_norm_weighted": 0.0,
+    "auxiliary_to_property_gradient_ratio": 0.0,
+    "clip_scale": 0.08447889009080659,
+    "clip_triggered": 1.0,
+    "denoise_loss": 0.0,
+    "loss": 3.2371060848236084,
+    "parameters_with_grad": 15235.0,
+    "pre_clip_gradient_norm": 60.620981216430664,
+    "property_gradient_norm": 60.620981216430664,
+    "property_loss": 3.2371060848236084,
+    "q_dimension_variance": 0.2274431437253952,
+    "q_norm": 3.999968647956848,
+    "selected_motifs": 0.0,
+    "shared_auxiliary_gradient_norm_weighted": 0.0,
+    "shared_gradient_parameters": 0.0,
+    "shared_property_gradient_norm": 0.0,
+    "denoise_single_count": 0,
+    "denoise_single_sum": 0,
+    "denoise_single_mean": null,
+    "denoise_multi_count": 0,
+    "denoise_multi_sum": 0,
+    "denoise_multi_mean": null,
+    "denoise_molecule_count": 0,
+    "denoise_molecule_sum": 0,
+    "denoise_molecule_mean": null,
+    "denoise_selected_mean": null,
+    "gradient_diagnostic_samples": 2,
+    "optimizer_steps": 2,
+    "parameters_with_grad_max": 15235,
+    "validation": {
+      "rmse": 3.477875262374602,
+      "mae": 3.170741081237793,
+      "evaluated_tasks": 1.0
+    }
+  }
+]
