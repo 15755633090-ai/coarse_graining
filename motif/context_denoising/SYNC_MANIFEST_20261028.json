@@ -1,0 +1,422 @@
+{
+  "repository": "15755633090-ai/coarse_graining",
+  "date": "2026-10-28",
+  "purpose": "Implementation and smoke verification only; no formal performance claims",
+  "files": [
+    {
+      "path": "model/attentivefp.py",
+      "bytes": 939,
+      "sha256": "abbe11b4f60650d3ccaf9f0c8e3fa721b1cb4f5bf4d3559920a4136c32b827ad"
+    },
+    {
+      "path": "model/benchmark.py",
+      "bytes": 28945,
+      "sha256": "e6c2253601a82069acd01a13fcfcfc4def2901dcc9633b82ca17a6a581149c26"
+    },
+    {
+      "path": "model/gine.py",
+      "bytes": 1396,
+      "sha256": "377e02824859654fcbef02a8928770fd26b2966350b9b53dafa0726e2961c253"
+    },
+    {
+      "path": "model/morgan.py",
+      "bytes": 6589,
+      "sha256": "90f8306b7eed2f6cd9571da6a67cf7e9f97233ceedae5ba638ef5050da1bf4d4"
+    },
+    {
+      "path": "model/pna.py",
+      "bytes": 2665,
+      "sha256": "f68a314115dfe04b7c97a624696e7e2cd4e01ec0b58b4246ffbf439e2e557d63"
+    },
+    {
+      "path": "motif/context_denoising/__init__.py",
+      "bytes": 60,
+      "sha256": "09e47a9194ed78aaec0f1d018191d88c907ebbf2b278f52fddcccc8d7d425c5f"
+    },
+    {
+      "path": "motif/context_denoising/data.py",
+      "bytes": 3074,
+      "sha256": "43a3a2f9520d43d1ae3824a08a4bb96afbdc92f7078b9483f2effacf2479fa6e"
+    },
+    {
+      "path": "motif/context_denoising/model.py",
+      "bytes": 8415,
+      "sha256": "568bc2deee3624ec642adba51b25f1c48dc717b4a64ee5f33b30aa0e4be7ab11"
+    },
+    {
+      "path": "motif/context_denoising/README.md",
+      "bytes": 6744,
+      "sha256": "ab27466ceaef0d2a5fbe189f7ed3ff476dff9503c69e648680bb655942daa4bb"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/atom/seed_0/best.pt",
+      "bytes": 89923,
+      "sha256": "c9a3af17a40ef0a3c14f53205f51627ca9669a6ac3b4bbc4141a9adab4c91bb8"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/atom/seed_0/config.json",
+      "bytes": 3012,
+      "sha256": "08d0e52bc552dd146efee9952a4e30e4fc059e8d7fbc5efa903bbde5dbb7f35b"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/atom/seed_0/history.json",
+      "bytes": 738,
+      "sha256": "7a43dc3160caee331776fd5435b90265d72c3264c1468b197f26b1dba54f308b"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/atom/seed_0/metrics.json",
+      "bytes": 353,
+      "sha256": "20fca758c47e6bd8055fe14ea31352967cb999f95c41b2ef640e742cce341c0c"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/atom/seed_0/test_predictions.csv",
+      "bytes": 1998,
+      "sha256": "cc18b49b52441a32af8c6169fb2ea96a2cb3974c654fbe7783267fa995e625e5"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/context/seed_0/best.pt",
+      "bytes": 89923,
+      "sha256": "d363e0b04be8bc0f1c6d411269d350a5c973c0c514d27b0d8ad89c2be9e3feb2"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/context/seed_0/config.json",
+      "bytes": 3015,
+      "sha256": "0fddc1cc482ee52b32c736ade005e54b64c275aad1f1e1bb77d6009a4e55a8ba"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/context/seed_0/history.json",
+      "bytes": 739,
+      "sha256": "90dd7e86366adcc57ac744418485ebd39d8efa95fa8e69c1682c74d4672678b0"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/context/seed_0/metrics.json",
+      "bytes": 356,
+      "sha256": "81f862dcef31057bee6a07c43d8e592923a4074bb0c0b6a3b3d40467c3109d15"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/context/seed_0/test_predictions.csv",
+      "bytes": 1993,
+      "sha256": "b8f09227309813403a8c7887020010a58af6e6909d816a1742eb829ed8e006a2"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/fixed/seed_0/best.pt",
+      "bytes": 89923,
+      "sha256": "0d665d92d138f644e515af0b263d8368c1fe5a5e58ebf49d4ae82e6779f5f536"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/fixed/seed_0/config.json",
+      "bytes": 3013,
+      "sha256": "8f5a649545741d4b03e6a26e63abf122a64327931f04d5de7708bcaae5041a78"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/fixed/seed_0/history.json",
+      "bytes": 770,
+      "sha256": "7419e250d7c016ae2c2e6e7df7e153b7ec1f541a2086cb5d49285eb5eebab914"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/fixed/seed_0/metrics.json",
+      "bytes": 354,
+      "sha256": "8752510008ecce0406fd2a8c8ffe42a2d141567893b8390c63cd87e552734e54"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/fixed/seed_0/test_predictions.csv",
+      "bytes": 1996,
+      "sha256": "fa4a3afaf13d933ab949af53a720b0568ced319dd752ce36087f184221c32ca5"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/mask/seed_0/best.pt",
+      "bytes": 89923,
+      "sha256": "b20bf81062a8d27a10a5b3c53da858991cf6aee7710c817d96c2d87d78c14128"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/mask/seed_0/config.json",
+      "bytes": 3012,
+      "sha256": "23bd69f256c92e32ae7de1c0ae3a4c47c46d79bb8bf128201c5d943166b936f1"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/mask/seed_0/history.json",
+      "bytes": 767,
+      "sha256": "e0b91feb6d1a79ec51e7623590a67dd687f8fd1a61e88db6d29cb21379c368f9"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/mask/seed_0/metrics.json",
+      "bytes": 354,
+      "sha256": "1d58504c741ce0911ed7b5f7c8b8d259fcf95783e080f0e7243d7f620b3c6e88"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/mask/seed_0/test_predictions.csv",
+      "bytes": 1999,
+      "sha256": "4b5686481864551e0ff9f96441802b7f17538d235d1587e859c54883dbadf675"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/motif/seed_0/best.pt",
+      "bytes": 89923,
+      "sha256": "5c6bcf887fd08902e36a485597303a0d700632ca25dd5da83cd6ccc81e296549"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/motif/seed_0/config.json",
+      "bytes": 3013,
+      "sha256": "7592286c79654c664eb7e30a1cd71e51f088ee8e35b8bba1235c879da415e6bb"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/motif/seed_0/history.json",
+      "bytes": 742,
+      "sha256": "c13328a98c2049ecd7959bb1ff9aa3c55175213980cdecf6fb169412c484ad3b"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/motif/seed_0/metrics.json",
+      "bytes": 355,
+      "sha256": "0c7395ea02ecba7f3208bb5127c0cab43ce483e636b901b9a8f926480590b5ea"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/motif/seed_0/test_predictions.csv",
+      "bytes": 2003,
+      "sha256": "0c6d67f13ef9f4f2fd6c2c79048980c42912e38ccdd6bbf3b84a8d3c45cf033f"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/no_communication/seed_0/best.pt",
+      "bytes": 89987,
+      "sha256": "3982b748150c777f5443bad967c20e657c2438d7aad19c67d616ba971a16f680"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/no_communication/seed_0/config.json",
+      "bytes": 3024,
+      "sha256": "b29f1abb06ad2103dd8b4ca8662c0083fd08afe18fee9d8315e74076f83ee1d6"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/no_communication/seed_0/history.json",
+      "bytes": 770,
+      "sha256": "054c63bdbb0c775cca35de891b6e9d642f081576309861d24c8ab8826434e60f"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/no_communication/seed_0/metrics.json",
+      "bytes": 367,
+      "sha256": "6c1bf27bb32790db8473e1fd98fea97a32ed62b0b9d88766b6302bc02446b691"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/no_communication/seed_0/test_predictions.csv",
+      "bytes": 2002,
+      "sha256": "a6f2e662ed54cc405318ba890922d0da48ac900adb7bec9f28fa1820cac50ff3"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/random/seed_0/best.pt",
+      "bytes": 89923,
+      "sha256": "345f5f9166885cca3771b443f01089b35795d4b3a641a0ae1ef435b3bb2d29c8"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/random/seed_0/config.json",
+      "bytes": 3014,
+      "sha256": "1c8148b19bd26a72132db09a897ac6352c1c3fe1da614299ffc316d9a627ed93"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/random/seed_0/history.json",
+      "bytes": 769,
+      "sha256": "396b91624c3aeae7f1f40905ca6ce9897dced82bf349a3689b0cb22b3800f4e3"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/random/seed_0/metrics.json",
+      "bytes": 355,
+      "sha256": "2e766bf5d83dbac4758a3a7453c709cbbf2ee072aa5c661041198ba8a617826b"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/random/seed_0/test_predictions.csv",
+      "bytes": 2000,
+      "sha256": "5f39856569992fa176d6b60ac35b26ed7e775ae2158ca024d79f9617191da702"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/shuffle/seed_0/best.pt",
+      "bytes": 89923,
+      "sha256": "222862e6a778c051768ee06481d197e59cc5f1c7adf86875233ff802c93e8fda"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/shuffle/seed_0/config.json",
+      "bytes": 3015,
+      "sha256": "43a50d5b5924e076ba8771a235e924d0d4528bbb27cfd5872b2626252b7ec945"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/shuffle/seed_0/history.json",
+      "bytes": 770,
+      "sha256": "be21ef58a220013f96cb958b187419dde9d3d39a34bc2260c77d9e18e1f94186"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/shuffle/seed_0/metrics.json",
+      "bytes": 354,
+      "sha256": "2b22425e214823c4521881e0687d846fc161eb0ef164263d308c17d0979bed72"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol/shuffle/seed_0/test_predictions.csv",
+      "bytes": 1992,
+      "sha256": "1d847e20329b00b81cccdfd21ee0786ff46bc3a9f7d9993279aada59eeef4e5f"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol_aggregate.csv",
+      "bytes": 1244,
+      "sha256": "d0ce3ea6cb04685bbe1a05ad801dcaad70f3bbe81b3970564ca450a81d937ec8"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol_partition_audit.json",
+      "bytes": 115,
+      "sha256": "1c9a6f35787bb88c2a80b3fa57a27c8bc0ef11d42c37b7ffee0987641c96c683"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol_seeds.csv",
+      "bytes": 870,
+      "sha256": "8bedc648f0290aee5fded967c08c0f35b32fea52ad5906834c52ca6db9865c73"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_20261028/esol_summary.json",
+      "bytes": 3147,
+      "sha256": "899ba327cafc6ad7cc9ec9e40104278731423ca09e58ddd900b87a45e3ec6375"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_20261028/bace/random/seed_0/config.json",
+      "bytes": 4045,
+      "sha256": "21c1b3dc0063f8e7dd38dabff92a9a38345ce4477513061c7edfad96aa09fa7c"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_20261028/bace_partition_audit.json",
+      "bytes": 127,
+      "sha256": "a3ed9af480df784690bb0e2a4caf8b8e49ff8934d17f23420097e5b74a4484f6"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/no_communication/seed_0/best.pt",
+      "bytes": 89423,
+      "sha256": "3fc500761fcea3ef9781377de60db7335cfd454de37246b5571c1fb8d2579651"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/no_communication/seed_0/config.json",
+      "bytes": 6364,
+      "sha256": "c549b4f1fd97164fae14eca7d2782566465f829126d1b8385b82fc03c0a79b6c"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/no_communication/seed_0/history.json",
+      "bytes": 405,
+      "sha256": "1cf1820fec0b9daa5ea30a55c379266b530c0e26885ee2d518a0ef0dcdeb897d"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/no_communication/seed_0/metrics.json",
+      "bytes": 397,
+      "sha256": "036dc38777106b9e6ebc876a403be9c3afd4a4d72aeb1ef6b9f64f6242d290f8"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/no_communication/seed_0/test_predictions.csv",
+      "bytes": 10819,
+      "sha256": "3820a9cd8cbb0819d36a8fc134eadb02e89d1aa9e4ba2c49700df2cc3f7e5901"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/random/seed_0/best.pt",
+      "bytes": 89423,
+      "sha256": "82ddf842b089d4809b5f1faeab14739ec435345b0382637f42b6fb608853eeec"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/random/seed_0/config.json",
+      "bytes": 6354,
+      "sha256": "aa9c245440f39f3042bbb615a32d1aaa897b2594b0e4fe799b1e9e77210f6057"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/random/seed_0/history.json",
+      "bytes": 405,
+      "sha256": "5c5be40bb3b874cb72dbf4fbf64c01f5a32d7bfadf672b6d4638153affa0acb9"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/random/seed_0/metrics.json",
+      "bytes": 385,
+      "sha256": "600d6fe64dad50ebc35e72cfa361936940bf197e2ebf4994eccd48f86116290f"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp/random/seed_0/test_predictions.csv",
+      "bytes": 10823,
+      "sha256": "d9adc8d2b306a52a072530c79805ee5796623a9acd34ea451a063dcf6fa29a5e"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp_aggregate.csv",
+      "bytes": 693,
+      "sha256": "7581e0577d8dd09d2ad837f728b4a0e01b7693924f428ab0047cf22dddaf78be"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp_partition_audit.json",
+      "bytes": 120,
+      "sha256": "029c636960a5c1e91d99c4317078e965a06d22b39ff55b150ba134efb843bab8"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp_seeds.csv",
+      "bytes": 335,
+      "sha256": "db333c7bc4f9ff3972f7bf633964d732c49f026a05fbc4d93d62376a9b52fdda"
+    },
+    {
+      "path": "motif/context_denoising/runs/smoke_classification_bbbp_20261028/bbbp_summary.json",
+      "bytes": 859,
+      "sha256": "3f82e7e845e1978bffc5bd5e4e460e59d716f32b5087700ed8cf4b959694db13"
+    },
+    {
+      "path": "motif/context_denoising/SYNC_RESULTS_20261028.md",
+      "bytes": 1300,
+      "sha256": "9125ccff5a4ded7b4eb6ce7060c47bd6431386005cbbde91339ce4b02ad1e62b"
+    },
+    {
+      "path": "motif/context_denoising/test_method.py",
+      "bytes": 3883,
+      "sha256": "c4fca143ca6c4a29d2514b85adf48638da4a73b71e77100d5df475cdc4bb6e6e"
+    },
+    {
+      "path": "motif/context_denoising/train.py",
+      "bytes": 10391,
+      "sha256": "769a437583fe5c20e5f374c461f37625fc55c88e80a75eeabf6044870738d09a"
+    },
+    {
+      "path": "motif/README.md",
+      "bytes": 13999,
+      "sha256": "5e183621e280a7846d7b6791b1d371ef3834fd961260f418fdb9648232092866"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/__init__.py",
+      "bytes": 649,
+      "sha256": "122daa983dec1e12366425898b7632c6dc0d104e58ee0fa28ed4e8262d2c2c9a"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/config.py",
+      "bytes": 1492,
+      "sha256": "f023053e13c61e417cf2c737545d50789110602a90e012d421ee5765cbc22b79"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/data.py",
+      "bytes": 9287,
+      "sha256": "b16f29ba0286659d98f0a71fc1b1c7191e58d85ed963be917aecb05400fc7bf3"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/diffusion.py",
+      "bytes": 3907,
+      "sha256": "61ee90b66a698451e5b6d987d151d6032724088c994bf5eb12cb57a9075c850c"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/evaluation.py",
+      "bytes": 19036,
+      "sha256": "de5e0088520bd8b79a7f1f5760536fba4f57f86305e915c0c31240a4421194c1"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/formal_evaluation.py",
+      "bytes": 19275,
+      "sha256": "68624a9ecd29dca61f7f5a0b87a74631b32d61e62698c1d52c3155febe678616"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/losses.py",
+      "bytes": 4347,
+      "sha256": "943249c26b1a5fe875ba82cc03cd470eefc8e121cd03ba6c639b14e6b2dc0e47"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/model.py",
+      "bytes": 10430,
+      "sha256": "ef72f8d802315fe3f7dd10223a076c9db26601754915cf8b790d65cf596365ab"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/property_prediction.py",
+      "bytes": 14839,
+      "sha256": "c1cb1e438f8ff4ab17ffe751a9709aa040758b5db54290ada83cde17e48491bd"
+    },
+    {
+      "path": "扩散GNN/01_扩散预训练/bond_diffusion/trainer.py",
+      "bytes": 7127,
+      "sha256": "aed6e06c6ccb6f8fa9d41fdff10819fca551fa1519e29b7955c7457734e37827"
+    }
+  ]
+}

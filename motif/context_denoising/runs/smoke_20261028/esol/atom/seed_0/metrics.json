@@ -1,0 +1,17 @@
+{
+  "variant": "atom",
+  "seed": 0,
+  "best_epoch": 1,
+  "validation": {
+    "rmse": 2.4540380248813336,
+    "mae": 2.0468549728393555,
+    "evaluated_tasks": 1.0
+  },
+  "elapsed_seconds": 0.12291549999999951,
+  "smoke_only": true,
+  "test": {
+    "rmse": 2.869414169120623,
+    "mae": 2.306039810180664,
+    "evaluated_tasks": 1.0
+  }
+}

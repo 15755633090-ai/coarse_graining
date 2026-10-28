@@ -1,0 +1,17 @@
+{
+  "variant": "no_communication",
+  "seed": 0,
+  "best_epoch": 1,
+  "validation": {
+    "roc_auc": 0.9554597701149425,
+    "average_precision": 0.7014232295482296,
+    "evaluated_tasks": 1.0
+  },
+  "elapsed_seconds": 0.24808379999999985,
+  "smoke_only": true,
+  "test": {
+    "roc_auc": 0.538818359375,
+    "average_precision": 0.5398364476219426,
+    "evaluated_tasks": 1.0
+  }
+}

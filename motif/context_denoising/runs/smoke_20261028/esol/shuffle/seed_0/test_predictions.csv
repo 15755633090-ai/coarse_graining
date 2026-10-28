@@ -1,0 +1,33 @@
+sample_index,smiles,target__measured log solubility in mols per litre,prediction__measured log solubility in mols per litre,observed__measured log solubility in mols per litre
+0,OCC3OC(OCC2OC(OC(C#N)c1ccccc1)C(O)C(O)C2O)C(O)C(O)C3O ,-0.77,-4.9668717,True
+1,Cc1occc1C(=O)Nc2ccccc2,-3.3,-4.3633127,True
+3,c1ccc2c(c1)ccc3c2ccc4c5ccccc5ccc43,-7.87,-6.3800426,True
+4,c1ccsc1,-1.33,-3.5794897,True
+8,ClC4=C(Cl)C5(Cl)C3C1CC(C2OC12)C3C4(Cl)C5(Cl)Cl,-6.29,-6.123209,True
+9,COc5cc4OCC3Oc2c1CC(Oc1ccc2C(=O)C3c4cc5OC)C(C)=C ,-4.42,-6.737262,True
+10,O=C1CCCN1,1.07,-4.178735,True
+13,CCC1(C(=O)NCNC1=O)c2ccccc2,-2.64,-5.083767,True
+21,O=c2[nH]c1CCCc1c(=O)n2C3CCCCC3,-4.594,-5.818553,True
+28,ClC(Cl)=C(c1ccc(Cl)cc1)c2ccc(Cl)cc2,-6.9,-4.973507,True
+36,N(c1ccccc1)c2ccccc2,-3.504,-4.530755,True
+38,CCCOP(=S)(OCCC)SCC(=O)N1CCCCC1C,-4.15,-6.698677,True
+42,O=C2NC(=O)C1(CCC1)C(=O)N2,-1.655,-5.215228,True
+48,COC(=O)C1=C(C)NC(=C(C1c2ccccc2N(=O)=O)C(=O)OC)C ,-4.76,-6.875787,True
+51,CCC1(C(=O)NC(=O)NC1=O)C2=CCCCC2 ,-2.17,-6.396553,True
+64,O=C(Cn1ccnc1N(=O)=O)NCc2ccccc2,-2.81,-5.171712,True
+65,OC4=C(C1CCC(CC1)c2ccc(Cl)cc2)C(=O)c3ccccc3C4=O,-5.931,-6.1157036,True
+67,NC(=O)c1cnccn1,-0.667,-3.8258123,True
+70,O=C2CN(N=Cc1ccc(o1)N(=O)=O)C(=O)N2 ,-3.38,-5.683405,True
+79,CCCC1COC(Cn2cncn2)(O1)c3ccc(Cl)cc3Cl,-3.493,-5.417085,True
+86,CC(C)C(C(=O)OC(C#N)c1cccc(Oc2ccccc2)c1)c3ccc(OC(F)F)cc3,-6.876,-5.5144577,True
+92,c1ccc2c(c1)c3cccc4cccc2c34,-6.0,-5.4097347,True
+95,CCC(=C(CC)c1ccc(O)cc1)c2ccc(O)cc2 ,-4.07,-4.92737,True
+98,C1OC1c2ccccc2 ,-1.6,-3.852294,True
+101,c2(Cl)c(Cl)c(Cl)c1nccnc1c2(Cl) ,-5.43,-4.53496,True
+109,OCC1OC(C(O)C1O)n2cnc3c(O)ncnc23,-1.23,-4.3595667,True
+116,c1ccc2cnccc2c1,-1.45,-4.240261,True
+135,C1Cc2ccccc2C1,-3.04,-4.055238,True
+137,O=C2NC(=O)C1(CC1)C(=O)N2 ,-1.886,-4.9586387,True
+150,Nc1ncnc2n(ccc12)C3OC(CO)C(O)C3O ,-1.95,-4.540591,True
+160,CSc1nnc(c(=O)n1N)C(C)(C)C,-2.253,-4.9186654,True
+161,Cc1ccc(OP(=O)(Oc2cccc(C)c2)Oc3ccccc3C)cc1,-6.01,-5.156006,True

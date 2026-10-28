@@ -1,0 +1,17 @@
+{
+  "variant": "shuffle",
+  "seed": 0,
+  "best_epoch": 2,
+  "validation": {
+    "rmse": 2.4650415501371548,
+    "mae": 2.170375347137451,
+    "evaluated_tasks": 1.0
+  },
+  "elapsed_seconds": 0.19041009999999936,
+  "smoke_only": true,
+  "test": {
+    "rmse": 2.428517934065775,
+    "mae": 2.11913800239563,
+    "evaluated_tasks": 1.0
+  }
+}

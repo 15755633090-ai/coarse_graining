@@ -1,0 +1,16 @@
+[
+  {
+    "epoch": 1,
+    "loss": 0.776961088180542,
+    "property_loss": 0.5896524637937546,
+    "denoise_loss": 18.730863094329834,
+    "q_norm": 3.9999658465385437,
+    "q_dimension_variance": 0.2738940045237541,
+    "selected_motifs": 71.25,
+    "validation": {
+      "roc_auc": 0.9554597701149425,
+      "average_precision": 0.7014232295482296,
+      "evaluated_tasks": 1.0
+    }
+  }
+]

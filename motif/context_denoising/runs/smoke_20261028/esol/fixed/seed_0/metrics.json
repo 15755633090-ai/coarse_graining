@@ -1,0 +1,17 @@
+{
+  "variant": "fixed",
+  "seed": 0,
+  "best_epoch": 2,
+  "validation": {
+    "rmse": 2.465034683014492,
+    "mae": 2.1703577041625977,
+    "evaluated_tasks": 1.0
+  },
+  "elapsed_seconds": 0.2558512000000004,
+  "smoke_only": true,
+  "test": {
+    "rmse": 2.4285281441942472,
+    "mae": 2.1191389560699463,
+    "evaluated_tasks": 1.0
+  }
+}

@@ -1,0 +1,5 @@
+,valid_roc_auc,valid_roc_auc,valid_roc_auc,valid_average_precision,valid_average_precision,valid_average_precision,valid_evaluated_tasks,valid_evaluated_tasks,valid_evaluated_tasks,test_roc_auc,test_roc_auc,test_roc_auc,test_average_precision,test_average_precision,test_average_precision,test_evaluated_tasks,test_evaluated_tasks,test_evaluated_tasks
+,mean,std,count,mean,std,count,mean,std,count,mean,std,count,mean,std,count,mean,std,count
+variant,,,,,,,,,,,,,,,,,,
+no_communication,0.9554597701149425,,1,0.7014232295482296,,1,1.0,,1,0.538818359375,,1,0.5398364476219426,,1,1.0,,1
+random,0.9554597701149425,,1,0.7014232295482296,,1,1.0,,1,0.53857421875,,1,0.5396946599631404,,1,1.0,,1

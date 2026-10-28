@@ -1,0 +1,17 @@
+{
+  "variant": "random",
+  "seed": 0,
+  "best_epoch": 1,
+  "validation": {
+    "roc_auc": 0.9554597701149425,
+    "average_precision": 0.7014232295482296,
+    "evaluated_tasks": 1.0
+  },
+  "elapsed_seconds": 0.2198247999999996,
+  "smoke_only": true,
+  "test": {
+    "roc_auc": 0.53857421875,
+    "average_precision": 0.5396946599631404,
+    "evaluated_tasks": 1.0
+  }
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "epoch": 1,
+    "loss": 3.407309412956238,
+    "property_loss": 3.2371158599853516,
+    "denoise_loss": 17.01935863494873,
+    "q_norm": 3.999968647956848,
+    "q_dimension_variance": 0.22744271904230118,
+    "selected_motifs": 23.0,
+    "validation": {
+      "rmse": 3.477933531886669,
+      "mae": 3.1708121299743652,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 2,
+    "loss": 1.7707538604736328,
+    "property_loss": 1.601276457309723,
+    "denoise_loss": 16.94774055480957,
+    "q_norm": 3.9999696016311646,
+    "q_dimension_variance": 0.2195425108075142,
+    "selected_motifs": 23.0,
+    "validation": {
+      "rmse": 2.465018433972001,
+      "mae": 2.1703410148620605,
+      "evaluated_tasks": 1.0
+    }
+  }
+]

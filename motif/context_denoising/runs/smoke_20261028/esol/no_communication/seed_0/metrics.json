@@ -1,0 +1,17 @@
+{
+  "variant": "no_communication",
+  "seed": 0,
+  "best_epoch": 2,
+  "validation": {
+    "rmse": 2.4649256769702124,
+    "mae": 2.1702332496643066,
+    "evaluated_tasks": 1.0
+  },
+  "elapsed_seconds": 0.26315430000000006,
+  "smoke_only": true,
+  "test": {
+    "rmse": 2.4284031653416123,
+    "mae": 2.1190009117126465,
+    "evaluated_tasks": 1.0
+  }
+}

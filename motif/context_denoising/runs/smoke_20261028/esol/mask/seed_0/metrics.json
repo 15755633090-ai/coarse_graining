@@ -1,0 +1,17 @@
+{
+  "variant": "mask",
+  "seed": 0,
+  "best_epoch": 2,
+  "validation": {
+    "rmse": 2.465018433972001,
+    "mae": 2.1703410148620605,
+    "evaluated_tasks": 1.0
+  },
+  "elapsed_seconds": 0.32331480000000035,
+  "smoke_only": true,
+  "test": {
+    "rmse": 2.4284291826792246,
+    "mae": 2.1190123558044434,
+    "evaluated_tasks": 1.0
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "variant": "motif",
+  "seed": 0,
+  "best_epoch": 2,
+  "validation": {
+    "rmse": 2.3891453371225726,
+    "mae": 2.1045784950256348,
+    "evaluated_tasks": 1.0
+  },
+  "elapsed_seconds": 0.28064809999999873,
+  "smoke_only": true,
+  "test": {
+    "rmse": 2.3633196867031843,
+    "mae": 2.065514087677002,
+    "evaluated_tasks": 1.0
+  }
+}
