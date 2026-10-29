@@ -8,6 +8,7 @@ from torch_geometric.nn import global_mean_pool
 
 from .data import ATOM_DIM, BOND_DIM
 from .diffusion import GaussianSchedule
+from .metrics import recovery_statistics
 
 
 @dataclass
@@ -140,6 +141,11 @@ class AtomDiffusionModel(nn.Module):
             raise ValueError(stage)
         for p in self.encoder.parameters():
             p.requires_grad_(True)
+        if not self.config.motif_prior:
+            # No cross edge can reach these modules under this structural ablation.
+            for name, p in self.encoder.named_parameters():
+                if name.startswith("boundary_input.") or ".cross_message." in name or ".gate." in name:
+                    p.requires_grad_(False)
         for p in self.noise_head.parameters():
             p.requires_grad_(stage == "pretrain")
         for p in self.property_head.parameters():
@@ -158,11 +164,7 @@ class AtomDiffusionModel(nn.Module):
         xt = self.schedule.corrupt(data.x, steps, noise)
         prediction = self.predict_noise(data, xt, t)
         errors = (prediction - noise).square().mean(-1)
-        groups = {"all": torch.ones_like(data.boundary), "boundary": data.boundary, "internal": ~data.boundary}
-        diagnostic = {}
-        for name, mask in groups.items():
-            diagnostic[f"{name}_error_sum"] = float(errors.detach()[mask].sum())
-            diagnostic[f"{name}_atoms"] = int(mask.sum())
+        diagnostic = recovery_statistics(data.x, xt, noise, prediction, steps, data.boundary, self.schedule)
         return errors.mean(), diagnostic
 
     def forward(self, data, return_states=False):

@@ -12,6 +12,12 @@ class GaussianSchedule(nn.Module):
         beta = torch.cat((torch.zeros(1), torch.linspace(1e-4, 0.02, steps)))
         self.register_buffer("alpha_bar", torch.cumprod(1 - beta, 0))
 
+    def description(self):
+        return {"type": "linear_beta_fixed_endpoints", "steps": self.steps,
+                "beta_start": 1e-4, "beta_end": 0.02,
+                "alpha_bar_T": float(self.alpha_bar[-1]),
+                "t0": "exactly clean", "steps_change_terminal_snr": True}
+
     def node_steps(self, graph_steps, batch):
         if graph_steps.dtype != torch.long or graph_steps.ndim != 1:
             raise ValueError("Expected a vector of integer graph timesteps")

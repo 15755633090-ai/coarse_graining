@@ -1,0 +1,1326 @@
+[
+  {
+    "epoch": 1,
+    "train_loss_batch_mean": 1.0203238129615784,
+    "pre_clip_gradient_norm": 0.03999759256839752,
+    "clip_fraction": 0.0,
+    "optimizer_steps": 2,
+    "observed_gradient_parameters": 32967,
+    "validation": {
+      "all_mse": 1.0197183114510995,
+      "boundary_mse": 1.0327783107757569,
+      "internal_mse": 1.0167500322515315,
+      "recovery": {
+        "all": {
+          "all": {
+            "all": {
+              "atoms": 216,
+              "noise_mse": 1.0197183114510995,
+              "x0_mse": 527.6226679484049,
+              "joint_accuracy": 0.027777777777777776
+            },
+            "element": {
+              "atoms": 216,
+              "noise_mse": 1.0180079142252605,
+              "x0_mse": 533.2406068024812,
+              "accuracy": 0.06481481481481481
+            },
+            "charge": {
+              "atoms": 216,
+              "noise_mse": 1.0366712146335177,
+              "x0_mse": 472.1504793520327,
+              "accuracy": 0.19907407407407407
+            },
+            "aromatic": {
+              "atoms": 216,
+              "noise_mse": 1.0197647236011647,
+              "x0_mse": 526.1825321338795,
+              "accuracy": 0.7037037037037037
+            }
+          },
+          "boundary": {
+            "all": {
+              "atoms": 40,
+              "noise_mse": 1.0327783107757569,
+              "x0_mse": 298.8614837646484,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 40,
+              "noise_mse": 1.032935094833374,
+              "x0_mse": 297.12070541381837,
+              "accuracy": 0.0
+            },
+            "charge": {
+              "atoms": 40,
+              "noise_mse": 1.0241584300994873,
+              "x0_mse": 264.62698402404783,
+              "accuracy": 0.2
+            },
+            "aromatic": {
+              "atoms": 40,
+              "noise_mse": 1.0751782417297364,
+              "x0_mse": 607.8464960098266,
+              "accuracy": 0.625
+            }
+          },
+          "internal": {
+            "all": {
+              "atoms": 176,
+              "noise_mse": 1.0167500322515315,
+              "x0_mse": 579.6137400540439,
+              "joint_accuracy": 0.03409090909090909
+            },
+            "element": {
+              "atoms": 176,
+              "noise_mse": 1.0146154056895862,
+              "x0_mse": 586.9041820872914,
+              "accuracy": 0.07954545454545454
+            },
+            "charge": {
+              "atoms": 176,
+              "noise_mse": 1.0395149751143022,
+              "x0_mse": 519.3148775967685,
+              "accuracy": 0.19886363636363635
+            },
+            "aromatic": {
+              "atoms": 176,
+              "noise_mse": 1.007170850580389,
+              "x0_mse": 507.62255131114614,
+              "accuracy": 0.7215909090909091
+            }
+          }
+        },
+        "t_0_10pct": {
+          "all": {
+            "all": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "joint_accuracy": null
+            },
+            "element": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "charge": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "aromatic": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            }
+          },
+          "boundary": {
+            "all": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "joint_accuracy": null
+            },
+            "element": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "charge": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "aromatic": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            }
+          },
+          "internal": {
+            "all": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "joint_accuracy": null
+            },
+            "element": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "charge": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "aromatic": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            }
+          }
+        },
+        "t_10_50pct": {
+          "all": {
+            "all": {
+              "atoms": 122,
+              "noise_mse": 1.0121363030105341,
+              "x0_mse": 1.221166485645732,
+              "joint_accuracy": 0.04918032786885246
+            },
+            "element": {
+              "atoms": 122,
+              "noise_mse": 1.007771101154265,
+              "x0_mse": 1.2212394651819447,
+              "accuracy": 0.10655737704918032
+            },
+            "charge": {
+              "atoms": 122,
+              "noise_mse": 1.058021607946177,
+              "x0_mse": 1.2427052669837826,
+              "accuracy": 0.28688524590163933
+            },
+            "aromatic": {
+              "atoms": 122,
+              "noise_mse": 0.9965562976774622,
+              "x0_mse": 1.087581509449443,
+              "accuracy": 0.7950819672131147
+            }
+          },
+          "boundary": {
+            "all": {
+              "atoms": 24,
+              "noise_mse": 1.030151943365733,
+              "x0_mse": 1.3858694235483806,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 24,
+              "noise_mse": 1.0335438251495361,
+              "x0_mse": 1.3897992372512817,
+              "accuracy": 0.0
+            },
+            "charge": {
+              "atoms": 24,
+              "noise_mse": 1.03351895014445,
+              "x0_mse": 1.3981357018152873,
+              "accuracy": 0.25
+            },
+            "aromatic": {
+              "atoms": 24,
+              "noise_mse": 0.8081279595692953,
+              "x0_mse": 1.0784526268641155,
+              "accuracy": 0.75
+            }
+          },
+          "internal": {
+            "all": {
+              "atoms": 98,
+              "noise_mse": 1.0077244505590321,
+              "x0_mse": 1.1808308581916653,
+              "joint_accuracy": 0.061224489795918366
+            },
+            "element": {
+              "atoms": 98,
+              "noise_mse": 1.0014595304216658,
+              "x0_mse": 1.1799596280467755,
+              "accuracy": 0.1326530612244898
+            },
+            "charge": {
+              "atoms": 98,
+              "noise_mse": 1.0640224534638074,
+              "x0_mse": 1.2046407972063338,
+              "accuracy": 0.29591836734693877
+            },
+            "aromatic": {
+              "atoms": 98,
+              "noise_mse": 1.042702207759935,
+              "x0_mse": 1.0898171249701052,
+              "accuracy": 0.8061224489795918
+            }
+          }
+        },
+        "t_50_100pct": {
+          "all": {
+            "all": {
+              "atoms": 94,
+              "noise_mse": 1.0295586281634392,
+              "x0_mse": 1210.8245141861287,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 94,
+              "noise_mse": 1.031294193673641,
+              "x0_mse": 1223.7337458184425,
+              "accuracy": 0.010638297872340425
+            },
+            "charge": {
+              "atoms": 94,
+              "noise_mse": 1.0089610282410966,
+              "x0_mse": 1083.328703535364,
+              "accuracy": 0.0851063829787234
+            },
+            "aromatic": {
+              "atoms": 94,
+              "noise_mse": 1.0498866020364965,
+              "x0_mse": 1207.6888028408619,
+              "accuracy": 0.5851063829787234
+            }
+          },
+          "boundary": {
+            "all": {
+              "atoms": 16,
+              "noise_mse": 1.0367181599140167,
+              "x0_mse": 745.0749778747559,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 16,
+              "noise_mse": 1.032021850347519,
+              "x0_mse": 740.7170724868774,
+              "accuracy": 0.0
+            },
+            "charge": {
+              "atoms": 16,
+              "noise_mse": 1.0101177096366882,
+              "x0_mse": 659.4702415466309,
+              "accuracy": 0.125
+            },
+            "aromatic": {
+              "atoms": 16,
+              "noise_mse": 1.4757536351680756,
+              "x0_mse": 1517.9987134933472,
+              "accuracy": 0.4375
+            }
+          },
+          "internal": {
+            "all": {
+              "atoms": 78,
+              "noise_mse": 1.0280900857387445,
+              "x0_mse": 1306.3628180088142,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 78,
+              "noise_mse": 1.0311448512933192,
+              "x0_mse": 1322.8140884790664,
+              "accuracy": 0.01282051282051282
+            },
+            "charge": {
+              "atoms": 78,
+              "noise_mse": 1.0087236991295447,
+              "x0_mse": 1170.2739046536958,
+              "accuracy": 0.07692307692307693
+            },
+            "aromatic": {
+              "atoms": 78,
+              "noise_mse": 0.9625291579808944,
+              "x0_mse": 1144.0353632217798,
+              "accuracy": 0.6153846153846154
+            }
+          }
+        }
+      }
+    },
+    "train_noise_mse": {
+      "all": 1.0201173920871158,
+      "boundary": 1.023852825164795,
+      "internal": 1.0195938887869476
+    },
+    "train_recovery": {
+      "all": {
+        "all": {
+          "all": {
+            "atoms": 179,
+            "noise_mse": 1.0201173920871158,
+            "x0_mse": 2257.1748428770948,
+            "joint_accuracy": 0.0670391061452514
+          },
+          "element": {
+            "atoms": 179,
+            "noise_mse": 1.0185950508330788,
+            "x0_mse": 2238.8676675977654,
+            "accuracy": 0.1005586592178771
+          },
+          "charge": {
+            "atoms": 179,
+            "noise_mse": 1.0378559474838513,
+            "x0_mse": 2480.6242143854747,
+            "accuracy": 0.18994413407821228
+          },
+          "aromatic": {
+            "atoms": 179,
+            "noise_mse": 1.0042507661787492,
+            "x0_mse": 2005.752094972067,
+            "accuracy": 0.6815642458100558
+          }
+        },
+        "boundary": {
+          "all": {
+            "atoms": 22,
+            "noise_mse": 1.023852825164795,
+            "x0_mse": 60.26757951216264,
+            "joint_accuracy": 0.09090909090909091
+          },
+          "element": {
+            "atoms": 22,
+            "noise_mse": 1.0218586921691895,
+            "x0_mse": 59.76958951083097,
+            "accuracy": 0.18181818181818182
+          },
+          "charge": {
+            "atoms": 22,
+            "noise_mse": 1.0378198190168901,
+            "x0_mse": 65.3804140957919,
+            "accuracy": 0.2727272727272727
+          },
+          "aromatic": {
+            "atoms": 22,
+            "noise_mse": 1.0587074973366477,
+            "x0_mse": 59.220942063765094,
+            "accuracy": 0.5909090909090909
+          }
+        },
+        "internal": {
+          "all": {
+            "atoms": 157,
+            "noise_mse": 1.0195938887869476,
+            "x0_mse": 2565.0215963375795,
+            "joint_accuracy": 0.06369426751592357
+          },
+          "element": {
+            "atoms": 157,
+            "noise_mse": 1.018137694923741,
+            "x0_mse": 2544.2189490445858,
+            "accuracy": 0.08917197452229299
+          },
+          "charge": {
+            "atoms": 157,
+            "noise_mse": 1.0378611862279807,
+            "x0_mse": 2819.0661823248406,
+            "accuracy": 0.17834394904458598
+          },
+          "aromatic": {
+            "atoms": 157,
+            "noise_mse": 0.9966199838431777,
+            "x0_mse": 2278.514430732484,
+            "accuracy": 0.6942675159235668
+          }
+        }
+      },
+      "t_0_10pct": {
+        "all": {
+          "all": {
+            "atoms": 6,
+            "noise_mse": 1.0207346280415852,
+            "x0_mse": 0.03772443036238352,
+            "joint_accuracy": 1.0
+          },
+          "element": {
+            "atoms": 6,
+            "noise_mse": 0.9981308778127035,
+            "x0_mse": 0.03688903649648031,
+            "accuracy": 1.0
+          },
+          "charge": {
+            "atoms": 6,
+            "noise_mse": 1.2541007995605469,
+            "x0_mse": 0.046349202593167625,
+            "accuracy": 1.0
+          },
+          "aromatic": {
+            "atoms": 6,
+            "noise_mse": 0.9654651482899984,
+            "x0_mse": 0.035681769251823425,
+            "accuracy": 1.0
+          }
+        },
+        "boundary": {
+          "all": {
+            "atoms": 2,
+            "noise_mse": 1.046628713607788,
+            "x0_mse": 0.038681428879499435,
+            "joint_accuracy": 1.0
+          },
+          "element": {
+            "atoms": 2,
+            "noise_mse": 1.0057531595230103,
+            "x0_mse": 0.037170737981796265,
+            "accuracy": 1.0
+          },
+          "charge": {
+            "atoms": 2,
+            "noise_mse": 1.4420208930969238,
+            "x0_mse": 0.05329437181353569,
+            "accuracy": 1.0
+          },
+          "aromatic": {
+            "atoms": 2,
+            "noise_mse": 1.1063752174377441,
+            "x0_mse": 0.040889546275138855,
+            "accuracy": 1.0
+          }
+        },
+        "internal": {
+          "all": {
+            "atoms": 4,
+            "noise_mse": 1.0077877044677734,
+            "x0_mse": 0.03724593296647072,
+            "joint_accuracy": 1.0
+          },
+          "element": {
+            "atoms": 4,
+            "noise_mse": 0.99431973695755,
+            "x0_mse": 0.03674818202853203,
+            "accuracy": 1.0
+          },
+          "charge": {
+            "atoms": 4,
+            "noise_mse": 1.1601407527923584,
+            "x0_mse": 0.04287661612033844,
+            "accuracy": 1.0
+          },
+          "aromatic": {
+            "atoms": 4,
+            "noise_mse": 0.895010232925415,
+            "x0_mse": 0.03307788074016571,
+            "accuracy": 1.0
+          }
+        }
+      },
+      "t_10_50pct": {
+        "all": {
+          "all": {
+            "atoms": 62,
+            "noise_mse": 1.0015770081550843,
+            "x0_mse": 1.9052035424017137,
+            "joint_accuracy": 0.0967741935483871
+          },
+          "element": {
+            "atoms": 62,
+            "noise_mse": 1.0055750262352727,
+            "x0_mse": 1.913918710524036,
+            "accuracy": 0.1774193548387097
+          },
+          "charge": {
+            "atoms": 62,
+            "noise_mse": 0.9372233729208669,
+            "x0_mse": 1.7938939371416647,
+            "accuracy": 0.3225806451612903
+          },
+          "aromatic": {
+            "atoms": 62,
+            "noise_mse": 1.1498086683211788,
+            "x0_mse": 2.0545181766633065,
+            "accuracy": 0.8064516129032258
+          }
+        },
+        "boundary": {
+          "all": {
+            "atoms": 11,
+            "noise_mse": 1.027573975649747,
+            "x0_mse": 0.4562079039486972,
+            "joint_accuracy": 0.0
+          },
+          "element": {
+            "atoms": 11,
+            "noise_mse": 1.025699788873846,
+            "x0_mse": 0.45598027922890405,
+            "accuracy": 0.18181818181818182
+          },
+          "charge": {
+            "atoms": 11,
+            "noise_mse": 1.0100493431091309,
+            "x0_mse": 0.4374841560016979,
+            "accuracy": 0.36363636363636365
+          },
+          "aromatic": {
+            "atoms": 11,
+            "noise_mse": 1.2442426898262717,
+            "x0_mse": 0.5820954712954435,
+            "accuracy": 0.7272727272727273
+          }
+        },
+        "internal": {
+          "all": {
+            "atoms": 51,
+            "noise_mse": 0.9959697723388672,
+            "x0_mse": 2.2177321490119484,
+            "joint_accuracy": 0.11764705882352941
+          },
+          "element": {
+            "atoms": 51,
+            "noise_mse": 1.0012345407523362,
+            "x0_mse": 2.2283760519588696,
+            "accuracy": 0.17647058823529413
+          },
+          "charge": {
+            "atoms": 51,
+            "noise_mse": 0.9215157639746573,
+            "x0_mse": 2.0864530077167585,
+            "accuracy": 0.3137254901960784
+          },
+          "aromatic": {
+            "atoms": 51,
+            "noise_mse": 1.1294404385136623,
+            "x0_mse": 2.372099670709348,
+            "accuracy": 0.8235294117647058
+          }
+        }
+      },
+      "t_50_100pct": {
+        "all": {
+          "all": {
+            "atoms": 111,
+            "noise_mse": 1.030439840780722,
+            "x0_mse": 3638.8817567567567,
+            "joint_accuracy": 0.0
+          },
+          "element": {
+            "atoms": 111,
+            "noise_mse": 1.02697348379874,
+            "x0_mse": 3609.3548704954956,
+            "accuracy": 0.009009009009009009
+          },
+          "charge": {
+            "atoms": 111,
+            "noise_mse": 1.082376531652502,
+            "x0_mse": 3999.281953828829,
+            "accuracy": 0.07207207207207207
+          },
+          "aromatic": {
+            "atoms": 111,
+            "noise_mse": 0.9250447384945981,
+            "x0_mse": 3233.3514921171172,
+            "accuracy": 0.5945945945945946
+          }
+        },
+        "boundary": {
+          "all": {
+            "atoms": 9,
+            "noise_mse": 1.0142434967888727,
+            "x0_mse": 146.75457763671875,
+            "joint_accuracy": 0.0
+          },
+          "element": {
+            "atoms": 9,
+            "noise_mse": 1.020742999182807,
+            "x0_mse": 145.53787570529514,
+            "accuracy": 0.0
+          },
+          "charge": {
+            "atoms": 9,
+            "noise_mse": 0.9819391568501791,
+            "x0_mse": 159.27224392361111,
+            "accuracy": 0.0
+          },
+          "aromatic": {
+            "atoms": 9,
+            "noise_mse": 0.8213494618733724,
+            "x0_mse": 144.04176923963757,
+            "accuracy": 0.3333333333333333
+          }
+        },
+        "internal": {
+          "all": {
+            "atoms": 102,
+            "noise_mse": 1.03186876633588,
+            "x0_mse": 3947.010569852941,
+            "joint_accuracy": 0.0
+          },
+          "element": {
+            "atoms": 102,
+            "noise_mse": 1.0275232651654411,
+            "x0_mse": 3914.985906862745,
+            "accuracy": 0.00980392156862745
+          },
+          "charge": {
+            "atoms": 102,
+            "noise_mse": 1.0912386950324564,
+            "x0_mse": 4338.106464460784,
+            "accuracy": 0.0784313725490196
+          },
+          "aromatic": {
+            "atoms": 102,
+            "noise_mse": 0.9341943404253792,
+            "x0_mse": 3505.9376531862745,
+            "accuracy": 0.6176470588235294
+          }
+        }
+      }
+    }
+  },
+  {
+    "epoch": 2,
+    "train_loss_batch_mean": 1.0324382781982422,
+    "pre_clip_gradient_norm": 0.0372402798384428,
+    "clip_fraction": 0.0,
+    "optimizer_steps": 2,
+    "observed_gradient_parameters": 32967,
+    "validation": {
+      "all_mse": 1.0182551984433774,
+      "boundary_mse": 1.0312768936157226,
+      "internal_mse": 1.0152957222678445,
+      "recovery": {
+        "all": {
+          "all": {
+            "all": {
+              "atoms": 216,
+              "noise_mse": 1.0182551984433774,
+              "x0_mse": 526.7590916951498,
+              "joint_accuracy": 0.027777777777777776
+            },
+            "element": {
+              "atoms": 216,
+              "noise_mse": 1.0165314850983795,
+              "x0_mse": 532.3433018437138,
+              "accuracy": 0.06481481481481481
+            },
+            "charge": {
+              "atoms": 216,
+              "noise_mse": 1.0350427274350766,
+              "x0_mse": 471.3751540007415,
+              "accuracy": 0.19907407407407407
+            },
+            "aromatic": {
+              "atoms": 216,
+              "noise_mse": 1.0200854407416449,
+              "x0_mse": 526.8048980147751,
+              "accuracy": 0.7037037037037037
+            }
+          },
+          "boundary": {
+            "all": {
+              "atoms": 40,
+              "noise_mse": 1.0312768936157226,
+              "x0_mse": 298.3962335586548,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 40,
+              "noise_mse": 1.0313775062561035,
+              "x0_mse": 296.6316198348999,
+              "accuracy": 0.0
+            },
+            "charge": {
+              "atoms": 40,
+              "noise_mse": 1.0230512142181396,
+              "x0_mse": 264.2517765045166,
+              "accuracy": 0.2
+            },
+            "aromatic": {
+              "atoms": 40,
+              "noise_mse": 1.0746479988098145,
+              "x0_mse": 608.2576383590698,
+              "accuracy": 0.625
+            }
+          },
+          "internal": {
+            "all": {
+              "atoms": 176,
+              "noise_mse": 1.0152957222678445,
+              "x0_mse": 578.6597081964666,
+              "joint_accuracy": 0.03409090909090909
+            },
+            "element": {
+              "atoms": 176,
+              "noise_mse": 1.0131572810086338,
+              "x0_mse": 585.9141498912464,
+              "accuracy": 0.07954545454545454
+            },
+            "charge": {
+              "atoms": 176,
+              "noise_mse": 1.0377681472084739,
+              "x0_mse": 518.4486097856002,
+              "accuracy": 0.19886363636363635
+            },
+            "aromatic": {
+              "atoms": 176,
+              "noise_mse": 1.007684664292769,
+              "x0_mse": 508.2929444746538,
+              "accuracy": 0.7215909090909091
+            }
+          }
+        },
+        "t_0_10pct": {
+          "all": {
+            "all": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "joint_accuracy": null
+            },
+            "element": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "charge": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "aromatic": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            }
+          },
+          "boundary": {
+            "all": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "joint_accuracy": null
+            },
+            "element": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "charge": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "aromatic": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            }
+          },
+          "internal": {
+            "all": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "joint_accuracy": null
+            },
+            "element": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "charge": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            },
+            "aromatic": {
+              "atoms": 0,
+              "noise_mse": null,
+              "x0_mse": null,
+              "accuracy": null
+            }
+          }
+        },
+        "t_10_50pct": {
+          "all": {
+            "all": {
+              "atoms": 122,
+              "noise_mse": 1.0107602916780065,
+              "x0_mse": 1.219527479077949,
+              "joint_accuracy": 0.04918032786885246
+            },
+            "element": {
+              "atoms": 122,
+              "noise_mse": 1.0063909311763575,
+              "x0_mse": 1.2195702849841508,
+              "accuracy": 0.10655737704918032
+            },
+            "charge": {
+              "atoms": 122,
+              "noise_mse": 1.0564950098756885,
+              "x0_mse": 1.241058599753458,
+              "accuracy": 0.28688524590163933
+            },
+            "aromatic": {
+              "atoms": 122,
+              "noise_mse": 0.9963236011442591,
+              "x0_mse": 1.0877947572801934,
+              "accuracy": 0.7950819672131147
+            }
+          },
+          "boundary": {
+            "all": {
+              "atoms": 24,
+              "noise_mse": 1.0288315018018086,
+              "x0_mse": 1.384335199991862,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 24,
+              "noise_mse": 1.032130499680837,
+              "x0_mse": 1.3881607055664062,
+              "accuracy": 0.0
+            },
+            "charge": {
+              "atoms": 24,
+              "noise_mse": 1.0331269303957622,
+              "x0_mse": 1.397553563117981,
+              "accuracy": 0.25
+            },
+            "aromatic": {
+              "atoms": 24,
+              "noise_mse": 0.8067735632260641,
+              "x0_mse": 1.0774078766504924,
+              "accuracy": 0.75
+            }
+          },
+          "internal": {
+            "all": {
+              "atoms": 98,
+              "noise_mse": 1.0063346162134288,
+              "x0_mse": 1.1791664045684191,
+              "joint_accuracy": 0.061224489795918366
+            },
+            "element": {
+              "atoms": 98,
+              "noise_mse": 1.0000874655587333,
+              "x0_mse": 1.178282912896604,
+              "accuracy": 0.1326530612244898
+            },
+            "charge": {
+              "atoms": 98,
+              "noise_mse": 1.0622177902533083,
+              "x0_mse": 1.2027333317970743,
+              "accuracy": 0.29591836734693877
+            },
+            "aromatic": {
+              "atoms": 98,
+              "noise_mse": 1.0427441499671157,
+              "x0_mse": 1.0903384150290976,
+              "accuracy": 0.8061224489795918
+            }
+          }
+        },
+        "t_50_100pct": {
+          "all": {
+            "all": {
+              "atoms": 94,
+              "noise_mse": 1.0279824277187914,
+              "x0_mse": 1208.8422994410737,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 94,
+              "noise_mse": 1.0296924266409366,
+              "x0_mse": 1221.6741274569897,
+              "accuracy": 0.010638297872340425
+            },
+            "charge": {
+              "atoms": 94,
+              "noise_mse": 1.0072003425435816,
+              "x0_mse": 1081.549211218002,
+              "accuracy": 0.0851063829787234
+            },
+            "aromatic": {
+              "atoms": 94,
+              "noise_mse": 1.0509249707485766,
+              "x0_mse": 1209.1185705306682,
+              "accuracy": 0.5851063829787234
+            }
+          },
+          "boundary": {
+            "all": {
+              "atoms": 16,
+              "noise_mse": 1.0349449515342712,
+              "x0_mse": 743.9141011238098,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 16,
+              "noise_mse": 1.030247986316681,
+              "x0_mse": 739.4968318939209,
+              "accuracy": 0.0
+            },
+            "charge": {
+              "atoms": 16,
+              "noise_mse": 1.0079376101493835,
+              "x0_mse": 658.5331335067749,
+              "accuracy": 0.125
+            },
+            "aromatic": {
+              "atoms": 16,
+              "noise_mse": 1.4764597713947296,
+              "x0_mse": 1519.0280766487122,
+              "accuracy": 0.4375
+            }
+          },
+          "internal": {
+            "all": {
+              "atoms": 78,
+              "noise_mse": 1.026554205478766,
+              "x0_mse": 1304.2121871556992,
+              "joint_accuracy": 0.0
+            },
+            "element": {
+              "atoms": 78,
+              "noise_mse": 1.0295785268147786,
+              "x0_mse": 1320.5822284405049,
+              "accuracy": 0.01282051282051282
+            },
+            "charge": {
+              "atoms": 78,
+              "noise_mse": 1.0070489247639973,
+              "x0_mse": 1168.3216278858674,
+              "accuracy": 0.07692307692307693
+            },
+            "aromatic": {
+              "atoms": 78,
+              "noise_mse": 0.9636358603453025,
+              "x0_mse": 1145.5475146953877,
+              "accuracy": 0.6153846153846154
+            }
+          }
+        }
+      }
+    },
+    "train_noise_mse": {
+      "all": 1.0324067696512744,
+      "boundary": 1.025487639687278,
+      "internal": 1.033376365710216
+    },
+    "train_recovery": {
+      "all": {
+        "all": {
+          "all": {
+            "atoms": 179,
+            "noise_mse": 1.0324067696512744,
+            "x0_mse": 1462.1000676501396,
+            "joint_accuracy": 0.0223463687150838
+          },
+          "element": {
+            "atoms": 179,
+            "noise_mse": 1.0348066617656686,
+            "x0_mse": 1465.3016268767458,
+            "accuracy": 0.08379888268156424
+          },
+          "charge": {
+            "atoms": 179,
+            "noise_mse": 1.0068411374225297,
+            "x0_mse": 1450.3844546525838,
+            "accuracy": 0.20670391061452514
+          },
+          "aromatic": {
+            "atoms": 179,
+            "noise_mse": 1.043006257637919,
+            "x0_mse": 1341.910464494588,
+            "accuracy": 0.6201117318435754
+          }
+        },
+        "boundary": {
+          "all": {
+            "atoms": 22,
+            "noise_mse": 1.025487639687278,
+            "x0_mse": 1927.968838778409,
+            "joint_accuracy": 0.0
+          },
+          "element": {
+            "atoms": 22,
+            "noise_mse": 1.025621847672896,
+            "x0_mse": 1935.1093306107955,
+            "accuracy": 0.13636363636363635
+          },
+          "charge": {
+            "atoms": 22,
+            "noise_mse": 1.0534267859025435,
+            "x0_mse": 1865.8742342862215,
+            "accuracy": 0.18181818181818182
+          },
+          "aromatic": {
+            "atoms": 22,
+            "noise_mse": 0.8498670187863436,
+            "x0_mse": 1875.666569102894,
+            "accuracy": 0.7727272727272727
+          }
+        },
+        "internal": {
+          "all": {
+            "atoms": 157,
+            "noise_mse": 1.033376365710216,
+            "x0_mse": 1396.8188974173966,
+            "joint_accuracy": 0.025477707006369428
+          },
+          "element": {
+            "atoms": 157,
+            "noise_mse": 1.0360936936299512,
+            "x0_mse": 1399.4686007165606,
+            "accuracy": 0.07643312101910828
+          },
+          "charge": {
+            "atoms": 157,
+            "noise_mse": 1.000313242529608,
+            "x0_mse": 1392.1629273238455,
+            "accuracy": 0.21019108280254778
+          },
+          "aromatic": {
+            "atoms": 157,
+            "noise_mse": 1.0700704003595243,
+            "x0_mse": 1267.1165157245223,
+            "accuracy": 0.5987261146496815
+          }
+        }
+      },
+      "t_0_10pct": {
+        "all": {
+          "all": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "joint_accuracy": null
+          },
+          "element": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "accuracy": null
+          },
+          "charge": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "accuracy": null
+          },
+          "aromatic": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "accuracy": null
+          }
+        },
+        "boundary": {
+          "all": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "joint_accuracy": null
+          },
+          "element": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "accuracy": null
+          },
+          "charge": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "accuracy": null
+          },
+          "aromatic": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "accuracy": null
+          }
+        },
+        "internal": {
+          "all": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "joint_accuracy": null
+          },
+          "element": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "accuracy": null
+          },
+          "charge": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "accuracy": null
+          },
+          "aromatic": {
+            "atoms": 0,
+            "noise_mse": null,
+            "x0_mse": null,
+            "accuracy": null
+          }
+        }
+      },
+      "t_10_50pct": {
+        "all": {
+          "all": {
+            "atoms": 108,
+            "noise_mse": 1.0353805400707103,
+            "x0_mse": 2.836740493774414,
+            "joint_accuracy": 0.037037037037037035
+          },
+          "element": {
+            "atoms": 108,
+            "noise_mse": 1.035591584664804,
+            "x0_mse": 2.843554037588614,
+            "accuracy": 0.12962962962962962
+          },
+          "charge": {
+            "atoms": 108,
+            "noise_mse": 1.0259741323965568,
+            "x0_mse": 2.7323393645109952,
+            "accuracy": 0.32407407407407407
+          },
+          "aromatic": {
+            "atoms": 108,
+            "noise_mse": 1.079252596254702,
+            "x0_mse": 3.057798738832827,
+            "accuracy": 0.7222222222222222
+          }
+        },
+        "boundary": {
+          "all": {
+            "atoms": 13,
+            "noise_mse": 1.0277974422161396,
+            "x0_mse": 1.006151951276339,
+            "joint_accuracy": 0.0
+          },
+          "element": {
+            "atoms": 13,
+            "noise_mse": 1.0188688314878023,
+            "x0_mse": 1.00346799997183,
+            "accuracy": 0.23076923076923078
+          },
+          "charge": {
+            "atoms": 13,
+            "noise_mse": 1.1571796490595891,
+            "x0_mse": 1.053231459397536,
+            "accuracy": 0.3076923076923077
+          },
+          "aromatic": {
+            "atoms": 13,
+            "noise_mse": 0.7827499279609094,
+            "x0_mse": 0.8833791109231802,
+            "accuracy": 0.7692307692307693
+          }
+        },
+        "internal": {
+          "all": {
+            "atoms": 95,
+            "noise_mse": 1.036418272319593,
+            "x0_mse": 3.0872421264648438,
+            "joint_accuracy": 0.042105263157894736
+          },
+          "element": {
+            "atoms": 95,
+            "noise_mse": 1.0378799840023643,
+            "x0_mse": 3.0953555458470396,
+            "accuracy": 0.11578947368421053
+          },
+          "charge": {
+            "atoms": 95,
+            "noise_mse": 1.0080196179841694,
+            "x0_mse": 2.962112105520148,
+            "accuracy": 0.3263157894736842
+          },
+          "aromatic": {
+            "atoms": 95,
+            "noise_mse": 1.1198266681871916,
+            "x0_mse": 3.355350775467722,
+            "accuracy": 0.7157894736842105
+          }
+        }
+      },
+      "t_50_100pct": {
+        "all": {
+          "all": {
+            "atoms": 71,
+            "noise_mse": 1.0278833416146291,
+            "x0_mse": 3681.8243012764083,
+            "joint_accuracy": 0.0
+          },
+          "element": {
+            "atoms": 71,
+            "noise_mse": 1.0336126408106845,
+            "x0_mse": 3689.885274537852,
+            "accuracy": 0.014084507042253521
+          },
+          "charge": {
+            "atoms": 71,
+            "noise_mse": 0.977737587942204,
+            "x0_mse": 3652.4463715889083,
+            "accuracy": 0.028169014084507043
+          },
+          "aromatic": {
+            "atoms": 71,
+            "noise_mse": 0.9878710894517495,
+            "x0_mse": 3378.475228323063,
+            "accuracy": 0.4647887323943662
+          }
+        },
+        "boundary": {
+          "all": {
+            "atoms": 9,
+            "noise_mse": 1.0221513907114665,
+            "x0_mse": 4711.359483506944,
+            "joint_accuracy": 0.0
+          },
+          "element": {
+            "atoms": 9,
+            "noise_mse": 1.0353762308756511,
+            "x0_mse": 4728.817979600694,
+            "accuracy": 0.0
+          },
+          "charge": {
+            "atoms": 9,
+            "noise_mse": 0.9035615258746676,
+            "x0_mse": 4559.504611545139,
+            "accuracy": 0.0
+          },
+          "aromatic": {
+            "atoms": 9,
+            "noise_mse": 0.9468139004376199,
+            "x0_mse": 4583.686674753825,
+            "accuracy": 0.7777777777777778
+          }
+        },
+        "internal": {
+          "all": {
+            "atoms": 62,
+            "noise_mse": 1.0287154105401808,
+            "x0_mse": 3532.375456779234,
+            "joint_accuracy": 0.0
+          },
+          "element": {
+            "atoms": 62,
+            "noise_mse": 1.0333566050375662,
+            "x0_mse": 3539.0721789944555,
+            "accuracy": 0.016129032258064516
+          },
+          "charge": {
+            "atoms": 62,
+            "noise_mse": 0.9885051173548545,
+            "x0_mse": 3520.7765246975805,
+            "accuracy": 0.03225806451612903
+          },
+          "aromatic": {
+            "atoms": 62,
+            "noise_mse": 0.9938309884840443,
+            "x0_mse": 3203.5248629662296,
+            "accuracy": 0.41935483870967744
+          }
+        }
+      }
+    }
+  }
+]

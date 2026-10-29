@@ -1,0 +1,15 @@
+{
+  "state": "complete",
+  "best_epoch": 2,
+  "best_score": 1.0182551984433774,
+  "epochs_run": 2,
+  "parameter_counts": {
+    "instantiated": 33256,
+    "optimized": 32967
+  },
+  "stage": "pretrain",
+  "smoke_only": true,
+  "train_molecules": 16,
+  "validation_molecules": 16,
+  "test_evaluated": false
+}

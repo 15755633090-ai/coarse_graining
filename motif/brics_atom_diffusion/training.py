@@ -1,6 +1,7 @@
 """Shared execution, checkpoint and evaluation utilities for the new atom model."""
 import argparse
 from contextlib import contextmanager
+from copy import deepcopy
 from dataclasses import asdict
 import hashlib
 import importlib.metadata
@@ -18,6 +19,8 @@ from torch_geometric.loader import DataLoader
 
 from .data import SCHEMA
 from .model import Config
+from .diffusion import GaussianSchedule
+from .metrics import summarize_recovery
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "model"))
@@ -139,6 +142,9 @@ def run_directory(args, metadata):
 def metadata(args, config, inputs, stage):
     settings = {k: str(v.resolve()) if isinstance(v, Path) else v for k, v in vars(args).items() if k != "resume"}
     return {"schema": CHECKPOINT_SCHEMA, "feature_schema": SCHEMA, "stage": stage,
+            "noise_schedule": GaussianSchedule(config.noise_steps).description(),
+            "motif_ablation": "full motif relation mechanism removed; both paths use full graph; no boundary gating"
+                if not config.motif_prior else "BRICS internal/cross relation mechanism enabled",
             "args": settings, "model": asdict(config), "inputs": inputs,
             "noise_target": "epsilon; MSE mean over all atoms and attribute channels",
             "structural_conditions": "clean topology, clean bond features, BRICS edge relations and boundary flags",
@@ -153,6 +159,32 @@ def load_checkpoint(path):
     return checkpoint
 
 
+def cpu_snapshot(value):
+    """The retained best state must not share mutable model/optimizer storage."""
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().clone()
+    if isinstance(value, dict):
+        return {k: cpu_snapshot(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [cpu_snapshot(v) for v in value]
+    if isinstance(value, tuple):
+        return tuple(cpu_snapshot(v) for v in value)
+    return deepcopy(value)
+
+
+def authoritative_best(latest):
+    if latest.get("checkpoint_protocol") != 2 or "best_checkpoint" not in latest:
+        raise ValueError("Legacy latest.pt has no authoritative best snapshot; unsafe automatic resume is refused")
+    best = latest["best_checkpoint"]
+    if any(best.get(key) != latest.get(key) for key in ("schema", "feature_schema", "stage", "config", "run_config_sha256")):
+        raise ValueError("Embedded best checkpoint belongs to another run/model")
+    if best["epoch"] != latest["best_epoch"] or best["best_epoch"] != latest["best_epoch"] or best["best_score"] != latest["best_score"]:
+        raise ValueError("Embedded best checkpoint/version inconsistent with latest.pt")
+    if best["epoch"] > latest["epoch"] or latest["history"][-1]["epoch"] != latest["epoch"]:
+        raise ValueError("Invalid latest checkpoint epoch/history")
+    return best
+
+
 @torch.no_grad()
 def evaluate_noise(model, batches, args):
     model.eval()
@@ -162,8 +194,9 @@ def evaluate_noise(model, batches, args):
         _, stats = model.denoise_loss(batch.to(args.device), generator)
         for name, value in stats.items():
             sums[name] = sums.get(name, 0) + value
-    return {name + "_mse": sums[name + "_error_sum"] / sums[name + "_atoms"]
-            if sums.get(name + "_atoms", 0) else None for name in ("all", "boundary", "internal")}
+    return {**{name + "_mse": sums[name + "_error_sum"] / sums[name + "_atoms"]
+               if sums.get(name + "_atoms", 0) else None for name in ("all", "boundary", "internal")},
+            "recovery": summarize_recovery(sums)}
 
 
 def fit(model, train_loader, valid_loader, args, stage, spec=None, scaler=None, positive_weight=None):
@@ -172,6 +205,7 @@ def fit(model, train_loader, valid_loader, args, stage, spec=None, scaler=None, 
     optimizer = torch.optim.AdamW(parameters, lr=args.learning_rate, weight_decay=args.weight_decay)
     generator = torch.Generator(device=args.device).manual_seed(args.seed + 7919)
     history, best, best_epoch, stale, first = [], None, 0, 0, 1
+    best_checkpoint = None
     run_config = json.loads((args.output_dir / "config.json").read_text(encoding="utf-8"))
     run_config_sha256 = digest(args.output_dir / "config.json")
     if args.resume:
@@ -180,6 +214,11 @@ def fit(model, train_loader, valid_loader, args, stage, spec=None, scaler=None, 
             raise ValueError("Resume stage/model mismatch")
         if saved.get("run_config_sha256") != run_config_sha256:
             raise ValueError("Checkpoint does not belong to this run configuration")
+        best_checkpoint = authoritative_best(saved)
+        # best.pt/history.json are caches. Roll them forward or back to the
+        # committed latest.pt even if an export was interrupted or ahead.
+        atomic_write(args.output_dir / "best.pt", best_checkpoint, binary=True)
+        atomic_write(args.output_dir / "history.json", saved["history"])
         model.load_state_dict(saved["model"], strict=True)
         optimizer.load_state_dict(saved["optimizer"])
         history, best, best_epoch, stale = saved["history"], saved["best_score"], saved["best_epoch"], saved["stale"]
@@ -244,9 +283,11 @@ def fit(model, train_loader, valid_loader, args, stage, spec=None, scaler=None, 
             record["train_noise_mse"] = {
                 name: groups[name + "_error_sum"] / groups[name + "_atoms"] if groups.get(name + "_atoms", 0) else None
                 for name in ("all", "boundary", "internal")}
+            record["train_recovery"] = summarize_recovery(groups)
         history.append(record)
         state = {"schema": CHECKPOINT_SCHEMA, "feature_schema": SCHEMA, "stage": stage,
                  "run_config_sha256": run_config_sha256, "run_metadata": run_config,
+                 "checkpoint_protocol": 2, "noise_schedule": model.schedule.description(),
                  "config": asdict(model.config), "num_tasks": model.num_tasks,
                  "model": model.state_dict(), "encoder": model.encoder.state_dict(),
                  "epoch": epoch, "best_score": best, "best_epoch": best_epoch, "stale": stale,
@@ -254,16 +295,24 @@ def fit(model, train_loader, valid_loader, args, stage, spec=None, scaler=None, 
                  "parameter_counts": {"instantiated": sum(p.numel() for p in model.parameters()),
                                       "optimized": sum(p.numel() for p in parameters)}}
         if improved:
-            atomic_write(args.output_dir / "best.pt", state, binary=True)
+            best_checkpoint = cpu_snapshot(state)
         latest = {**state, "optimizer": optimizer.state_dict(), "history": history,
+                  "best_checkpoint": best_checkpoint,
                   "torch_rng": torch.get_rng_state(), "cuda_rng": torch.cuda.get_rng_state_all() if args.device.startswith("cuda") else [],
                   "noise_rng": generator.get_state(), "loader_rng": train_loader.generator.get_state()}
         atomic_write(args.output_dir / "latest.pt", latest, binary=True)
+        # The latest replacement above is the only epoch commit point. A crash
+        # before/after this export is repaired exclusively from latest on resume.
+        if improved:
+            atomic_write(args.output_dir / "best.pt", best_checkpoint, binary=True)
         atomic_write(args.output_dir / "history.json", history)
         atomic_write(args.output_dir / "status.json", {"state": "running", "epoch": epoch, "best_epoch": best_epoch,
                                                        "best_score": best, "elapsed_seconds_this_process": time.perf_counter() - start})
         print(f"{stage} epoch={epoch} validation={score:.6f} best={best:.6f}", flush=True)
-    checkpoint = load_checkpoint(args.output_dir / "best.pt")
+    checkpoint = best_checkpoint
+    if checkpoint is None:
+        raise ValueError("No committed best checkpoint")
+    atomic_write(args.output_dir / "best.pt", checkpoint, binary=True)
     model.load_state_dict(checkpoint["model"], strict=True)
     return {"best_epoch": checkpoint["best_epoch"], "best_score": checkpoint["best_score"],
             "epochs_run": history[-1]["epoch"], "parameter_counts": checkpoint["parameter_counts"]}

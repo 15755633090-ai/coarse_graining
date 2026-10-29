@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "missing_first_export_and_rogue_cache",
+      "committed_epoch_at_interruption": 1,
+      "weights_history_rng_match_continuous": true,
+      "best_export_matches_authority": true
+    },
+    {
+      "case": "before_latest_commit",
+      "committed_epoch_at_interruption": 1,
+      "weights_history_rng_match_continuous": true,
+      "best_export_matches_authority": true
+    },
+    {
+      "case": "after_latest_commit",
+      "committed_epoch_at_interruption": 2,
+      "weights_history_rng_match_continuous": true,
+      "best_export_matches_authority": true
+    }
+  ],
+  "noise_schedule": {
+    "type": "linear_beta_fixed_endpoints",
+    "steps": 1000,
+    "beta_start": 0.0001,
+    "beta_end": 0.02,
+    "alpha_bar_T": 4.0358307160204276e-05,
+    "t0": "exactly clean",
+    "steps_change_terminal_snr": true
+  },
+  "recovery_diagnostics_present": true,
+  "test_evaluated": false,
+  "formal_performance_claims": false
+}

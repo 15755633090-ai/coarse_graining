@@ -1,0 +1,400 @@
+{
+  "repository": "15755633090-ai/coarse_graining",
+  "date": "2026-10-29",
+  "previous_commit": "010399c3594a00a8ef2172bc73daf5d9116aa510",
+  "purpose": "Recovery diagnostics, checkpoint transaction protocol v2 and failure-window acceptance; no formal performance claims",
+  "files": [
+    {
+      "path": "_github_sync/check_brics_recovery_windows_20261029.py",
+      "bytes": 4543,
+      "sha256": "595f519c867f0239e5b2bef307830a7fc3e7bc4e09c1addac2b3f90af8e1963d"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/__init__.py",
+      "bytes": 92,
+      "sha256": "ddc5de4c52283058fc7e23abcbe6ea384092f12f795057d9c911e13b42eb58c2"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/ABLATIONS.md",
+      "bytes": 3123,
+      "sha256": "474a37fc775eee656b9256e0a6392029e9acf0aa7e2706802c766ae0cbb7ff04"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/data.py",
+      "bytes": 4243,
+      "sha256": "d7c7a660e528cd2aefe812ecf67cb7b5b493534da42248a6d80cab93f1a9ed27"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/diffusion.py",
+      "bytes": 2136,
+      "sha256": "7f4c9ea1baf6d850104563418b94f77b10ab4e8894c7dd37675e2a09c6e00d88"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/finetune.py",
+      "bytes": 4620,
+      "sha256": "b35b8b86f90c473ca0b213e4f489b72dac5c19770c5e752ed555d55dd255400d"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/metrics.py",
+      "bytes": 3318,
+      "sha256": "18d34a46cedcccd15b1b8019dfbc382970402ec7c264de95e81a0862e918f903"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/model.py",
+      "bytes": 8097,
+      "sha256": "9231af4420a5fa34416507ce6e65c2fee4dab931af21b0c4d7c5d97e65af6dc0"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/pretrain.py",
+      "bytes": 3514,
+      "sha256": "3de8d521bd238052eaaa695e97c01b7fbce275ca98e179eae71e5a614482c9af"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/README.md",
+      "bytes": 11495,
+      "sha256": "566bfe445ea5f384908c0e252fa041d5903170b36dc1f2e9acba5322713a2bd9"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/RELIABILITY_REVISION_20261029.md",
+      "bytes": 2669,
+      "sha256": "32958463920c4e3df9e4099345e18d90da6074758968a4b9c585f9e04e08d6d3"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/acceptance.json",
+      "bytes": 1011,
+      "sha256": "7f8e0ea9b437d43e07e3f0b7cd3956934163fbdf206c30dcf73c0f6d0722bdf1"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/after_latest_commit/completion.json",
+      "bytes": 297,
+      "sha256": "8d288e33ac01cea712e9a0bf6c5d99a4d05893dce4190906878f6f8daa84fde1"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/after_latest_commit/config.json",
+      "bytes": 6255,
+      "sha256": "088703608460b1f76ba50ed2429da17f486c933a0067e938a3ff80a09b45f75c"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/after_latest_commit/history.json",
+      "bytes": 40101,
+      "sha256": "849f018f10f7ab185f68811ab0d0013efd97a8581c741fc89bcfdfd9eae34412"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/after_latest_commit/status.json",
+      "bytes": 321,
+      "sha256": "946bb7a0eae29a2b636f0b7b30b117b797faf00a5ac2e136d953d6c10dfca8df"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/before_latest_commit/completion.json",
+      "bytes": 297,
+      "sha256": "8d288e33ac01cea712e9a0bf6c5d99a4d05893dce4190906878f6f8daa84fde1"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/before_latest_commit/config.json",
+      "bytes": 6256,
+      "sha256": "c0a609b4f653acbada7ee8f117b8490595df427e11512894e9866db848f4101d"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/before_latest_commit/history.json",
+      "bytes": 40101,
+      "sha256": "849f018f10f7ab185f68811ab0d0013efd97a8581c741fc89bcfdfd9eae34412"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/before_latest_commit/status.json",
+      "bytes": 321,
+      "sha256": "946bb7a0eae29a2b636f0b7b30b117b797faf00a5ac2e136d953d6c10dfca8df"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/continuous/completion.json",
+      "bytes": 297,
+      "sha256": "8d288e33ac01cea712e9a0bf6c5d99a4d05893dce4190906878f6f8daa84fde1"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/continuous/config.json",
+      "bytes": 6246,
+      "sha256": "9d624527e4a7119199f70074890a49deafdd4d83ca04c3fb674537208c0ad456"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/continuous/history.json",
+      "bytes": 40101,
+      "sha256": "849f018f10f7ab185f68811ab0d0013efd97a8581c741fc89bcfdfd9eae34412"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/continuous/status.json",
+      "bytes": 321,
+      "sha256": "946bb7a0eae29a2b636f0b7b30b117b797faf00a5ac2e136d953d6c10dfca8df"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/esol_pretrained/completion.json",
+      "bytes": 387,
+      "sha256": "6dd005fdf2d990bcc79ae0293286929745bc31334c5ccd25ca42380296327b8c"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/esol_pretrained/config.json",
+      "bytes": 6753,
+      "sha256": "4e5198102659048be9367c37bae30a3c81a08ffdb795182e8c8317b0f3ff5712"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/esol_pretrained/history.json",
+      "bytes": 712,
+      "sha256": "f50e97b0d10ad1e3103fe444b498e42903ba03e8881bc1a3896d109d71831f5b"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/esol_pretrained/status.json",
+      "bytes": 411,
+      "sha256": "4580e5ec4c67dd886ef379abc0ff342d7fd511240bbdd145f0a7bb9d6ff06626"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/missing_first_export_and_rogue_cache/completion.json",
+      "bytes": 297,
+      "sha256": "8d288e33ac01cea712e9a0bf6c5d99a4d05893dce4190906878f6f8daa84fde1"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/missing_first_export_and_rogue_cache/config.json",
+      "bytes": 6272,
+      "sha256": "82314fd8781ea2b1b46ad24911315f9fa611e1ec908aaf7f51dba978f64f5336"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/missing_first_export_and_rogue_cache/history.json",
+      "bytes": 40101,
+      "sha256": "849f018f10f7ab185f68811ab0d0013efd97a8581c741fc89bcfdfd9eae34412"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/missing_first_export_and_rogue_cache/status.json",
+      "bytes": 321,
+      "sha256": "946bb7a0eae29a2b636f0b7b30b117b797faf00a5ac2e136d953d6c10dfca8df"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/acceptance.json",
+      "bytes": 662,
+      "sha256": "cf8adb4160d52e02ef9ee224863d2b5f746af1d3768a9ba7573a4538ea2b963f"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/completion.json",
+      "bytes": 409,
+      "sha256": "3bab23e7b2aa2c7a8e0ebd8423fc3d4ace2a9f468702b224c9f6f24c7de97f41"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/config.json",
+      "bytes": 9916,
+      "sha256": "666187553667aa39ab0183f1aa039cb283019b7f4fa5a32ca92e554d782edfc0"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/history.json",
+      "bytes": 379,
+      "sha256": "af83d6d244f35d168600defcaa156d28f660b9a4fe383609327529e90b2970cc"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/status.json",
+      "bytes": 433,
+      "sha256": "09965b5c99482fbe573fb8b5ba67791d8fcef6e0cc7538f76bb34d04cf517bc5"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/completion.json",
+      "bytes": 387,
+      "sha256": "6dd005fdf2d990bcc79ae0293286929745bc31334c5ccd25ca42380296327b8c"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/config.json",
+      "bytes": 6176,
+      "sha256": "f0db2cf084eb6e970454dabba8a0809b24942bd1fec09a951a6e3f5700720a2e"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/history.json",
+      "bytes": 712,
+      "sha256": "f50e97b0d10ad1e3103fe444b498e42903ba03e8881bc1a3896d109d71831f5b"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/status.json",
+      "bytes": 411,
+      "sha256": "4580e5ec4c67dd886ef379abc0ff342d7fd511240bbdd145f0a7bb9d6ff06626"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/completion.json",
+      "bytes": 390,
+      "sha256": "b0e16e6024b6d9ec9d21ff11e520a368f2fda3f61daf0617286771bac757b67d"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/config.json",
+      "bytes": 5922,
+      "sha256": "71b91845a4b5c9a059ef790afb5bd584a4bda27b54e622771f7c7180ad6d5682"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/history.json",
+      "bytes": 711,
+      "sha256": "4833cb59ca13b539af4e946e1b42a43c9827e8e845f9189c06036322daafb1b6"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/status.json",
+      "bytes": 414,
+      "sha256": "5d3e18896bc2782205eb56497d48348c7658d6a7881446e6a52669b709e220cb"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/completion.json",
+      "bytes": 297,
+      "sha256": "a67bacfe1060e81082398b25762bdd1066b65d314f25daa2eee5cd51e61c7dd5"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/config.json",
+      "bytes": 5675,
+      "sha256": "96495b1adbbf8997e24998ccbe09adb898967d86093a313c6129d5b8c9822aa6"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/history.json",
+      "bytes": 1047,
+      "sha256": "9ddfa8b5f6eb61faf0858e8bd0f5e3fc7654685b92e8fd35ce461f0e714a35be"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/status.json",
+      "bytes": 321,
+      "sha256": "ef637b1f6f2d14f97e641fba37216cf5259cea95d2e6c9f211b0106a244328b4"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/completion.json",
+      "bytes": 297,
+      "sha256": "a67bacfe1060e81082398b25762bdd1066b65d314f25daa2eee5cd51e61c7dd5"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/config.json",
+      "bytes": 5679,
+      "sha256": "245d1a477c19ba32b0df03036a8802d41c6cc3a33cde43c42676306b378c7ddd"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/history.json",
+      "bytes": 1047,
+      "sha256": "9ddfa8b5f6eb61faf0858e8bd0f5e3fc7654685b92e8fd35ce461f0e714a35be"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/status.json",
+      "bytes": 321,
+      "sha256": "ef637b1f6f2d14f97e641fba37216cf5259cea95d2e6c9f211b0106a244328b4"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/SYNC_SCOPE_20261029.md",
+      "bytes": 1244,
+      "sha256": "9077d93019c7546efb42605d9244c05240cf41d6e5d2e6b507de33efa35351e3"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/test_diagnostics.py",
+      "bytes": 6141,
+      "sha256": "01b0cfe78e49820262dce0f9c4eee248b0f64c6eafd95adb5f1b8dfb70f477f9"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/test_interfaces.py",
+      "bytes": 9010,
+      "sha256": "62189c223e9c749fd16dfe5fe91eb28ec21c9a2bf4fe6519e765603dd8d7c8e3"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/training.py",
+      "bytes": 16331,
+      "sha256": "bfd5381e5978b0532cf3190a502be844f1fe4fdbe228c29ba22273be976796a3"
+    },
+    {
+      "path": "motif/README.md",
+      "bytes": 14306,
+      "sha256": "1f07998d1d03eecece9de1b6b9bf937f50b51f3b47461543b929648f2c5646b8"
+    }
+  ],
+  "local_only_checkpoints": [
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/best.pt",
+      "bytes": 186343,
+      "sha256": "8ebc968172a593308ef9f91c8d06f4e988c1ba6bcd9b594ffe008fe2082597d8"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/latest.pt",
+      "bytes": 517286,
+      "sha256": "92f48cdffef7fb2e60ea17483740f0e51461e3c08947db84615dece4366740ac"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/best.pt",
+      "bytes": 186531,
+      "sha256": "71a52bce9dbce60161e5f8318e0e09cccd2e6e7ebf13c1f09f43db97b6b1006f"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/latest.pt",
+      "bytes": 517608,
+      "sha256": "3f6fef8a760f4e3447eb6cfa5aa4788be7a4b49c4c1d365eedf4722ffd571bab"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/best.pt",
+      "bytes": 186275,
+      "sha256": "f72b1ed00e8647b39724ea9e0687e5fe4bb6e225ecf324636553d0510fbcf4d7"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/latest.pt",
+      "bytes": 517352,
+      "sha256": "04d3ef8ced90b672af744c47ae3695218681ee3de4514e197d248fc6341329b7"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/best.pt",
+      "bytes": 186471,
+      "sha256": "cd8875dd982d628592fa156a8e81fcb3b1f317134c7404788e4165b90b2a4b93"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/latest.pt",
+      "bytes": 535654,
+      "sha256": "df2c31ccfbaabb3134c92ca544f81dd2360095314fb9f2a4c64b22bafd5e4411"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/best.pt",
+      "bytes": 182896,
+      "sha256": "a967100c06d2a7fcf9500d464fa4dc1b13f3d7c95461bee43a334fbf81039097"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/latest.pt",
+      "bytes": 524181,
+      "sha256": "d20d67efb75cb956aa28b3619c9ad2e696ebe36d51a22b3bfddf20d49ee89bb7"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/after_latest_commit/best.pt",
+      "bytes": 312653,
+      "sha256": "10919cba2fd316249266322c0392adc2370eedc04b5ec51b8ca023ce3452beb7"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/after_latest_commit/latest.pt",
+      "bytes": 837603,
+      "sha256": "282edbf8b6353e03dee9e533fe286a9264da20345182cdbb8e4245f6dc898906"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/before_latest_commit/best.pt",
+      "bytes": 312653,
+      "sha256": "4f5a7aa942dca42e70082c42b0cab31d95f6586784728e32ff76edd8de16d491"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/before_latest_commit/latest.pt",
+      "bytes": 837987,
+      "sha256": "739185c554de085009155d43214a892dff1953855839a34cc96d497fe2945fe0"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/continuous/best.pt",
+      "bytes": 312653,
+      "sha256": "dfeec785bcc2c4e7ae44989de342830d0c1f29b720eeea1af371c780ceedb7e1"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/continuous/latest.pt",
+      "bytes": 837603,
+      "sha256": "e38794aaa4694ec6cfb33b717e7bf8f1472a4394962c7c6e737bf94fab901bb1"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/esol_pretrained/best.pt",
+      "bytes": 318666,
+      "sha256": "bb938ea3649be357b07f94ece2ad3ae5f662e78bbf94948403931e90293446f6"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/esol_pretrained/latest.pt",
+      "bytes": 825443,
+      "sha256": "4cda45a05597ec583ab9cdd90e68189ba3e02078982f3a1a6bb7cca2ce5fe2f3"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/missing_first_export_and_rogue_cache/best.pt",
+      "bytes": 312653,
+      "sha256": "b60169a1a9ecb4c55a81898f98efbc40f471a7a627f8e4f63a99298080774ddb"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/diagnostics_20261029/missing_first_export_and_rogue_cache/latest.pt",
+      "bytes": 837987,
+      "sha256": "79af5462db07e6a8955ce02eaf5ab42e78289e667296adc4d82a961058450df4"
+    }
+  ]
+}

@@ -23,6 +23,7 @@
 | data.py | RDKit 图与非重叠 BRICS 连通分量；真实双向连接端点 |
 | diffusion.py | 累计 alpha_bar 日程、加噪、epsilon 到 x0 的一致转换 |
 | model.py | 双状态原子 MPNN、时间嵌入、边界门控、节点解码与性质读出 |
+| metrics.py | 时间区间 × 边界/内部 × 属性块的恢复统计 |
 | training.py | 共享优化/评价、原子分组损失、带重试的原子文件替换、检查点与恢复 |
 | pretrain.py | 无标签语料的单一条件扩散预训练 |
 | finetune.py | 编码器严格迁移、全参数微调或从头训练对照 |
@@ -35,6 +36,7 @@
 - 仅在原子属性空间加高斯噪声，**不破坏或恢复连接，不恢复键，不处理三维坐标**。干净键和拓扑可间接透露芳香性等属性，这属于披露的条件化任务，不能声称无条件恢复结构。
 - s 的初始输入也来自 x_t，没有外部原子输入的旁路。s 同时接收时间条件与边界标记。其独立性限定为：给定静态条件后，外部基序的输入数值不经消息进入 s；形式电荷、芳香性本身可能带有环境相关化学信息，不声称物理或化学意义上完全环境无关。
 - 每个分子采一个 t∈[1,T]，原子噪声相互独立；T=1000，beta 从 1e-4 线性增加到 0.02，alpha_bar[0]=1。
+- `noise_steps` 改变终点噪声强度，不是纯计算预算开关。配置和检查点记录 `noise_schedule.alpha_bar_T`：T=1000 约 4.04e-5，T=100 约 0.364。不应将不同 T 的比较解释为仅改变时间分辨率。
 - 只预测 epsilon，损失为批内所有原子与属性通道的 MSE，没有第二套基序去噪、对比或连接重建损失。恢复公式使用同一个累计 alpha_bar。x0 转换是接口，不是另一个训练目标。
 - 门控是每层每条有向跨边界边上的标量 sigmoid，不做 softmax；按入边数量聚合，**不按门控和归一化**，保留抑制消息的效果。它调节信息流，不等于化学因果贡献。
 - 微调加载 encoder 的全部权重，由性质损失更新整个 encoder 和新预测头；噪声头冻结且不进入预测。下游显式用 t=0，该状态不要求反向采样。
@@ -46,7 +48,7 @@
 
 ```powershell
 $py = 'C:/Users/12775/miniconda3/envs/polyolefin_ml/python.exe'
-& $py -m unittest motif.brics_atom_diffusion.test_interfaces -v
+& $py -m unittest motif.brics_atom_diffusion.test_interfaces motif.brics_atom_diffusion.test_diagnostics -v
 
 # 预训练语料 CSV 必须有 smiles 列；请指定实际选定的无标签语料。
 # 没有 --valid-csv 时，先按规范 SMILES 去重，再按 seed 划分 10% 无标签验证分子。
@@ -67,11 +69,13 @@ $py = 'C:/Users/12775/miniconda3/envs/polyolefin_ml/python.exe'
 
 每轮保存 best.pt、latest.pt、history.json 和 status.json。latest.pt 包含优化器、模型、训练数据加载器 RNG、训练噪声 RNG、Torch CPU/CUDA RNG、历史与早停计数。
 
+检查点协议 v2 还在 latest.pt 内保存独立的最佳模型快照。**原子替换 latest.pt 是唯一提交点**；随后 best.pt/history.json 只是导出缓存。恢复时从 latest.pt 检查最佳轮次/分数/配置一致性，并修复缺失、陈旧或错误领先的 best.pt 和 history.json，再恢复模型/优化器/RNG。旧版已完成的 best.pt 仍可按原接口用于微调；没有权威最佳快照的旧 latest.pt 不再自动恢复，避免猜测其一致性。
+
 对未完成运行，使用**相同原命令**加 `--resume` 恢复。源码、数据、配置需完全一致；不能借 resume 修改 epoch 上限、超参数或迁移其他运行的检查点。已完成目录拒绝重复评价或覆盖。进程强制退出留下的 `.lock` 不会被自动删除，先确认原进程已经结束再处理锁，或使用新的输出目录。
 
 ### 接口与控制
 
-`--single-state`、`--uniform-boundary`、`--no-motif-prior` 提供初步结构控制开关；会改变计算路径或参数量，**尚不能视为容量匹配消融**。关闭基序先验时，所有边按普通边处理，边界标记归零。连接位点打乱消融尚未实现。
+`--single-state`、`--uniform-boundary`、`--no-motif-prior` 提供初步结构控制开关；会改变计算路径或参数量，**尚不能视为容量匹配消融**。`--no-motif-prior` 是移除整套基序关系机制：所有边按普通边处理、边界标记归零、跨边界门控不再起作用、s/h 两条路径均可沿完整图传播；不能解释为只移除一个 BRICS 标记。该开关下边界输入、跨边界消息和门控的无效参数从优化器排除，仍报告实例化/优化参数量和实际有梯度的参数量。连接位点打乱消融尚未实现。
 
 ```python
 import torch
@@ -96,6 +100,18 @@ batch 使用 data.py 的 AtomData 经 PyG Batch/DataLoader 合批。旧 MotiL �
 ## 已完成的验收（非性能结论）
 
 13 项测试全部通过：受损输入敏感性及梯度、时间条件、无干净特征/编号旁路、内部隔离与上下文响应、原子/边重排、合批与端点、门控对齐、uniform 门控严格等于 1 且保留真实边、已知噪声精确恢复、每分子时间步、单原子/无边及控制开关、两阶段梯度、干净预测不采样。门控消融命令与边界见 [ABLATIONS.md](ABLATIONS.md)。
+
+后续新增 7 项解析诊断/检查点不变量测试，共 **20 项通过**。恢复诊断与中断窗口的独立验收见 [RELIABILITY_REVISION_20261029.md](RELIABILITY_REVISION_20261029.md)。
+
+### 恢复质量日志
+
+预训练 history 的 `train_recovery` 和 `validation.recovery` 按以下维度交叉记录，训练/选模目标仍为原始全通道噪声 MSE：
+
+- 时间区间：全部、t/T≤0.1、0.1<t/T≤0.5、t/T>0.5；这是时间区间统计，不是每个整数 t 的独立估计。
+- 原子组：全部、边界、内部。
+- 属性块：全部 133 通道、元素 119、电荷 12、芳香性 2；每块单独计算通道平均噪声 MSE、累计日程还原后的 x0 MSE和各块 argmax 分类准确率。“全部”的准确率是三个属性同时正确的 joint_accuracy。
+
+每项带原子数，空组为 null；跨 batch 累计误差总和/正确数/原子数后求均值，不平均不同大小 batch 的准确率。原子特征块数量不平衡、类别多数效应和干净键条件仍存在，恢复指标不能单独证明学好了基序或门控有效。固定验证 RNG 使同配置评价可重复，但小验证集可能没有某些时间区间样本，应检查 counts。不同 T 的同一相对时间区间也不保证相同噪声强度。
 
 `runs/smoke_20261029`：
 

@@ -1,0 +1,28 @@
+[
+  {
+    "epoch": 1,
+    "train_loss_batch_mean": 1.0909925997257233,
+    "pre_clip_gradient_norm": 0.7004062049090862,
+    "clip_fraction": 0.0,
+    "optimizer_steps": 2,
+    "observed_gradient_parameters": 30723,
+    "validation": {
+      "rmse": 1.9080814256387686,
+      "mae": 1.5890438556671143,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 2,
+    "train_loss_batch_mean": 1.0660799443721771,
+    "pre_clip_gradient_norm": 0.6280705891549587,
+    "clip_fraction": 0.0,
+    "optimizer_steps": 2,
+    "observed_gradient_parameters": 30723,
+    "validation": {
+      "rmse": 1.891001577153751,
+      "mae": 1.5760104656219482,
+      "evaluated_tasks": 1.0
+    }
+  }
+]
