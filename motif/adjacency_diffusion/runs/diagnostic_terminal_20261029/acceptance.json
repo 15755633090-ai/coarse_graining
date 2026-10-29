@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "completed_cells": 12,
+  "all_cells_steps": 400,
+  "trajectory_records_per_cell": 8,
+  "core_model_and_training_files_unchanged_from_commit": "7a76e5cf4fa59ab4a881a19817b88a0f092fec2c",
+  "test_evaluated": false,
+  "final_method_switched": false
+}
