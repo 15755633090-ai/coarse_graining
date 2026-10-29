@@ -1,0 +1,12 @@
+{
+  "state": "complete",
+  "screen_cells": 16,
+  "completed_training_cells": 22,
+  "confirmation_rows": 9,
+  "selected": [
+    "bounded_density_gate"
+  ],
+  "elapsed_seconds": 281.6514435,
+  "test_evaluated": false,
+  "formal_performance_claims": false
+}

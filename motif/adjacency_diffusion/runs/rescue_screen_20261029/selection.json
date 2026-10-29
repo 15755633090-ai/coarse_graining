@@ -1,0 +1,24 @@
+{
+  "selected": [
+    "bounded_density_gate"
+  ],
+  "references": [
+    "epsilon_terminal",
+    "epsilon_random"
+  ],
+  "development_eligible": [
+    "preconditioned_terminal",
+    "preconditioned_random",
+    "preconditioned_random_zero",
+    "preconditioned_t500",
+    "preconditioned_curriculum",
+    "velocity_random",
+    "bounded_random",
+    "bounded_density",
+    "bounded_density_brics",
+    "bounded_density_gate",
+    "bounded_density_gate_degree"
+  ],
+  "selection_locked_before_confirmation": true,
+  "no_retuning_on_confirmation": true
+}

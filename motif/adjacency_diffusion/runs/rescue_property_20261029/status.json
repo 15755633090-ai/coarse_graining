@@ -1,0 +1,9 @@
+{
+  "state": "complete",
+  "completed_jobs": 16,
+  "planned_jobs": 16,
+  "paired_initialization_verified": true,
+  "validation_replays_passed": true,
+  "test_evaluated": false,
+  "elapsed_seconds": 1174.0052805
+}

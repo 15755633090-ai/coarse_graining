@@ -1,0 +1,32 @@
+{
+  "validation_only": true,
+  "test_evaluated": false,
+  "groups": [
+    {
+      "readout": "mean",
+      "scratch_mean": 0.8636907480971431,
+      "scratch_sd": 0.06982461866132662,
+      "pretrained_mean": 0.8443486547276011,
+      "pretrained_sd": 0.022200310203030756,
+      "paired_deltas": [
+        0.035534481063726364,
+        -0.0159326695533909,
+        -0.07762809161896178
+      ],
+      "relative_improvement_percent": 2.239469788481104
+    },
+    {
+      "readout": "mean_sum",
+      "scratch_mean": 0.9043690892546147,
+      "scratch_sd": 0.021140456409904865,
+      "pretrained_mean": 0.8734705076704339,
+      "pretrained_sd": 0.05695297108650087,
+      "paired_deltas": [
+        -0.09457859855066475,
+        0.05442568151297822,
+        -0.052542827714855855
+      ],
+      "relative_improvement_percent": 3.4165897476269955
+    }
+  ]
+}
