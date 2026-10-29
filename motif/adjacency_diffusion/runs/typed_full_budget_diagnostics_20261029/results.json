@@ -1,0 +1,164 @@
+{
+  "runs": [
+    {
+      "best_epoch": 58,
+      "best_score": 0.8145719665618847,
+      "epochs_run": 60,
+      "elapsed_seconds": 99.6980905,
+      "arm": "scratch",
+      "task_seed": 0,
+      "pretrain_seed": null,
+      "validation": {
+        "rmse": 0.8145719665618847,
+        "mae": 0.6566787958145142,
+        "evaluated_tasks": 1.0
+      },
+      "encoder_initial_hash": "4a5fefc48b4388ba5fa5666d635f3fc3eaa5f2857bf885e0edb771522c54f322",
+      "head_initial_hash": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true,
+      "continued": false,
+      "original_best_rmse": 0.8145719665618847
+    },
+    {
+      "best_epoch": 58,
+      "best_score": 0.8203571489081319,
+      "epochs_run": 60,
+      "elapsed_seconds": 74.95778080000001,
+      "arm": "full",
+      "task_seed": 0,
+      "validation": {
+        "rmse": 0.8203571489081319,
+        "mae": 0.6436409950256348,
+        "evaluated_tasks": 1.0
+      },
+      "continued": true,
+      "original_best_rmse": 0.8877210959539377,
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 58,
+      "best_score": 0.8346626685935945,
+      "epochs_run": 60,
+      "elapsed_seconds": 24.513663499999993,
+      "arm": "bounded",
+      "task_seed": 0,
+      "validation": {
+        "rmse": 0.8346626685935945,
+        "mae": 0.5889443159103394,
+        "evaluated_tasks": 1.0
+      },
+      "continued": true,
+      "original_best_rmse": 0.8504838323788868,
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 52,
+      "best_score": 0.7795728610660805,
+      "epochs_run": 60,
+      "elapsed_seconds": 97.00489569999996,
+      "arm": "scratch",
+      "task_seed": 1,
+      "pretrain_seed": null,
+      "validation": {
+        "rmse": 0.7795728610660805,
+        "mae": 0.5948008894920349,
+        "evaluated_tasks": 1.0
+      },
+      "encoder_initial_hash": "6cd3a6113ee7f04b4d7a01202ab48166fb4a917c2a61b7dd23dfc3897ba87b71",
+      "head_initial_hash": "331743ae36d337bab57044c37641869b3d82b95cfe74a6bea3452ef907ed0d8a",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true,
+      "continued": false,
+      "original_best_rmse": 0.7795728610660805
+    },
+    {
+      "best_epoch": 52,
+      "best_score": 0.7997303090892586,
+      "epochs_run": 60,
+      "elapsed_seconds": 79.9460102,
+      "arm": "full",
+      "task_seed": 1,
+      "validation": {
+        "rmse": 0.7997303090892586,
+        "mae": 0.6445867419242859,
+        "evaluated_tasks": 1.0
+      },
+      "continued": true,
+      "original_best_rmse": 0.8625246763154738,
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 25,
+      "best_score": 0.8468921575180671,
+      "epochs_run": 60,
+      "elapsed_seconds": 67.26903519999999,
+      "arm": "bounded",
+      "task_seed": 1,
+      "validation": {
+        "rmse": 0.8468921575180671,
+        "mae": 0.6514297723770142,
+        "evaluated_tasks": 1.0
+      },
+      "continued": true,
+      "original_best_rmse": 0.8468921575180671,
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 58,
+      "best_score": 0.7958362391220756,
+      "epochs_run": 60,
+      "elapsed_seconds": 111.55687439999997,
+      "arm": "scratch",
+      "task_seed": 2,
+      "validation": {
+        "rmse": 0.7958362391220756,
+        "mae": 0.6030460000038147,
+        "evaluated_tasks": 1.0
+      },
+      "continued": true,
+      "original_best_rmse": 0.8556049882932422,
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 57,
+      "best_score": 0.8347319707302995,
+      "epochs_run": 60,
+      "elapsed_seconds": 92.09508929999998,
+      "arm": "full",
+      "task_seed": 2,
+      "validation": {
+        "rmse": 0.8347319707302995,
+        "mae": 0.6481755375862122,
+        "evaluated_tasks": 1.0
+      },
+      "continued": true,
+      "original_best_rmse": 0.8375265757770938,
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 52,
+      "best_score": 0.8444360839976436,
+      "epochs_run": 60,
+      "elapsed_seconds": 85.57943790000002,
+      "arm": "bounded",
+      "task_seed": 2,
+      "validation": {
+        "rmse": 0.8444360839976436,
+        "mae": 0.648406445980072,
+        "evaluated_tasks": 1.0
+      },
+      "continued": true,
+      "original_best_rmse": 0.8710490330735354,
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    }
+  ],
+  "test_evaluated": false
+}

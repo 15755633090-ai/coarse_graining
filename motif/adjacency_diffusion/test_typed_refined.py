@@ -71,6 +71,22 @@ class RefinedTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 training_checkpoint(path,other)
 
+    def test_optimizer_groups(self):
+        from types import SimpleNamespace
+        from .typed_train import make_optimizer
+        model=RefinedBondModel(self.config,self.priors,'frequency_init')
+        model.set_stage('finetune')
+        args=SimpleNamespace(stage='finetune',learning_rate=.001,weight_decay=0.,encoder_learning_rate=.0001)
+        optimizer=make_optimizer(model,args)
+        self.assertEqual([g['lr'] for g in optimizer.param_groups],[.0001,.001])
+        identities=[id(p) for group in optimizer.param_groups for p in group['params']]
+        self.assertEqual(len(identities),len(set(identities)))
+        self.assertEqual(set(identities),{id(p) for p in model.parameters() if p.requires_grad})
+        self.assertEqual({id(p) for p in optimizer.param_groups[0]['params']},
+                         {id(p) for p in model.encoder.parameters()})
+        args.encoder_learning_rate=None
+        self.assertEqual(len(make_optimizer(model,args).param_groups),1)
+
 
 if __name__=='__main__':
     unittest.main()

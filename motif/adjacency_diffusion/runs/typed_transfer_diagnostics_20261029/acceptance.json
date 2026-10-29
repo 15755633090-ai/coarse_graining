@@ -1,0 +1,11 @@
+{
+  "original_latest_checkpoints_unchanged": true,
+  "common_60_epochs_all_9_verified": true,
+  "continuation_checkpoint_replays_passed": true,
+  "low_lr_matched_initialization_and_data_verified": true,
+  "diagnostic_predictions_match_original": true,
+  "frozen_head_probes": 18,
+  "additional_finetuning_runs": 6,
+  "continuation_runs": 7,
+  "test_evaluated": false
+}

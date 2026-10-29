@@ -1,0 +1,132 @@
+[
+  {
+    "epoch": 1,
+    "train_rmse": 1.5833570957183838,
+    "validation_rmse": 1.8722896575927734
+  },
+  {
+    "epoch": 2,
+    "train_rmse": 1.4433108568191528,
+    "validation_rmse": 1.7406604290008545
+  },
+  {
+    "epoch": 3,
+    "train_rmse": 1.3420487642288208,
+    "validation_rmse": 1.647032380104065
+  },
+  {
+    "epoch": 4,
+    "train_rmse": 1.2672430276870728,
+    "validation_rmse": 1.7515102624893188
+  },
+  {
+    "epoch": 5,
+    "train_rmse": 1.222024917602539,
+    "validation_rmse": 1.5420167446136475
+  },
+  {
+    "epoch": 6,
+    "train_rmse": 1.184162974357605,
+    "validation_rmse": 1.7828141450881958
+  },
+  {
+    "epoch": 7,
+    "train_rmse": 1.169917345046997,
+    "validation_rmse": 1.766115427017212
+  },
+  {
+    "epoch": 8,
+    "train_rmse": 1.118192434310913,
+    "validation_rmse": 1.5577054023742676
+  },
+  {
+    "epoch": 9,
+    "train_rmse": 1.0932738780975342,
+    "validation_rmse": 1.6538619995117188
+  },
+  {
+    "epoch": 10,
+    "train_rmse": 1.0609371662139893,
+    "validation_rmse": 1.601750373840332
+  },
+  {
+    "epoch": 11,
+    "train_rmse": 1.0713003873825073,
+    "validation_rmse": 1.5073226690292358
+  },
+  {
+    "epoch": 12,
+    "train_rmse": 1.0389901399612427,
+    "validation_rmse": 1.598671317100525
+  },
+  {
+    "epoch": 13,
+    "train_rmse": 1.0250736474990845,
+    "validation_rmse": 1.5961729288101196
+  },
+  {
+    "epoch": 14,
+    "train_rmse": 1.047562837600708,
+    "validation_rmse": 1.7170361280441284
+  },
+  {
+    "epoch": 15,
+    "train_rmse": 0.9883858561515808,
+    "validation_rmse": 1.6051759719848633
+  },
+  {
+    "epoch": 16,
+    "train_rmse": 1.015140175819397,
+    "validation_rmse": 1.5721491575241089
+  },
+  {
+    "epoch": 17,
+    "train_rmse": 0.9662485122680664,
+    "validation_rmse": 1.5752321481704712
+  },
+  {
+    "epoch": 18,
+    "train_rmse": 0.9664283990859985,
+    "validation_rmse": 1.645641565322876
+  },
+  {
+    "epoch": 19,
+    "train_rmse": 0.9504709839820862,
+    "validation_rmse": 1.6045646667480469
+  },
+  {
+    "epoch": 20,
+    "train_rmse": 0.9733376502990723,
+    "validation_rmse": 1.5753941535949707
+  },
+  {
+    "epoch": 21,
+    "train_rmse": 0.939490795135498,
+    "validation_rmse": 1.6126161813735962
+  },
+  {
+    "epoch": 22,
+    "train_rmse": 0.9347953200340271,
+    "validation_rmse": 1.6279973983764648
+  },
+  {
+    "epoch": 23,
+    "train_rmse": 0.9210631251335144,
+    "validation_rmse": 1.6006011962890625
+  },
+  {
+    "epoch": 24,
+    "train_rmse": 0.9385889768600464,
+    "validation_rmse": 1.6052004098892212
+  },
+  {
+    "epoch": 25,
+    "train_rmse": 0.9296349287033081,
+    "validation_rmse": 1.5760217905044556
+  },
+  {
+    "epoch": 26,
+    "train_rmse": 0.968380868434906,
+    "validation_rmse": 1.5605989694595337
+  }
+]

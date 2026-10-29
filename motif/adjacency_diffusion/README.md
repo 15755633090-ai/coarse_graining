@@ -1,5 +1,7 @@
 # 邻接扩散：MotiL diffusion priming 机制对齐路径
 
+最新结论：完整键特征版本的迁移诊断发现原早停会漏掉后期改善；统一实际60轮后，性质验证仍是 scratch .7967、full .8183、bounded .8420，未证明预训练增益。当前不能按较高恢复率把 t≤300 视作性质预测最佳设置。详见 [迁移诊断](TRANSFER_DIAGNOSIS_20261029.md)。下文的二值机制和早期协议作为历史实现记录保留。
+
 本模块与 `brics_atom_diffusion` 的原子属性去噪、`context_denoising` 的基序隐向量去噪分开。对齐 MotiL 正文 Methods / Diffusion priming 公式 1–5 的核心：**保留 X，对 A 加高斯噪声，由预测噪声一步恢复 A，以干净邻接重建误差训练**。
 
 **这是论文机制对齐的自建实现，不是完整 MotiL 复现。** 没有实现完整 CMPNN、bi-scaled training，也没有匹配论文全部训练预算/划分。具体数值和接口选择未由正文完全规定的部分在下文披露。来源：https://pmc.ncbi.nlm.nih.gov/articles/PMC12748552/ ，DOI 10.1038/s41467-025-66685-w。
@@ -81,6 +83,8 @@ $py = 'C:/Users/12775/miniconda3/envs/polyolefin_ml/python.exe'
 已固定同架构 scratch/full/bounded 的三种子 ESOL 验证协议，见 [TYPED_PROPERTY_PROTOCOL_20261029.md](TYPED_PROPERTY_PROTOCOL_20261029.md)。运行中不修改噪声范围、读出或门控，不用部分结果提前判断新版下游收益。
 
 该九组验证已全部完成：验证 RMSE 均值 scratch .8166、full .8626、bounded .8561；未显示新版预训练的下游收益，bounded 三个种子均未优于 scratch。完整配对差值、立体属性披露和适用范围见上述协议与运行结果。
+
+后续诊断已补齐冻结探针、18组冻结预测头、6组编码器LR消融和7例续训：全部训练满60轮后均值为 scratch .7967、full .8183、bounded .8420。原早停掩盖部分晚期改善，且full/bounded排序反转；限定噪声的恢复优势仍未转化为性质收益。证据和未证实机制见 [TRANSFER_DIAGNOSIS_20261029.md](TRANSFER_DIAGNOSIS_20261029.md)。
 
 ## 已完成验收（不是性能结论）
 

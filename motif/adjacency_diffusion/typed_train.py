@@ -65,10 +65,24 @@ def evaluate(model,batches,args):
     return {'objective':sum(row['objective'] for row in result.values())/len(result),'by_timestep':result}
 
 
+def make_optimizer(model,args):
+    parameters=[p for p in model.parameters() if p.requires_grad]
+    encoder_lr=getattr(args,'encoder_learning_rate',None)
+    if encoder_lr is None:
+        return torch.optim.Adam(parameters,lr=args.learning_rate,weight_decay=args.weight_decay)
+    if args.stage!='finetune' or encoder_lr<=0:
+        raise ValueError('Separate encoder learning rate requires finetune and a positive value')
+    encoder=[p for p in model.encoder.parameters() if p.requires_grad]
+    identities={id(p) for p in encoder}
+    head=[p for p in parameters if id(p) not in identities]
+    return torch.optim.Adam([{'params':encoder,'lr':encoder_lr},{'params':head,'lr':args.learning_rate}],
+                            weight_decay=args.weight_decay)
+
+
 def fit(model,train,valid,args,metadata,spec=None,scaler=None,weight=None):
     model.set_stage(args.stage)
     parameters=[p for p in model.parameters() if p.requires_grad]
-    optimizer=torch.optim.Adam(parameters,lr=args.learning_rate,weight_decay=args.weight_decay)
+    optimizer=make_optimizer(model,args)
     generator=torch.Generator(device=args.device).manual_seed(args.seed+7919)
     history,best,stale,best_state,first=[],None,0,None,1
     identity=io.digest(args.output_dir/'config.json')
@@ -157,6 +171,7 @@ def main():
     p.add_argument('--data-root',type=Path,default=io.ROOT/'data')
     p.add_argument('--variant',choices=('v1','frequency_init','factorized','factorized_evidence'),default='v1')
     p.add_argument('--training-max-t',type=int)
+    p.add_argument('--encoder-learning-rate',type=float)
     args=p.parse_args()
     config=io.initialize(args)
     if args.training_max_t is not None and (args.variant=='v1' or not 1<=args.training_max_t<=config.noise_steps):

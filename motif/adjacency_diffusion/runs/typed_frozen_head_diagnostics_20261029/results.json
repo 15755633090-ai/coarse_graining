@@ -1,0 +1,169 @@
+{
+  "runs": [
+    {
+      "seed": 0,
+      "arm": "scratch",
+      "input": "raw",
+      "best_epoch": 57,
+      "epochs": 60,
+      "validation_rmse": 1.4507858753204346,
+      "training_rmse_at_best": 1.4932109117507935
+    },
+    {
+      "seed": 0,
+      "arm": "scratch",
+      "input": "standardized",
+      "best_epoch": 5,
+      "epochs": 20,
+      "validation_rmse": 1.3587899208068848,
+      "training_rmse_at_best": 1.2416434288024902
+    },
+    {
+      "seed": 0,
+      "arm": "full",
+      "input": "raw",
+      "best_epoch": 34,
+      "epochs": 49,
+      "validation_rmse": 1.2279984951019287,
+      "training_rmse_at_best": 1.0261681079864502
+    },
+    {
+      "seed": 0,
+      "arm": "full",
+      "input": "standardized",
+      "best_epoch": 27,
+      "epochs": 42,
+      "validation_rmse": 1.1950318813323975,
+      "training_rmse_at_best": 0.9971194267272949
+    },
+    {
+      "seed": 0,
+      "arm": "bounded",
+      "input": "raw",
+      "best_epoch": 34,
+      "epochs": 49,
+      "validation_rmse": 1.2475272417068481,
+      "training_rmse_at_best": 1.0021331310272217
+    },
+    {
+      "seed": 0,
+      "arm": "bounded",
+      "input": "standardized",
+      "best_epoch": 25,
+      "epochs": 40,
+      "validation_rmse": 1.3178738355636597,
+      "training_rmse_at_best": 0.9200654625892639
+    },
+    {
+      "seed": 1,
+      "arm": "scratch",
+      "input": "raw",
+      "best_epoch": 29,
+      "epochs": 44,
+      "validation_rmse": 1.4954471588134766,
+      "training_rmse_at_best": 1.621509075164795
+    },
+    {
+      "seed": 1,
+      "arm": "scratch",
+      "input": "standardized",
+      "best_epoch": 11,
+      "epochs": 26,
+      "validation_rmse": 1.5073226690292358,
+      "training_rmse_at_best": 1.0713003873825073
+    },
+    {
+      "seed": 1,
+      "arm": "full",
+      "input": "raw",
+      "best_epoch": 27,
+      "epochs": 42,
+      "validation_rmse": 1.3566930294036865,
+      "training_rmse_at_best": 1.0034767389297485
+    },
+    {
+      "seed": 1,
+      "arm": "full",
+      "input": "standardized",
+      "best_epoch": 26,
+      "epochs": 41,
+      "validation_rmse": 1.212842345237732,
+      "training_rmse_at_best": 0.9871411919593811
+    },
+    {
+      "seed": 1,
+      "arm": "bounded",
+      "input": "raw",
+      "best_epoch": 26,
+      "epochs": 41,
+      "validation_rmse": 1.1820875406265259,
+      "training_rmse_at_best": 0.947746217250824
+    },
+    {
+      "seed": 1,
+      "arm": "bounded",
+      "input": "standardized",
+      "best_epoch": 53,
+      "epochs": 60,
+      "validation_rmse": 1.1001912355422974,
+      "training_rmse_at_best": 0.7473762631416321
+    },
+    {
+      "seed": 2,
+      "arm": "scratch",
+      "input": "raw",
+      "best_epoch": 26,
+      "epochs": 41,
+      "validation_rmse": 1.4654302597045898,
+      "training_rmse_at_best": 1.5021902322769165
+    },
+    {
+      "seed": 2,
+      "arm": "scratch",
+      "input": "standardized",
+      "best_epoch": 6,
+      "epochs": 21,
+      "validation_rmse": 1.4969016313552856,
+      "training_rmse_at_best": 1.1509796380996704
+    },
+    {
+      "seed": 2,
+      "arm": "full",
+      "input": "raw",
+      "best_epoch": 10,
+      "epochs": 25,
+      "validation_rmse": 1.3663713932037354,
+      "training_rmse_at_best": 1.1573182344436646
+    },
+    {
+      "seed": 2,
+      "arm": "full",
+      "input": "standardized",
+      "best_epoch": 18,
+      "epochs": 33,
+      "validation_rmse": 1.4202615022659302,
+      "training_rmse_at_best": 1.0296297073364258
+    },
+    {
+      "seed": 2,
+      "arm": "bounded",
+      "input": "raw",
+      "best_epoch": 13,
+      "epochs": 28,
+      "validation_rmse": 1.266548752784729,
+      "training_rmse_at_best": 1.0302172899246216
+    },
+    {
+      "seed": 2,
+      "arm": "bounded",
+      "input": "standardized",
+      "best_epoch": 13,
+      "epochs": 28,
+      "validation_rmse": 1.2372422218322754,
+      "training_rmse_at_best": 0.92801433801651
+    }
+  ],
+  "test_evaluated": false,
+  "protocol": "frozen initial encoders; matched MLP initialization/data order; train-only feature statistics; Adam .001, batch16, 60 epochs, patience15",
+  "script_sha256": "fa5e2bade573147e9dde803b68a866e71a6104a850fd9e49f602a0c34ef67beb"
+}

@@ -55,6 +55,13 @@ def prepare(args):
             if saved['variant']!='frequency_init' or model.training_max_t!=maximum:
                 raise ValueError('Wrong source variant/horizon')
             sources[str(seed)][arm]={'path':str(path),'sha256':sha(path),'training_max_t':maximum}
+    if args.reuse_pretraining:
+        resolved=runs/'typed_property_comparison_20261029'/'resolved_pretrain_sources.json'
+        sources=json.loads(resolved.read_text(encoding='utf-8'))
+        for arms in sources.values():
+            for item in arms.values():
+                if sha(Path(item['path']))!=item['sha256']:
+                    raise ValueError('Changed reused pretraining source')
     files=[ROOT/name for name in pretrain_plan['source_sha256'] if (ROOT/name).exists()]
     files+=list(module.glob('*.py'))+[Path(__file__).resolve()]
     files=sorted(set(files))
@@ -63,19 +70,20 @@ def prepare(args):
         dest.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(path,dest)
     plan={'scope':'locked exploratory validation; no test evaluation',
-          'arms':['scratch','full','bounded'],'variant':'frequency_init','bounded_training_max_t':300,
+          'arms':args.arms,'variant':'frequency_init','bounded_training_max_t':300,
           'task_to_pretrain_seed':{'0':7,'1':1,'2':2},'pretrain_sources':sources,
-          'additional_pretraining_seed':None if args.smoke else 2,'pretraining_protocol':pretrain_plan,
+          'additional_pretraining_seed':None if args.smoke or args.reuse_pretraining else 2,'pretraining_protocol':pretrain_plan,
           'task_seeds':[0] if args.smoke else [0,1,2],
           'readout':'mean; no readout search','task_dropout':.1,'pretrain_dropout':0.,
           'epochs':args.epochs,'patience':args.patience,'batch_size':args.batch_size,
           'learning_rate':.001,'weight_decay':0.,'grad_clip':5.,'device':args.device,
+          'encoder_learning_rate':args.encoder_learning_rate,
           'data_root':str(ROOT/'data'),'limit':16 if args.smoke else 0,'smoke_only':args.smoke,
           'gpu_fraction':.45,'test_evaluated':False,'selection':'none; report all three arms',
           'stereo_disclosure':'retain source typed recovery results and new seed2 diagnostics; no rare-stereo optimization',
           'source_sha256':{p.relative_to(ROOT).as_posix():sha(p) for p in files}}
     runner.io.atomic_write(out/'plan.json',plan)
-    print(json.dumps({'prepared':str(out),'property_jobs':len(plan['task_seeds'])*3,'additional_pretrain_jobs':0 if args.smoke else 2}))
+    print(json.dumps({'prepared':str(out),'property_jobs':len(plan['task_seeds'])*len(plan['arms']),'additional_pretrain_jobs':0 if plan['additional_pretraining_seed'] is None else 2}))
 
 
 def add_seed_two(out,plan,sources):
@@ -139,16 +147,22 @@ def report(out,rows):
     pairs=[]
     for seed in sorted({r['task_seed'] for r in rows}):
         group={r['arm']:r['validation']['rmse'] for r in rows if r['task_seed']==seed}
-        if len(group)==3:
-            pairs.append({'task_seed':seed,'full_minus_scratch':group['full']-group['scratch'],
-                          'bounded_minus_scratch':group['bounded']-group['scratch'],'bounded_minus_full':group['bounded']-group['full']})
+        if 'scratch' in group and len(group)>1:
+            pair={'task_seed':seed}
+            if 'full' in group:
+                pair['full_minus_scratch']=group['full']-group['scratch']
+            if 'bounded' in group:
+                pair['bounded_minus_scratch']=group['bounded']-group['scratch']
+            if 'full' in group and 'bounded' in group:
+                pair['bounded_minus_full']=group['bounded']-group['full']
+            pairs.append(pair)
     runner.io.atomic_write(out/'results.json',{'runs':rows,'aggregate':aggregate,'paired_deltas':pairs,'test_evaluated':False})
     lines=['# Locked three-arm ESOL validation','',
            '| task seed | pretraining seed | arm | best epoch | validation RMSE |',
            '|---:|---:|---|---:|---:|']
     for row in rows:
         lines.append(f'| {row["task_seed"]} | {row["pretrain_seed"]} | {row["arm"]} | {row["best_epoch"]} | {row["validation"]["rmse"]:.5f} |')
-    lines+=['','Aggregates are provisional until all nine runs complete.','']
+    lines+=['','Aggregates are provisional until all planned runs complete.','']
     for arm,row in aggregate.items():
         lines.append(f'{arm}: n={row["completed"]}, mean RMSE={row["mean_rmse"]:.5f}, sample SD={row["sample_sd"]}')
     (out/'REPORT.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
@@ -173,6 +187,8 @@ def execute(args):
                 raise ValueError('Source checkpoint changed')
     if plan['additional_pretraining_seed'] is not None:
         add_seed_two(out,plan,sources)
+    else:
+        runner.io.atomic_write(out/'resolved_pretrain_sources.json',sources)
     source,full_splits,spec=runner.io.build_property_data(Path(plan['data_root']),'esol')
     protocol=plan['pretraining_protocol']
     seen=set(protocol['train_smiles'])|set(protocol['development_smiles'])|set(protocol['confirmation_smiles'])
@@ -204,17 +220,19 @@ def execute(args):
             folder=out/f'{arm}_task_seed_{task_seed}'
             settings=SimpleNamespace(stage='finetune',output_dir=folder,device=plan['device'],seed=task_seed,
                 epochs=plan['epochs'],patience=plan['patience'],batch_size=plan['batch_size'],threads=2,
-                learning_rate=.001,weight_decay=0.,grad_clip=5.,resume=False,limit=plan['limit'])
+                learning_rate=.001,weight_decay=0.,grad_clip=5.,resume=False,limit=plan['limit'],
+                encoder_learning_rate=plan.get('encoder_learning_rate'))
             metadata={'schema':model.checkpoint('finetune')['schema'],'variant':'frequency_init','arm':arm,
                 'config':asdict(config),'task_seed':task_seed,'pretrain_seed':pretrain_seed if arm!='scratch' else None,
                 'checkpoint_source':item if arm!='scratch' else None,'task_dropout':.1,'pretrain_dropout':0.,
                 'splits':splits,'readout':'mean','upstream_downstream_overlap':overlap,
                 'encoder_initial_hash':encoder_start,'head_initial_hash':head_start,
                 'run_plan_sha256':sha(out/'plan.json'),'software':runner.io.shared.provenance()['software'],
+                'encoder_learning_rate':plan.get('encoder_learning_rate') or .001,'head_learning_rate':.001,
                 'mapping_sha256':sha(Path(plan['data_root'])/spec.directory/'mapping/mol.csv.gz'),
                 'test_evaluated':False}
             runner.io.atomic_write(out/'status.json',{'state':'running','stage':'property','current_arm':arm,
-                'task_seed':task_seed,'completed_property_jobs':len(rows),'planned_property_jobs':len(plan['task_seeds'])*3})
+                'task_seed':task_seed,'completed_property_jobs':len(rows),'planned_property_jobs':len(plan['task_seeds'])*len(plan['arms'])})
             with runner.io.run_directory(settings,metadata):
                 train=runner.io.loader(data,splits['train'],settings,True)
                 valid=runner.io.loader(data,splits['valid'],settings,False)
@@ -252,6 +270,9 @@ def main():
     p.add_argument('--epochs',type=int,default=60)
     p.add_argument('--patience',type=int,default=15)
     p.add_argument('--batch-size',type=int,default=16)
+    p.add_argument('--encoder-learning-rate',type=float)
+    p.add_argument('--reuse-pretraining',action='store_true')
+    p.add_argument('--arms',nargs='+',choices=('scratch','full','bounded'),default=['scratch','full','bounded'])
     args=p.parse_args()
     if args.execute:
         try:

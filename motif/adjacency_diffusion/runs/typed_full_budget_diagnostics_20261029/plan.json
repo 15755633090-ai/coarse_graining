@@ -1,0 +1,18 @@
+{
+  "change": "patience=1000; retain the original 60-epoch cap; exact optimizer/model/RNG/loader state continuation",
+  "frozen_code": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\typed_property_comparison_20261029\\frozen_source",
+  "original_plan_sha256": "fe2d21dbfbaaa37e2024233664c6b52d0b9732b1efa9a70f325b7951aa8a8eae",
+  "script_sha256": "1653c4e973b1a93e6985af5032a1a32b19e47f1683d51febffc5a45dab421ac5",
+  "test_evaluated": false,
+  "source_latest_sha256": {
+    "scratch_0": "c697b12d1a7480461b68fa127222dc9dcebde1da843e9e8ea74f04d11dbd1069",
+    "full_0": "537f6a8ca76bc53c7e154b41ee80d2f39b0c00620633338df09d16cb4ddf003a",
+    "bounded_0": "0e2482fd8c3e9df9167146e7d216298408b4e00251e5f20eab389702c0270a5b",
+    "scratch_1": "a30850c3091e06d0a9f943e31dd24b9c306af13cc5d7cc9f9b8560016214769a",
+    "full_1": "f832993602b06a9c6bb699a8227ffa84ad13edb1c4dce02bdd412f5916c20a7a",
+    "bounded_1": "98d645b4e2f238598e74167d0868b1741826dbe6737452f8c06bbc1ad3be3470",
+    "scratch_2": "7a1fffbcb6356fe80d7d0de0fafef69af65161f14da09ae6133e3264de1beb04",
+    "full_2": "033793865838ad08571b5a24d1cd55ecdbef26eb9a1bf135a7a5211f0f867f85",
+    "bounded_2": "2a33ef37fb94d4dc3210bc795c12bb57b34ae0ac13a6fabc956fb9c18a187651"
+  }
+}

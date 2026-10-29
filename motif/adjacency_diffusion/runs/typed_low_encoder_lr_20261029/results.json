@@ -1,0 +1,139 @@
+{
+  "runs": [
+    {
+      "best_epoch": 55,
+      "best_score": 0.9622247029738228,
+      "epochs_run": 60,
+      "elapsed_seconds": 96.7078321,
+      "arm": "scratch",
+      "task_seed": 0,
+      "pretrain_seed": null,
+      "validation": {
+        "rmse": 0.9622247029738228,
+        "mae": 0.7586256265640259,
+        "evaluated_tasks": 1.0
+      },
+      "encoder_initial_hash": "4a5fefc48b4388ba5fa5666d635f3fc3eaa5f2857bf885e0edb771522c54f322",
+      "head_initial_hash": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 12,
+      "best_score": 1.1965646107242327,
+      "epochs_run": 27,
+      "elapsed_seconds": 48.03640200000001,
+      "arm": "bounded",
+      "task_seed": 0,
+      "pretrain_seed": 7,
+      "validation": {
+        "rmse": 1.1965646107242327,
+        "mae": 0.912823498249054,
+        "evaluated_tasks": 1.0
+      },
+      "encoder_initial_hash": "4a5fefc48b4388ba5fa5666d635f3fc3eaa5f2857bf885e0edb771522c54f322",
+      "head_initial_hash": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 59,
+      "best_score": 0.9440944169478933,
+      "epochs_run": 60,
+      "elapsed_seconds": 175.1318387,
+      "arm": "scratch",
+      "task_seed": 1,
+      "pretrain_seed": null,
+      "validation": {
+        "rmse": 0.9440944169478933,
+        "mae": 0.7507206201553345,
+        "evaluated_tasks": 1.0
+      },
+      "encoder_initial_hash": "6cd3a6113ee7f04b4d7a01202ab48166fb4a917c2a61b7dd23dfc3897ba87b71",
+      "head_initial_hash": "331743ae36d337bab57044c37641869b3d82b95cfe74a6bea3452ef907ed0d8a",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 20,
+      "best_score": 0.9460670045305789,
+      "epochs_run": 35,
+      "elapsed_seconds": 116.05374930000005,
+      "arm": "bounded",
+      "task_seed": 1,
+      "pretrain_seed": 1,
+      "validation": {
+        "rmse": 0.9460670045305789,
+        "mae": 0.7084582448005676,
+        "evaluated_tasks": 1.0
+      },
+      "encoder_initial_hash": "6cd3a6113ee7f04b4d7a01202ab48166fb4a917c2a61b7dd23dfc3897ba87b71",
+      "head_initial_hash": "331743ae36d337bab57044c37641869b3d82b95cfe74a6bea3452ef907ed0d8a",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 39,
+      "best_score": 0.9649011386375577,
+      "epochs_run": 54,
+      "elapsed_seconds": 162.06719909999998,
+      "arm": "scratch",
+      "task_seed": 2,
+      "pretrain_seed": null,
+      "validation": {
+        "rmse": 0.9649011386375577,
+        "mae": 0.7641984224319458,
+        "evaluated_tasks": 1.0
+      },
+      "encoder_initial_hash": "1c375529b4d786303eae7d8ad03e8d68a788d60c26166ec1304c2edb16378fbd",
+      "head_initial_hash": "da49d1de941d2e89ebc38d7081ea794c3c7f374c4810a2c8b158cf8652869de5",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 14,
+      "best_score": 0.970275324110842,
+      "epochs_run": 29,
+      "elapsed_seconds": 77.2188016,
+      "arm": "bounded",
+      "task_seed": 2,
+      "pretrain_seed": 2,
+      "validation": {
+        "rmse": 0.970275324110842,
+        "mae": 0.7411302328109741,
+        "evaluated_tasks": 1.0
+      },
+      "encoder_initial_hash": "1c375529b4d786303eae7d8ad03e8d68a788d60c26166ec1304c2edb16378fbd",
+      "head_initial_hash": "da49d1de941d2e89ebc38d7081ea794c3c7f374c4810a2c8b158cf8652869de5",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    }
+  ],
+  "aggregate": {
+    "scratch": {
+      "completed": 3,
+      "mean_rmse": 0.9570734195197579,
+      "sample_sd": 0.01131952771920627
+    },
+    "bounded": {
+      "completed": 3,
+      "mean_rmse": 1.0376356464552179,
+      "sample_sd": 0.1381677330165816
+    }
+  },
+  "paired_deltas": [
+    {
+      "task_seed": 0,
+      "bounded_minus_scratch": 0.23433990775040991
+    },
+    {
+      "task_seed": 1,
+      "bounded_minus_scratch": 0.001972587582685592
+    },
+    {
+      "task_seed": 2,
+      "bounded_minus_scratch": 0.0053741854732843874
+    }
+  ],
+  "test_evaluated": false
+}
