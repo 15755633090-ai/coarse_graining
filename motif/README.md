@@ -1,5 +1,7 @@
 # 二维 Motif 扩散预训练与分子语境学习
 
+**2026-10-29 邻接扩散对齐路径：保留八类原子属性，对完整邻接候选对加噪并优化 A 重建；无 BRICS、BRICS 统一处理与条件门控入口见 [adjacency_diffusion/README.md](adjacency_diffusion/README.md)。已验收科学计算接口与小样本迁移，不是完整 MotiL 复现或正式成绩。**
+
 **2026-10-29 新框架：BRICS 结构引导、内部／上下文双状态与边界门控的原子级条件去噪，见 [brics_atom_diffusion/README.md](brics_atom_diffusion/README.md)。已通过接口与小样本端到端验收，尚未进行正式性能验证；与下述基序隐向量模型分开。**
 
 **2026-10-28 新方案：仅对基序隐表示加噪的上下文去噪辅助学习，独立代码、消融配置与运行方法见 [context_denoising/README.md](context_denoising/README.md)。已完成小样本流程验收，尚未进行正式性能实验。**

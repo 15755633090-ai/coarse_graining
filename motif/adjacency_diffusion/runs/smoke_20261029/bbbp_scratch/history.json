@@ -1,0 +1,15 @@
+[
+  {
+    "epoch": 1,
+    "train_loss_batch_mean": 0.34870341047644615,
+    "pre_clip_norm": 0.0669444976374507,
+    "clip_fraction": 0.0,
+    "optimizer_steps": 8,
+    "observed_gradient_parameters": 13693,
+    "validation": {
+      "roc_auc": 0.8405172413793104,
+      "average_precision": 0.49752673510404677,
+      "evaluated_tasks": 1.0
+    }
+  }
+]

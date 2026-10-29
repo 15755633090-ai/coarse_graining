@@ -1,0 +1,19 @@
+{
+  "state": "complete",
+  "best_epoch": 1,
+  "best_score": 1.7967969794542666,
+  "epochs_run": 1,
+  "parameter_counts": {
+    "instantiated": 15652,
+    "optimized": 15183
+  },
+  "validation": {
+    "rmse": 1.7967969794542666,
+    "mae": 1.4282562732696533,
+    "evaluated_tasks": 1.0
+  },
+  "stage": "finetune",
+  "pretrained_encoder": true,
+  "smoke_only": true,
+  "test_evaluated": false
+}

@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "checkpoint_commit_interruption_recovered": true,
+  "rogue_best_and_history_repaired": true,
+  "resume_weights_history_rng_match_continuous": true,
+  "incompatible_attribute_checkpoint_rejected": true,
+  "downstream_replays": [
+    {
+      "run": "esol_pretrained",
+      "strict_reload_and_validation_replay": true
+    },
+    {
+      "run": "esol_scratch",
+      "strict_reload_and_validation_replay": true
+    },
+    {
+      "run": "esol_gated_pretrained",
+      "strict_reload_and_validation_replay": true
+    },
+    {
+      "run": "bbbp_scratch",
+      "strict_reload_and_validation_replay": true
+    }
+  ],
+  "test_evaluated": false,
+  "formal_performance_claims": false,
+  "mechanism_alignment_only_not_full_motil_reproduction": true
+}

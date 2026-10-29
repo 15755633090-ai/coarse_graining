@@ -1,0 +1,314 @@
+{
+  "repository": "15755633090-ai/coarse_graining",
+  "date": "2026-10-29",
+  "purpose": "Paper-mechanism-aligned adjacency diffusion implementation and pipeline acceptance; not full MotiL reproduction or performance evidence",
+  "files": [
+    {
+      "path": "motif/adjacency_diffusion/__init__.py",
+      "bytes": 82,
+      "sha256": "a41c602115100639cc67a96430a2c823b03f711f035f240767842123ca91f405"
+    },
+    {
+      "path": "motif/adjacency_diffusion/data.py",
+      "bytes": 3676,
+      "sha256": "f15ad9b99b3fbf03d7f49c98ed03d0a1157e235f156f99eb31463bcd8f79cf5f"
+    },
+    {
+      "path": "motif/adjacency_diffusion/diffusion.py",
+      "bytes": 2073,
+      "sha256": "aeefa136e587f4b884fab6f6a121fa00085a10c527c343db62d31c3f5fc14666"
+    },
+    {
+      "path": "motif/adjacency_diffusion/finetune.py",
+      "bytes": 3982,
+      "sha256": "7afb0ffb92bb21a9595c062ecd1ea9ba9597ae497932fbb20ea5b5366a33b4bd"
+    },
+    {
+      "path": "motif/adjacency_diffusion/metrics.py",
+      "bytes": 2771,
+      "sha256": "e33a42d24ffd23430c072e36ce219b6e741b591a1a07fa5e12526992cea610af"
+    },
+    {
+      "path": "motif/adjacency_diffusion/model.py",
+      "bytes": 8176,
+      "sha256": "06768f2b3f11b2a6b94cbdf9da9eda703a74456b5e31720877cc79ccfea4dfa8"
+    },
+    {
+      "path": "motif/adjacency_diffusion/pretrain.py",
+      "bytes": 2604,
+      "sha256": "a6f7aba5786126422c56217e985c59f2d6c2aca4349cc6d48035dc97b3ae96ee"
+    },
+    {
+      "path": "motif/adjacency_diffusion/README.md",
+      "bytes": 8324,
+      "sha256": "a4224a4e5ed4fa8fb15e8639d1cbf697a20fc9c4eff155fb7d20fce78e452372"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/acceptance.json",
+      "bytes": 792,
+      "sha256": "3ec4b8cc93a5b56cf883c36068e0412db6d729525e142f9ad8b8520ca2b2a480"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/baseline_pretrain/completion.json",
+      "bytes": 290,
+      "sha256": "89645dd72d4761e325fab634074b6f73891251ba78d27bc5603e738876be6f5b"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/baseline_pretrain/config.json",
+      "bytes": 8418,
+      "sha256": "24a37144cbbba31a2bb8110f13f042039a2ec5e35d90675b85c1c78a5d18eae5"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/baseline_pretrain/history.json",
+      "bytes": 8669,
+      "sha256": "b91aef1770208a0b594364dc16a94136d38f1df7f92af183c19d47a8a620771e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/baseline_pretrain/status.json",
+      "bytes": 314,
+      "sha256": "92ee239b00e5bbcbb7d7390fde736c84e1e41c5421d1b343ef5b3612de993191"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/bbbp_scratch/completion.json",
+      "bytes": 408,
+      "sha256": "e488775843648210aa4897b6ec6cdd1d50bc5747263c4097752a09547238ac95"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/bbbp_scratch/config.json",
+      "bytes": 11739,
+      "sha256": "8fb5a53c99be175c1ac700737f745cf1302db7e41e4fcab02ededdd8d4714239"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/bbbp_scratch/history.json",
+      "bytes": 369,
+      "sha256": "9ff3bf3dfb628172ad6f84e23d373e898355ec6e1e295e883c0822118e36e6a4"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/bbbp_scratch/status.json",
+      "bytes": 432,
+      "sha256": "635dbf3e4aa8250b3cf2b2844090faf88d56c4db4f2addeabc94b19ad0f2b7e8"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_gated_pretrained/completion.json",
+      "bytes": 389,
+      "sha256": "f5601d3ce5b9dde8336d575269e5050e2d30d5d84109f313ee558d15bb385874"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_gated_pretrained/config.json",
+      "bytes": 8037,
+      "sha256": "9c65b07e9781933fa4ad0623f9269fecd4433e0d5092d8c94b6d45f29860f9a5"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_gated_pretrained/history.json",
+      "bytes": 350,
+      "sha256": "3bab97743b8f79216f172f79f29a1ea395e24da31af8e3e0d6f79bcb798b5c99"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_gated_pretrained/status.json",
+      "bytes": 413,
+      "sha256": "3b20eb1159619e0f91aa77bd9a3cf97a7097cdac271a4d5296290e47808ac0c5"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_pretrained/completion.json",
+      "bytes": 389,
+      "sha256": "dccaf7ef7cb47432a30be827779cc61c9face26c86f527723a04573a8428f7c8"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_pretrained/config.json",
+      "bytes": 7995,
+      "sha256": "959c615498ec0614ffcb213877d13bea9b7e5bfe2c41e977fba6f86a909c0e70"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_pretrained/history.json",
+      "bytes": 693,
+      "sha256": "e21560389905899a439219a047b76197d66e68f912d7f7fa094c41b26f4a4f6d"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_pretrained/status.json",
+      "bytes": 413,
+      "sha256": "3029fe1d9202364b9c551d9e811fc762754740de5b753abf436c9edec071dd71"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_scratch/completion.json",
+      "bytes": 390,
+      "sha256": "d97540da428a82a0fdbb08a2129fe862bf905eddfbf0e5af9087ec3c45048604"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_scratch/config.json",
+      "bytes": 7744,
+      "sha256": "ea85ba9beb635abe94bf6e07896646154269a47733c668f0ee5be43fa78d1c8e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_scratch/history.json",
+      "bytes": 695,
+      "sha256": "95f4382de96d4e0a0315fc7077105d144abec10f48df528108b05a7fb414735e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_scratch/status.json",
+      "bytes": 414,
+      "sha256": "510224928a448968d86f0014fa7e1c758b859cb8588017a7d91ccd6800092c6c"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/gated_pretrain/completion.json",
+      "bytes": 290,
+      "sha256": "c870e1c711f546ef59a77bbc83a0ea2229ffc4cb409edbf328809756601129f1"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/gated_pretrain/config.json",
+      "bytes": 8454,
+      "sha256": "26d6f938c59d7fe0bddad38063c4e4123a584a081297cd18abebadc6e86d041e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/gated_pretrain/history.json",
+      "bytes": 8663,
+      "sha256": "bfe0baed2507e7817507532bf3fc32a7fe78690a494113dd97b9eb2d2764d680"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/gated_pretrain/status.json",
+      "bytes": 314,
+      "sha256": "8d829e0f558314c1beeef5c8ca27eaaf69e0c170098098d5e54ddd3fd7a29a8d"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/resume_window/completion.json",
+      "bytes": 290,
+      "sha256": "89645dd72d4761e325fab634074b6f73891251ba78d27bc5603e738876be6f5b"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/resume_window/config.json",
+      "bytes": 8414,
+      "sha256": "fccd99b10d4c292595fae2206a6aea0b1124c887854afefccb1317f350e76fa0"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/resume_window/history.json",
+      "bytes": 8669,
+      "sha256": "b91aef1770208a0b594364dc16a94136d38f1df7f92af183c19d47a8a620771e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/resume_window/status.json",
+      "bytes": 314,
+      "sha256": "92ee239b00e5bbcbb7d7390fde736c84e1e41c5421d1b343ef5b3612de993191"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/uniform_pretrain/completion.json",
+      "bytes": 289,
+      "sha256": "0c6b6d63ddb3af10791b4ee7e3ab84b2fe4144a208a7a763949ed856ca34c5bf"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/uniform_pretrain/config.json",
+      "bytes": 8458,
+      "sha256": "1d554137e3b3e0e98418338bd15d94158cdac331dc69c2cb18c404bb27779600"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/uniform_pretrain/history.json",
+      "bytes": 8663,
+      "sha256": "1394ce3ffcf7b55fd72f305a4e94d9f2a0cf20baa31b1d0b22a6f45d54e9e3e0"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/uniform_pretrain/status.json",
+      "bytes": 313,
+      "sha256": "a1bc7178a94fef5027b544263cd456a9eaa5279d0b266c4564df16c958213257"
+    },
+    {
+      "path": "motif/adjacency_diffusion/test_interfaces.py",
+      "bytes": 10621,
+      "sha256": "80750f1552f963e0bd668fd56a53f0293e6caddbed6f66ef7d9a8a77a371626e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/training.py",
+      "bytes": 11994,
+      "sha256": "7a20b48c06cb8d04a57ac78d05bb809e8cac0f89713483b5c98f234833bbe916"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/PAPER_ALIGNMENT_20261029.md",
+      "bytes": 5487,
+      "sha256": "1092fa5480364ba8ff2591b8d0c6badaa26207883c66f71e70c4a56695a677e4"
+    },
+    {
+      "path": "motif/README.md",
+      "bytes": 14639,
+      "sha256": "649139895bc2a313c9a254fb3cd6bbd0aba92c1e604b794c277aac485a2aac76"
+    }
+  ],
+  "local_only_checkpoints": [
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/baseline_pretrain/best.pt",
+      "bytes": 170796,
+      "sha256": "d609b765152ebc9697c3962581127f9f0ec101202a55cad3069b6c31262c3ec4"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/baseline_pretrain/latest.pt",
+      "bytes": 453666,
+      "sha256": "229fe63bdf26a2b7eed95a2388d0400a79210611fbcc88bfae9ffed8aec80801"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/bbbp_scratch/best.pt",
+      "bytes": 169772,
+      "sha256": "c862849059b05c0e21139c5b29d3ee01abb9fd09fc32c6e71802724e51ef5f38"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/bbbp_scratch/latest.pt",
+      "bytes": 448482,
+      "sha256": "84773acdff4b6116cef177191d14c7d12c47945ebbc2ea88f78990431ced604e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_gated_pretrained/best.pt",
+      "bytes": 187354,
+      "sha256": "c5fd3588da36c0d1c46a44bb6eb033e2d6ab46019ae36286bda06fb548cb2d8a"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_gated_pretrained/latest.pt",
+      "bytes": 494998,
+      "sha256": "76c3628c81d025ff24bad5e552c3173a18d80d77ce309dcf0c3b6b1938cd79a4"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_pretrained/best.pt",
+      "bytes": 169962,
+      "sha256": "92c11d2b77955ee82420504e8a0a8b57019893395a839544747604fec046986c"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_pretrained/latest.pt",
+      "bytes": 448678,
+      "sha256": "3f850c1b3bea80c6d6083645198a2a4de6a91276ac492337e32713a4a50b4b97"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_scratch/best.pt",
+      "bytes": 169706,
+      "sha256": "aa092229bb39878ddd73e93a785e70e6a86b4032fb720f6b7b82bab8c6c8e15c"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/esol_scratch/latest.pt",
+      "bytes": 448422,
+      "sha256": "912d2d0053b7a73ae69aad6b1439c071c2975028eeedd2d7df8d8da57da48671"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/gated_pretrain/best.pt",
+      "bytes": 188188,
+      "sha256": "e6f4315d0758e66b4e510c4465c7e0cb883addeb01125fd05448967263fc768c"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/gated_pretrain/latest.pt",
+      "bytes": 500050,
+      "sha256": "5f64a69766a47f9a4548b03fcfef97b98d817b0b1d64bbd8fb593db2c7b68387"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/resume_window/best.pt",
+      "bytes": 161677,
+      "sha256": "b351bc93ac5eedb54048fbf7a74eff0a26060f7e1f06b817a0bb5334b89bbd52"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/resume_window/latest.pt",
+      "bytes": 428637,
+      "sha256": "984d1834a1ceac68eb1e66e7eda6e4c13455959c65607b9e7e7b0943917a6fdf"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/uniform_pretrain/best.pt",
+      "bytes": 170860,
+      "sha256": "1d94a4630eba10cdc9f9623f337e6ec90bf332e07cea7509ef3d06d7816becd0"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/smoke_20261029/uniform_pretrain/latest.pt",
+      "bytes": 453730,
+      "sha256": "8d5776112c744d834c27744ea18481ff4980395f783eb9c891e8e71943d3f344"
+    }
+  ]
+}
