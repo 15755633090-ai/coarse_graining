@@ -1,0 +1,16 @@
+{
+  "best_epoch": 2,
+  "best_score": 2.0959502089606956,
+  "epochs_run": 2,
+  "elapsed_seconds": 0.1595052999999993,
+  "validation": {
+    "rmse": 2.0959502089606956,
+    "mae": 1.6904590129852295,
+    "evaluated_tasks": 1.0
+  },
+  "schema": "typed_hierarchical_evidence_v2",
+  "variant": "factorized_evidence",
+  "test_evaluated": false,
+  "checkpoint_replay_passed": true,
+  "smoke_only": true
+}

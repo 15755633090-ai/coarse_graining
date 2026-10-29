@@ -14,6 +14,7 @@ from .typed_bonds import (GraphDataset,edge_target,corrupt,TypedBondModel,
 class TypedBondsTests(unittest.TestCase):
     def setUp(self):
         torch.set_num_threads(2)
+        torch.manual_seed(7)
         self.model=TypedBondModel(Config(hidden_dim=12,layers=2,dropout=0.,
                                  motif_prior=True,conditional_gate=True,time_mode='random'))
 

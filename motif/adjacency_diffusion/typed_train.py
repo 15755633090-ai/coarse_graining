@@ -14,6 +14,16 @@ from .data import condition_from_batch
 from motif.brics_atom_diffusion.pretrain import read_smiles
 
 
+def training_checkpoint(path,model):
+    if hasattr(model,'variant'):
+        from .typed_refined import load_model
+        _,saved=load_model(path)
+        if saved['variant']!=model.variant:
+            raise ValueError('Typed recovery variant mismatch')
+        return saved
+    return load_checkpoint(path)
+
+
 @torch.no_grad()
 def evaluate(model,batches,args):
     model.eval()
@@ -63,7 +73,7 @@ def fit(model,train,valid,args,metadata,spec=None,scaler=None,weight=None):
     history,best,stale,best_state,first=[],None,0,None,1
     identity=io.digest(args.output_dir/'config.json')
     if args.resume:
-        saved=load_checkpoint(args.output_dir/'latest.pt')
+        saved=training_checkpoint(args.output_dir/'latest.pt',model)
         if saved['run_config_sha256']!=identity or saved['stage']!=args.stage:
             raise ValueError('Resume identity mismatch')
         best_state=io.shared.authoritative_best(saved)
@@ -145,8 +155,12 @@ def main():
     p.add_argument('--pretrained',type=Path)
     p.add_argument('--dataset',choices=sorted(io.TASK_SPECS),default='esol')
     p.add_argument('--data-root',type=Path,default=io.ROOT/'data')
+    p.add_argument('--variant',choices=('v1','frequency_init','factorized','factorized_evidence'),default='v1')
+    p.add_argument('--training-max-t',type=int)
     args=p.parse_args()
     config=io.initialize(args)
+    if args.training_max_t is not None and (args.variant=='v1' or not 1<=args.training_max_t<=config.noise_steps):
+        raise ValueError('A bounded training horizon requires a refined variant and 1 <= max_t <= noise_steps')
     if args.time_mode!='random':
         raise ValueError('Typed v1 uses randomly sampled timesteps; choose --time-mode random')
     spec=scaler=weight=None
@@ -163,15 +177,19 @@ def main():
         splits={'train':list(range(len(train_smiles))),'valid':list(range(len(train_smiles),len(data)))}
         inputs={'train_smiles':train_smiles,'valid_smiles':valid_smiles,
                 'train_csv_sha256':io.digest(args.smiles_csv),'valid_csv_sha256':io.digest(args.valid_csv)}
-        model=TypedBondModel(config).to(args.device)
     else:
         source,full_splits,spec=io.build_property_data(args.data_root,args.dataset)
         splits={k:v[:args.limit] if args.limit else v for k,v in full_splits.items() if k!='test'}
         data=GraphDataset(source.smiles,source.targets,source.target_mask)
         inputs={'dataset':args.dataset,'splits':splits,'pretrained_sha256':io.digest(args.pretrained) if args.pretrained else None}
-        model=TypedBondModel(config,spec.num_tasks).to(args.device)
         if args.pretrained:
-            saved=load_checkpoint(args.pretrained)
+            if args.variant=='v1':
+                saved=load_checkpoint(args.pretrained)
+            else:
+                from .typed_refined import load_model
+                _,saved=load_model(args.pretrained)
+                if saved['variant']!=args.variant:
+                    raise ValueError('Pretrained recovery variant mismatch')
             if saved['stage']!='pretrain' or saved['config']!=asdict(config):
                 raise ValueError('Typed encoder pretraining configuration mismatch')
             corpus=saved['run_metadata']['inputs']
@@ -180,13 +198,31 @@ def main():
                      if Chem.MolToSmiles(Chem.MolFromSmiles(source.smiles[i]),canonical=True) in seen]
             if overlap:
                 raise ValueError('Pretraining corpus overlaps downstream validation/test molecules')
-            model.encoder.load_state_dict(saved['encoder'],strict=True)
         y,mask=source.targets[splits['train']],source.target_mask[splits['train']]
         scaler=io.TargetScaler.fit(y,mask) if spec.task_type=='regression' else None
         weight=io.classification_positive_weight(y,mask) if spec.task_type=='classification' else None
-    metadata={'schema':SCHEMA,'feature_schema':FEATURE_SCHEMA,'config':asdict(config),'inputs':inputs,
+    if args.variant=='v1':
+        model=TypedBondModel(config,spec.num_tasks if spec else 1)
+    else:
+        from .typed_refined import RefinedBondModel,training_priors
+        priors=saved['priors'] if args.stage=='finetune' and args.pretrained else training_priors([data[i] for i in splits['train']])
+        model=RefinedBondModel(config,priors,args.variant,spec.num_tasks if spec else 1)
+        model.training_max_t=args.training_max_t or config.noise_steps
+        if args.stage=='finetune' and args.pretrained:
+            expected=saved.get('training_max_t',config.noise_steps)
+            if args.training_max_t is not None and args.training_max_t!=expected:
+                raise ValueError('Pretraining noise-horizon mismatch')
+            model.training_max_t=expected
+        model.initialize_priors()
+    if args.stage=='finetune' and args.pretrained:
+        model.encoder.load_state_dict(saved['encoder'],strict=True)
+    model.to(args.device)
+    metadata={'schema':model.checkpoint(args.stage)['schema'],'feature_schema':FEATURE_SCHEMA,'config':asdict(config),'inputs':inputs,
               'args':{k:str(v.resolve()) if isinstance(v,Path) else v for k,v in vars(args).items() if k!='resume'},
-              'objective':'sum of four block CE; type on all pairs; remaining attributes on true bonds; per-graph normalized',
+              'objective':('presence BCE plus independently normalized conditional type CE plus three auxiliary block CE'
+                           if getattr(model,'factorized',False) else 'sum of four block CE; type on all pairs; remaining attributes on true bonds; per-graph normalized'),
+              'recovery_variant':args.variant,
+              'class_priors':{name:getattr(model,'prior_'+name).tolist() for name in BLOCKS} if hasattr(model,'variant') else None,
               'noise':'independent Gaussian channels, symmetric across endpoints, all 17 channels corrupted',
               'extra_prior':'clean atom133 and optional clean BRICS membership; no clean edge feature condition',
               'noise_schedule':model.schedule.description(),'test_evaluated':False,
@@ -198,15 +234,20 @@ def main():
         valid=io.loader(data,splits['valid'],args,False)
         result=fit(model,train,valid,args,metadata,spec,scaler,weight)
         result['validation']=evaluate(model,valid,args) if args.stage=='pretrain' else io.compute_property_metrics(*io.predict(model,valid,args.device,scaler,spec)[:3],spec)
-        replay=TypedBondModel(config,model.num_tasks).to(args.device)
-        replay.load_state_dict(load_checkpoint(args.output_dir/'best.pt')['model'],strict=True)
+        if args.variant=='v1':
+            replay=TypedBondModel(config,model.num_tasks).to(args.device)
+            replay.load_state_dict(load_checkpoint(args.output_dir/'best.pt')['model'],strict=True)
+        else:
+            from .typed_refined import load_model
+            replay,_=load_model(args.output_dir/'best.pt')
+            replay.to(args.device)
         if args.stage=='finetune':
             first=io.predict(model,valid,args.device,scaler,spec)[0]
             second=io.predict(replay,valid,args.device,scaler,spec)[0]
             torch.testing.assert_close(first,second,atol=1e-6,rtol=1e-6)
         else:
             assert evaluate(replay,valid,args)==result['validation']
-        result.update(schema=SCHEMA,test_evaluated=False,checkpoint_replay_passed=True,smoke_only=bool(args.limit))
+        result.update(schema=model.checkpoint(args.stage)['schema'],variant=args.variant,test_evaluated=False,checkpoint_replay_passed=True,smoke_only=bool(args.limit))
         io.atomic_write(args.output_dir/'completion.json',result)
         io.atomic_write(args.output_dir/'status.json',{'state':'complete',**result})
 

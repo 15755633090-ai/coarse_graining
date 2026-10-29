@@ -58,6 +58,9 @@ class TypedEncoder(Encoder):
         super().__init__(config)
         self.edge=mlp(EDGE_DIM,config.hidden_dim,config.hidden_dim)
 
+    def observation_weight(self,noisy,t):
+        return 1-noisy[...,:6].softmax(-1)[...,0]
+
     def forward(self,condition,noisy,t):
         if noisy.shape!=(*condition.pairs.shape,EDGE_DIM):
             raise ValueError('Expected one 17-channel observation per candidate pair')
@@ -70,7 +73,7 @@ class TypedEncoder(Encoder):
         s=(self.s_input(condition.x)+embedding)*condition.nodes[...,None] if self.s_input is not None else h
         edge=self.edge(noisy)
         # A probability from the RECEIVED observation, never the clean target support.
-        weight=1-noisy[...,:6].softmax(-1)[...,0]
+        weight=self.observation_weight(noisy,t)
         clean=t.eq(0)[:,None,None]
         weight=torch.where(clean,1-noisy[...,0],weight)*condition.pairs
         gates=[]
