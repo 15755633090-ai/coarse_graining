@@ -1,0 +1,224 @@
+{
+  "repository": "15755633090-ai/coarse_graining",
+  "date": "2026-10-29",
+  "purpose": "New atom-level BRICS conditional diffusion implementation and smoke acceptance; no formal gating-ablation claim",
+  "files": [
+    {
+      "path": "motif/brics_atom_diffusion/__init__.py",
+      "bytes": 92,
+      "sha256": "ddc5de4c52283058fc7e23abcbe6ea384092f12f795057d9c911e13b42eb58c2"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/ABLATIONS.md",
+      "bytes": 2893,
+      "sha256": "0ee2b543829416d387b963b30043fdc36322267b73d0b82595d48d145c9f27c8"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/data.py",
+      "bytes": 4243,
+      "sha256": "d7c7a660e528cd2aefe812ecf67cb7b5b493534da42248a6d80cab93f1a9ed27"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/diffusion.py",
+      "bytes": 1846,
+      "sha256": "e6732ddf68fecaaf0498e51352f409cf187e441c3f249fcbb61f2dd87e494707"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/finetune.py",
+      "bytes": 4620,
+      "sha256": "b35b8b86f90c473ca0b213e4f489b72dac5c19770c5e752ed555d55dd255400d"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/model.py",
+      "bytes": 7932,
+      "sha256": "b3a5d2d296b4a9b3fee5e23549ed0010cc717285d82bc7f5160563d045dd6e7a"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/pretrain.py",
+      "bytes": 3514,
+      "sha256": "3de8d521bd238052eaaa695e97c01b7fbce275ca98e179eae71e5a614482c9af"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/README.md",
+      "bytes": 9063,
+      "sha256": "bd7d0a58936b2f4274229fd148654bf93d2aa931e4ae3cf2458f0e724a41fc35"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/acceptance.json",
+      "bytes": 662,
+      "sha256": "cf8adb4160d52e02ef9ee224863d2b5f746af1d3768a9ba7573a4538ea2b963f"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/completion.json",
+      "bytes": 409,
+      "sha256": "3bab23e7b2aa2c7a8e0ebd8423fc3d4ace2a9f468702b224c9f6f24c7de97f41"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/config.json",
+      "bytes": 9916,
+      "sha256": "666187553667aa39ab0183f1aa039cb283019b7f4fa5a32ca92e554d782edfc0"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/history.json",
+      "bytes": 379,
+      "sha256": "af83d6d244f35d168600defcaa156d28f660b9a4fe383609327529e90b2970cc"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/status.json",
+      "bytes": 433,
+      "sha256": "09965b5c99482fbe573fb8b5ba67791d8fcef6e0cc7538f76bb34d04cf517bc5"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/completion.json",
+      "bytes": 387,
+      "sha256": "6dd005fdf2d990bcc79ae0293286929745bc31334c5ccd25ca42380296327b8c"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/config.json",
+      "bytes": 6176,
+      "sha256": "f0db2cf084eb6e970454dabba8a0809b24942bd1fec09a951a6e3f5700720a2e"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/history.json",
+      "bytes": 712,
+      "sha256": "f50e97b0d10ad1e3103fe444b498e42903ba03e8881bc1a3896d109d71831f5b"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/status.json",
+      "bytes": 411,
+      "sha256": "4580e5ec4c67dd886ef379abc0ff342d7fd511240bbdd145f0a7bb9d6ff06626"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/completion.json",
+      "bytes": 390,
+      "sha256": "b0e16e6024b6d9ec9d21ff11e520a368f2fda3f61daf0617286771bac757b67d"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/config.json",
+      "bytes": 5922,
+      "sha256": "71b91845a4b5c9a059ef790afb5bd584a4bda27b54e622771f7c7180ad6d5682"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/history.json",
+      "bytes": 711,
+      "sha256": "4833cb59ca13b539af4e946e1b42a43c9827e8e845f9189c06036322daafb1b6"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/status.json",
+      "bytes": 414,
+      "sha256": "5d3e18896bc2782205eb56497d48348c7658d6a7881446e6a52669b709e220cb"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/completion.json",
+      "bytes": 297,
+      "sha256": "a67bacfe1060e81082398b25762bdd1066b65d314f25daa2eee5cd51e61c7dd5"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/config.json",
+      "bytes": 5675,
+      "sha256": "96495b1adbbf8997e24998ccbe09adb898967d86093a313c6129d5b8c9822aa6"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/history.json",
+      "bytes": 1047,
+      "sha256": "9ddfa8b5f6eb61faf0858e8bd0f5e3fc7654685b92e8fd35ce461f0e714a35be"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/status.json",
+      "bytes": 321,
+      "sha256": "ef637b1f6f2d14f97e641fba37216cf5259cea95d2e6c9f211b0106a244328b4"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/completion.json",
+      "bytes": 297,
+      "sha256": "a67bacfe1060e81082398b25762bdd1066b65d314f25daa2eee5cd51e61c7dd5"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/config.json",
+      "bytes": 5679,
+      "sha256": "245d1a477c19ba32b0df03036a8802d41c6cc3a33cde43c42676306b378c7ddd"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/history.json",
+      "bytes": 1047,
+      "sha256": "9ddfa8b5f6eb61faf0858e8bd0f5e3fc7654685b92e8fd35ce461f0e714a35be"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/status.json",
+      "bytes": 321,
+      "sha256": "ef637b1f6f2d14f97e641fba37216cf5259cea95d2e6c9f211b0106a244328b4"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/SYNC_SCOPE_20261029.md",
+      "bytes": 1003,
+      "sha256": "26a552b9ddd6a7744c52e09a226bb1db03bf81cad046a23a1ff9473e38ef794a"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/test_interfaces.py",
+      "bytes": 9010,
+      "sha256": "62189c223e9c749fd16dfe5fe91eb28ec21c9a2bf4fe6519e765603dd8d7c8e3"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/training.py",
+      "bytes": 13549,
+      "sha256": "9f632ff31f0a1faa775b38d13e10c45f7b03d758fc49043237883c436932b4b3"
+    },
+    {
+      "path": "motif/README.md",
+      "bytes": 14306,
+      "sha256": "1f07998d1d03eecece9de1b6b9bf937f50b51f3b47461543b929648f2c5646b8"
+    }
+  ],
+  "local_only_checkpoints": [
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/best.pt",
+      "bytes": 186343,
+      "sha256": "8ebc968172a593308ef9f91c8d06f4e988c1ba6bcd9b594ffe008fe2082597d8"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/bbbp_scratch/latest.pt",
+      "bytes": 517286,
+      "sha256": "92f48cdffef7fb2e60ea17483740f0e51461e3c08947db84615dece4366740ac"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/best.pt",
+      "bytes": 186531,
+      "sha256": "71a52bce9dbce60161e5f8318e0e09cccd2e6e7ebf13c1f09f43db97b6b1006f"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_pretrained/latest.pt",
+      "bytes": 517608,
+      "sha256": "3f6fef8a760f4e3447eb6cfa5aa4788be7a4b49c4c1d365eedf4722ffd571bab"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/best.pt",
+      "bytes": 186275,
+      "sha256": "f72b1ed00e8647b39724ea9e0687e5fe4bb6e225ecf324636553d0510fbcf4d7"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/esol_scratch/latest.pt",
+      "bytes": 517352,
+      "sha256": "04d3ef8ced90b672af744c47ae3695218681ee3de4514e197d248fc6341329b7"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/best.pt",
+      "bytes": 186471,
+      "sha256": "cd8875dd982d628592fa156a8e81fcb3b1f317134c7404788e4165b90b2a4b93"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/pretrain/latest.pt",
+      "bytes": 535654,
+      "sha256": "df2c31ccfbaabb3134c92ca544f81dd2360095314fb9f2a4c64b22bafd5e4411"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/best.pt",
+      "bytes": 182896,
+      "sha256": "a967100c06d2a7fcf9500d464fa4dc1b13f3d7c95461bee43a334fbf81039097"
+    },
+    {
+      "path": "motif/brics_atom_diffusion/runs/smoke_20261029/resume_probe/latest.pt",
+      "bytes": 524181,
+      "sha256": "d20d67efb75cb956aa28b3619c9ad2e696ebe36d51a22b3bfddf20d49ee89bb7"
+    }
+  ]
+}

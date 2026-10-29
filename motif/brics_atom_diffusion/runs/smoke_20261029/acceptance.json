@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "interrupted_epoch": 1,
+  "resumed_to_epoch": 2,
+  "resume_matches_uninterrupted_weights_and_rng_exactly": true,
+  "resume_matches_uninterrupted_history": true,
+  "checkpoint_replays": [
+    {
+      "run": "esol_pretrained",
+      "strict_checkpoint_reload": true,
+      "validation_reproduced": true
+    },
+    {
+      "run": "esol_scratch",
+      "strict_checkpoint_reload": true,
+      "validation_reproduced": true
+    },
+    {
+      "run": "bbbp_scratch",
+      "strict_checkpoint_reload": true,
+      "validation_reproduced": true
+    }
+  ],
+  "test_evaluated": false,
+  "formal_performance_claims": false
+}

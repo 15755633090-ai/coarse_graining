@@ -1,0 +1,19 @@
+{
+  "state": "complete",
+  "best_epoch": 1,
+  "best_score": 0.47629310344827586,
+  "epochs_run": 1,
+  "parameter_counts": {
+    "instantiated": 33256,
+    "optimized": 30723
+  },
+  "validation": {
+    "roc_auc": 0.47629310344827586,
+    "average_precision": 0.1154401774325375,
+    "evaluated_tasks": 1.0
+  },
+  "stage": "finetune",
+  "smoke_only": true,
+  "test_evaluated": false,
+  "pretrained_encoder": false
+}
