@@ -1,0 +1,38 @@
+{
+  "7": {
+    "full": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\typed_recovery_comparison_20261029\\frequency_init_seed_7\\encoder.pt",
+      "sha256": "477f20a3b7670f717ab57fafd89f9a34610a6c708656a190929a6443f98bc6c2",
+      "training_max_t": 1000
+    },
+    "bounded": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\typed_bounded_noise_20261029\\frequency_init_seed_7\\encoder.pt",
+      "sha256": "136b9d6651047d5917078933c90381ed130e1610f27bfd0f4bfd8267019ac2e9",
+      "training_max_t": 300
+    }
+  },
+  "1": {
+    "full": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\typed_recovery_comparison_20261029\\frequency_init_seed_1\\encoder.pt",
+      "sha256": "f5d29e52c8f80a88d06579106ec2b54da6d4d58481bd45ea58b23e4dc01bccb9",
+      "training_max_t": 1000
+    },
+    "bounded": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\typed_bounded_noise_20261029\\frequency_init_seed_1\\encoder.pt",
+      "sha256": "69459a846754e99229bdc260c56261d2aee3c6db8a8fc60042bc1626fb75117b",
+      "training_max_t": 300
+    }
+  },
+  "2": {
+    "full": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\typed_property_comparison_20261029\\additional_pretraining\\full_seed_2\\encoder.pt",
+      "sha256": "7b571bcf3a30b0c0efc9dc41ebea4eed09bcce86d38b9440e4459621c55ba660",
+      "training_max_t": 1000
+    },
+    "bounded": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\typed_property_comparison_20261029\\additional_pretraining\\bounded_seed_2\\encoder.pt",
+      "sha256": "9126a46770b530c63a830e3ddee963c8130e234f6ab38b07a892fc25bbd225cc",
+      "training_max_t": 300
+    }
+  }
+}

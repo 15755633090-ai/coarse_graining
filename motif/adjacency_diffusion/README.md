@@ -78,6 +78,10 @@ $py = 'C:/Users/12775/miniconda3/envs/polyolefin_ml/python.exe'
 
 限定训练噪声范围的两组补充对照也已完成：同一 t200 条件下，类型/联合正确率约90.8%/90.2%，但训练范围外高噪声表现更差。后续优先验证 `--variant frequency_init --training-max-t 300`，并保留全范围参考；尚无该设置的下游性能结论。
 
+已固定同架构 scratch/full/bounded 的三种子 ESOL 验证协议，见 [TYPED_PROPERTY_PROTOCOL_20261029.md](TYPED_PROPERTY_PROTOCOL_20261029.md)。运行中不修改噪声范围、读出或门控，不用部分结果提前判断新版下游收益。
+
+该九组验证已全部完成：验证 RMSE 均值 scratch .8166、full .8626、bounded .8561；未显示新版预训练的下游收益，bounded 三个种子均未优于 scratch。完整配对差值、立体属性披露和适用范围见上述协议与运行结果。
+
 ## 已完成验收（不是性能结论）
 
 新增有限预算恢复筛选已完成，后续配对性质验证独立记录，见 [RESCUE_SCREEN_20261029.md](RESCUE_SCREEN_20261029.md)。实验适配保留主实现默认配置；不能把有界参数化、额外 BRICS 条件及门控的联合收益解释为单独门控贡献。

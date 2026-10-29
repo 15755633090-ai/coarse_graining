@@ -1,0 +1,32 @@
+{
+  "completed_jobs": 9,
+  "three_independent_pretrain_seeds": [
+    7,
+    1,
+    2
+  ],
+  "paired_initialization_verified": true,
+  "all_checkpoint_replays_passed": true,
+  "source_checkpoint_hashes_verified": true,
+  "run_plan_hash_verified": true,
+  "validation_only": true,
+  "test_evaluated": false,
+  "summary": {
+    "scratch": {
+      "mean_rmse": 0.8165832719737358,
+      "sample_sd": 0.03805594703547176
+    },
+    "full": {
+      "mean_rmse": 0.8625907826821684,
+      "sample_sd": 0.02509732538508208
+    },
+    "bounded": {
+      "mean_rmse": 0.8561416743234964,
+      "sample_sd": 0.013034455905531067
+    }
+  },
+  "full_beats_scratch_seeds": 1,
+  "bounded_beats_scratch_seeds": 0,
+  "bounded_beats_full_seeds": 2,
+  "conclusion": "No downstream benefit demonstrated for these ESOL settings; retain recovery claim separately."
+}
