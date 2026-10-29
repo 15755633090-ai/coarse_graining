@@ -54,6 +54,7 @@ def corrupt(target,t,pairs,schedule,generator=None):
 
 
 class TypedEncoder(Encoder):
+    input_dim=EDGE_DIM
     def __init__(self,config):
         super().__init__(config)
         self.edge=mlp(EDGE_DIM,config.hidden_dim,config.hidden_dim)
@@ -62,8 +63,8 @@ class TypedEncoder(Encoder):
         return 1-noisy[...,:6].softmax(-1)[...,0]
 
     def forward(self,condition,noisy,t):
-        if noisy.shape!=(*condition.pairs.shape,EDGE_DIM):
-            raise ValueError('Expected one 17-channel observation per candidate pair')
+        if noisy.shape!=(*condition.pairs.shape,self.input_dim):
+            raise ValueError(f'Expected one {self.input_dim}-channel observation per candidate pair')
         if (condition.same_fragment is not None)!=self.config.motif_prior:
             raise ValueError('Condition/prior mismatch')
         noisy=noisy*condition.pairs[...,None]

@@ -1,0 +1,172 @@
+{
+  "schema": "typed_gaussian_pair_mask_v1",
+  "feature_schema": "atom133_edge17_type6_stereo7_conjugation2_ring2_v1",
+  "config": {
+    "hidden_dim": 12,
+    "layers": 2,
+    "dropout": 0.0,
+    "noise_steps": 1000,
+    "beta_min": 0.0001,
+    "beta_max": 0.02,
+    "motif_prior": true,
+    "conditional_gate": true,
+    "dual_state": true,
+    "time_mode": "random"
+  },
+  "inputs": {
+    "dataset": "esol",
+    "splits": {
+      "train": [
+        2,
+        5,
+        6,
+        7,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        22,
+        23,
+        24
+      ],
+      "valid": [
+        32,
+        34,
+        72,
+        88,
+        91,
+        156,
+        164,
+        186,
+        195,
+        200,
+        213,
+        226,
+        232,
+        240,
+        254,
+        262
+      ]
+    },
+    "pretrained_sha256": "cad92bd89339cdef6a82177356a85617308b290a439ef9f9ae138476fab7ff4a"
+  },
+  "args": {
+    "output_dir": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_bond_acceptance_20261029\\finetune",
+    "seed": 0,
+    "device": "cpu",
+    "threads": 2,
+    "epochs": 2,
+    "patience": 2,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "grad_clip": 5.0,
+    "hidden_dim": 12,
+    "layers": 2,
+    "dropout": 0.0,
+    "noise_steps": 1000,
+    "beta_min": 0.0001,
+    "beta_max": 0.02,
+    "time_mode": "random",
+    "motif_prior": true,
+    "conditional_gate": true,
+    "single_state": false,
+    "limit": 16,
+    "stage": "finetune",
+    "smiles_csv": null,
+    "valid_csv": null,
+    "smiles_column": "smiles",
+    "pretrained": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_bond_acceptance_20261029\\pretrain\\best.pt",
+    "dataset": "esol",
+    "data_root": "C:\\Users\\12775\\Desktop\\GNN课题1\\data",
+    "variant": "masked",
+    "pair_mask_ratio": null,
+    "training_max_t": null,
+    "encoder_learning_rate": null
+  },
+  "objective": "four block CE restricted to fully masked pairs; auxiliary attributes only on true bonds within masked pairs",
+  "recovery_variant": "masked",
+  "pair_mask_ratio": 0.3,
+  "masked_only_objective": true,
+  "class_priors": {
+    "type": [
+      0.9012755155563354,
+      0.0645408183336258,
+      0.006632653065025806,
+      0.0007653061184100807,
+      0.026530612260103226,
+      0.00025510202976875007
+    ],
+    "stereo": [
+      0.9845758080482483,
+      0.0025706940796226263,
+      0.0025706940796226263,
+      0.0025706940796226263,
+      0.0025706940796226263,
+      0.0025706940796226263,
+      0.0025706940796226263
+    ],
+    "conjugated": [
+      0.5416666865348816,
+      0.4583333432674408
+    ],
+    "ring": [
+      0.5026041865348816,
+      0.4973958432674408
+    ]
+  },
+  "noise": "all 17 channels Gaussian-corrupted, then selected candidate pairs fully hidden with an independent mask flag",
+  "extra_prior": "clean atom133 and optional clean BRICS membership; no clean edge feature condition",
+  "noise_schedule": {
+    "steps": 1000,
+    "beta_min": 0.0001,
+    "beta_max": 0.02,
+    "discretization": "beta_min + (t/T)*(beta_max-beta_min), t=1..T",
+    "alpha_bar_T": 3.9956019661670615e-05,
+    "beta_endpoint_values": "explicit implementation choices, not verified paper values"
+  },
+  "test_evaluated": false,
+  "source_sha256": {
+    "motif/adjacency_diffusion/data.py": "f15ad9b99b3fbf03d7f49c98ed03d0a1157e235f156f99eb31463bcd8f79cf5f",
+    "motif/adjacency_diffusion/diffusion.py": "aeefa136e587f4b884fab6f6a121fa00085a10c527c343db62d31c3f5fc14666",
+    "motif/adjacency_diffusion/finetune.py": "7afb0ffb92bb21a9595c062ecd1ea9ba9597ae497932fbb20ea5b5366a33b4bd",
+    "motif/adjacency_diffusion/masked_bonds.py": "562beea349dff8db2cfb94220918db6a5dec1e38bb65dec8a33f575538e52ebc",
+    "motif/adjacency_diffusion/metrics.py": "e33a42d24ffd23430c072e36ce219b6e741b591a1a07fa5e12526992cea610af",
+    "motif/adjacency_diffusion/model.py": "06768f2b3f11b2a6b94cbdf9da9eda703a74456b5e31720877cc79ccfea4dfa8",
+    "motif/adjacency_diffusion/posterior.py": "63e816a28f9b302f54c45b65e96153cb47a9847f067eeb4cb74a6379a6f5036c",
+    "motif/adjacency_diffusion/pretrain.py": "a6f7aba5786126422c56217e985c59f2d6c2aca4349cc6d48035dc97b3ae96ee",
+    "motif/adjacency_diffusion/reparameterizations.py": "741e25aa7f5c0a62f1cf87e1dd8087e762f0b2084304734bc66775faffadaffe",
+    "motif/adjacency_diffusion/test_interfaces.py": "80750f1552f963e0bd668fd56a53f0293e6caddbed6f66ef7d9a8a77a371626e",
+    "motif/adjacency_diffusion/test_masked_bonds.py": "fa123eecc9577393d2c733e59fcf80d9ba0b77a239a2ca528a0924c678d18d02",
+    "motif/adjacency_diffusion/test_posterior.py": "86c2e8c7f3a8142d78efb21d10bf1bf18fa9721be86134af73a5873a5da3a1af",
+    "motif/adjacency_diffusion/test_reparameterizations.py": "5e641a68d73f880e733c2946d57ad431db1480b16738d7b3d0b0f7855fff16ea",
+    "motif/adjacency_diffusion/test_typed_bonds.py": "bf6ce88a0216b44b10ef226b5f568255d8c3f30eec5feccb627be5c5356cc83b",
+    "motif/adjacency_diffusion/test_typed_refined.py": "c98af0078366d303a1558dc53d1363e0599bdcba28587a8ccba8520839edb80a",
+    "motif/adjacency_diffusion/training.py": "7a20b48c06cb8d04a57ac78d05bb809e8cac0f89713483b5c98f234833bbe916",
+    "motif/adjacency_diffusion/typed_bonds.py": "4106a4f63f214f6926fe319e0c044ff758cb14cf90f09ba335aaed435d7b90d0",
+    "motif/adjacency_diffusion/typed_refined.py": "2e4a9dec0a3b46a82d805b0707db392b75cee0f74e912bcdc4be9d12d6b13e3f",
+    "motif/adjacency_diffusion/typed_train.py": "bc339e40c1585abef673ab72328394ea28f96bdc4f28dd9107885072c18d4a80",
+    "motif/adjacency_diffusion/__init__.py": "a41c602115100639cc67a96430a2c823b03f711f035f240767842123ca91f405"
+  },
+  "dependency_sha256": {
+    "motif/brics_atom_diffusion/data.py": "d7c7a660e528cd2aefe812ecf67cb7b5b493534da42248a6d80cab93f1a9ed27",
+    "motif/brics_atom_diffusion/training.py": "bfd5381e5978b0532cf3190a502be844f1fe4fdbe228c29ba22273be976796a3",
+    "model/benchmark.py": "e6c2253601a82069acd01a13fcfcfc4def2901dcc9633b82ca17a6a581149c26"
+  },
+  "software": {
+    "python": "3.9.23",
+    "torch": "2.8.0+cu128",
+    "torch-geometric": "2.6.1",
+    "rdkit": "2025.3.5",
+    "ogb": "1.3.6",
+    "numpy": "2.0.2",
+    "pandas": "2.3.1",
+    "scikit-learn": "1.6.1",
+    "cuda": "12.8"
+  }
+}

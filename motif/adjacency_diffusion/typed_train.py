@@ -15,6 +15,12 @@ from motif.brics_atom_diffusion.pretrain import read_smiles
 
 
 def training_checkpoint(path,model):
+    if hasattr(model,'mask_ratio'):
+        from .masked_bonds import load_model
+        _,saved=load_model(path)
+        if saved['mask_ratio']!=model.mask_ratio:
+            raise ValueError('Pair mask configuration mismatch')
+        return saved
     if hasattr(model,'variant'):
         from .typed_refined import load_model
         _,saved=load_model(path)
@@ -32,14 +38,19 @@ def evaluate(model,batches,args):
         timestep=max(1,round(step*model.config.noise_steps/1000))
         generator=torch.Generator(device=args.device).manual_seed(args.seed+100003+step)
         counts,loss_sum,graphs,truth,scores={},0.,0,[],[]
+        masked_counts,masked_truth,masked_scores={},[],[]
         for batch in batches:
             batch=batch.to(args.device)
             condition=condition_from_batch(batch,model.config.motif_prior)
             target=edge_target(batch,condition)
             t=torch.full((len(target),),timestep,dtype=torch.long,device=args.device)
-            noisy=corrupt(target,t,condition.pairs,model.schedule,generator)
+            if hasattr(model,'prepare_observation'):
+                noisy,selected=model.prepare_observation(target,t,condition.pairs,generator)
+            else:
+                noisy=corrupt(target,t,condition.pairs,model.schedule,generator)
+                selected=None
             logits=model.predict_bonds(condition,noisy,t)
-            loss,_=reconstruction_objective(logits,target,condition.pairs)
+            loss,_=reconstruction_objective(logits,target,selected if selected is not None and model.mask_ratio>0 else condition.pairs)
             loss_sum+=float(loss)*len(target)
             graphs+=len(target)
             for key,value in recovery_counts(logits,target,condition.pairs).items():
@@ -47,6 +58,12 @@ def evaluate(model,batches,args):
             upper=torch.triu(condition.pairs,diagonal=1)
             truth.append(target[...,0].eq(0)[upper].cpu())
             scores.append((1-logits[...,:6].softmax(-1)[...,0])[upper].cpu())
+            if selected is not None:
+                for key,value in recovery_counts(logits,target,selected).items():
+                    masked_counts[key]=masked_counts.get(key,0)+value
+                masked_upper=torch.triu(selected,diagonal=1)
+                masked_truth.append(target[...,0].eq(0)[masked_upper].cpu())
+                masked_scores.append((1-logits[...,:6].softmax(-1)[...,0])[masked_upper].cpu())
         y,z=torch.cat(truth).numpy(),torch.cat(scores).numpy()
         def ratio(key,denominator):
             return counts[key]/counts[denominator] if counts[denominator] else None
@@ -61,6 +78,20 @@ def evaluate(model,batches,args):
             row[name+'_accuracy_true_bonds']=ratio(name+'_correct','bonds')
         for name in ('single','double','triple','aromatic','other','nondefault_stereo'):
             row[name+'_accuracy']=ratio(name+'_correct',name+'_count')
+        if masked_truth:
+            my,mz=torch.cat(masked_truth).numpy(),torch.cat(masked_scores).numpy()
+            def masked_ratio(key,denominator):
+                return masked_counts[key]/masked_counts[denominator] if masked_counts[denominator] else None
+            row['masked_recovery']={'counts':masked_counts,
+                'presence_AP':float(average_precision_score(my,mz)) if my.any() else None,
+                'presence_precision':masked_ratio('true_positive','predicted_bonds'),
+                'presence_recall':masked_ratio('true_positive','bonds'),
+                'type_accuracy_true_bonds':masked_ratio('type_bond_correct','bonds'),
+                'joint_accuracy_true_bonds':masked_ratio('joint_bond_correct','bonds')}
+            for name in ('stereo','conjugated','ring'):
+                row['masked_recovery'][name+'_accuracy_true_bonds']=masked_ratio(name+'_correct','bonds')
+            for name in ('single','double','triple','aromatic','other','nondefault_stereo'):
+                row['masked_recovery'][name+'_accuracy']=masked_ratio(name+'_correct',name+'_count')
         result[str(timestep)]=row
     return {'objective':sum(row['objective'] for row in result.values())/len(result),'by_timestep':result}
 
@@ -169,11 +200,14 @@ def main():
     p.add_argument('--pretrained',type=Path)
     p.add_argument('--dataset',choices=sorted(io.TASK_SPECS),default='esol')
     p.add_argument('--data-root',type=Path,default=io.ROOT/'data')
-    p.add_argument('--variant',choices=('v1','frequency_init','factorized','factorized_evidence'),default='v1')
+    p.add_argument('--variant',choices=('v1','frequency_init','factorized','factorized_evidence','masked'),default='v1')
+    p.add_argument('--pair-mask-ratio',type=float)
     p.add_argument('--training-max-t',type=int)
     p.add_argument('--encoder-learning-rate',type=float)
     args=p.parse_args()
     config=io.initialize(args)
+    if args.pair_mask_ratio is not None and (args.variant!='masked' or not 0<=args.pair_mask_ratio<=1):
+        raise ValueError('Pair mask ratio requires --variant masked and a value in [0,1]')
     if args.training_max_t is not None and (args.variant=='v1' or not 1<=args.training_max_t<=config.noise_steps):
         raise ValueError('A bounded training horizon requires a refined variant and 1 <= max_t <= noise_steps')
     if args.time_mode!='random':
@@ -201,9 +235,12 @@ def main():
             if args.variant=='v1':
                 saved=load_checkpoint(args.pretrained)
             else:
-                from .typed_refined import load_model
+                if args.variant=='masked':
+                    from .masked_bonds import load_model
+                else:
+                    from .typed_refined import load_model
                 _,saved=load_model(args.pretrained)
-                if saved['variant']!=args.variant:
+                if args.variant!='masked' and saved['variant']!=args.variant:
                     raise ValueError('Pretrained recovery variant mismatch')
             if saved['stage']!='pretrain' or saved['config']!=asdict(config):
                 raise ValueError('Typed encoder pretraining configuration mismatch')
@@ -221,7 +258,16 @@ def main():
     else:
         from .typed_refined import RefinedBondModel,training_priors
         priors=saved['priors'] if args.stage=='finetune' and args.pretrained else training_priors([data[i] for i in splits['train']])
-        model=RefinedBondModel(config,priors,args.variant,spec.num_tasks if spec else 1)
+        if args.variant=='masked':
+            from .masked_bonds import MaskedBondModel
+            ratio=args.pair_mask_ratio if args.pair_mask_ratio is not None else .3
+            if args.stage=='finetune' and args.pretrained:
+                if args.pair_mask_ratio is not None and ratio!=saved['mask_ratio']:
+                    raise ValueError('Pretraining pair-mask mismatch')
+                ratio=saved['mask_ratio']
+            model=MaskedBondModel(config,priors,ratio,spec.num_tasks if spec else 1)
+        else:
+            model=RefinedBondModel(config,priors,args.variant,spec.num_tasks if spec else 1)
         model.training_max_t=args.training_max_t or config.noise_steps
         if args.stage=='finetune' and args.pretrained:
             expected=saved.get('training_max_t',config.noise_steps)
@@ -234,11 +280,15 @@ def main():
     model.to(args.device)
     metadata={'schema':model.checkpoint(args.stage)['schema'],'feature_schema':FEATURE_SCHEMA,'config':asdict(config),'inputs':inputs,
               'args':{k:str(v.resolve()) if isinstance(v,Path) else v for k,v in vars(args).items() if k!='resume'},
-              'objective':('presence BCE plus independently normalized conditional type CE plus three auxiliary block CE'
+              'objective':('four block CE restricted to fully masked pairs; auxiliary attributes only on true bonds within masked pairs'
+                           if getattr(model,'mask_ratio',0)>0 else 'presence BCE plus independently normalized conditional type CE plus three auxiliary block CE'
                            if getattr(model,'factorized',False) else 'sum of four block CE; type on all pairs; remaining attributes on true bonds; per-graph normalized'),
               'recovery_variant':args.variant,
+              'pair_mask_ratio':getattr(model,'mask_ratio',None),
+              'masked_only_objective':bool(getattr(model,'mask_ratio',0)>0),
               'class_priors':{name:getattr(model,'prior_'+name).tolist() for name in BLOCKS} if hasattr(model,'variant') else None,
-              'noise':'independent Gaussian channels, symmetric across endpoints, all 17 channels corrupted',
+              'noise':('all 17 channels Gaussian-corrupted, then selected candidate pairs fully hidden with an independent mask flag'
+                       if hasattr(model,'mask_ratio') else 'independent Gaussian channels, symmetric across endpoints, all 17 channels corrupted'),
               'extra_prior':'clean atom133 and optional clean BRICS membership; no clean edge feature condition',
               'noise_schedule':model.schedule.description(),'test_evaluated':False,
               'source_sha256':{p.relative_to(io.ROOT).as_posix():io.digest(p) for p in Path(__file__).parent.glob('*.py')},
@@ -253,7 +303,10 @@ def main():
             replay=TypedBondModel(config,model.num_tasks).to(args.device)
             replay.load_state_dict(load_checkpoint(args.output_dir/'best.pt')['model'],strict=True)
         else:
-            from .typed_refined import load_model
+            if args.variant=='masked':
+                from .masked_bonds import load_model
+            else:
+                from .typed_refined import load_model
             replay,_=load_model(args.output_dir/'best.pt')
             replay.to(args.device)
         if args.stage=='finetune':

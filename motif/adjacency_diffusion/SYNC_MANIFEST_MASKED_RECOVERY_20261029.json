@@ -1,0 +1,136 @@
+{
+  "files": [
+    {
+      "path": "_github_sync/package_masked_bonds_20261029.py",
+      "chars": 1634,
+      "sha256": "80ee1035d0ccde2efee37a08fac0c5a802d748c2a1c11d7a8a4049f85b7d9ea5"
+    },
+    {
+      "path": "motif/adjacency_diffusion/masked_bonds.py",
+      "chars": 4416,
+      "sha256": "562beea349dff8db2cfb94220918db6a5dec1e38bb65dec8a33f575538e52ebc"
+    },
+    {
+      "path": "motif/adjacency_diffusion/MASKED_RECOVERY_20261029.md",
+      "chars": 2249,
+      "sha256": "3acc3175c6eda22e0d7d13b344d9f47a1e0cc8c85148410a6e60d399438fecf7"
+    },
+    {
+      "path": "motif/adjacency_diffusion/README.md",
+      "chars": 5995,
+      "sha256": "0543e2112045dd2a940a87a5076eed6865e10b85a060a13721482202aa2604cd"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/acceptance.json",
+      "chars": 247,
+      "sha256": "40d0fb5d16679fafba3e62d0944b247a689396431bd332cc503f7e18a4e0d8b5"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/finetune/completion.json",
+      "chars": 382,
+      "sha256": "ceab240de86db8d81d82bb13baf82d22af2b385787fd6edbc3fdf4b7277382e7"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/finetune/config.json",
+      "chars": 6303,
+      "sha256": "a2dfb6fbed166e19343d8bcf611937b09ec9a8fbd7a35cd3d37ae72e55b03ee1"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/finetune/history.json",
+      "chars": 525,
+      "sha256": "c8a94096658f70a6ddbdd810efa6cb585ccdfab1d65c559ab34bdd550d445ebc"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/finetune/status.json",
+      "chars": 405,
+      "sha256": "ec983c4ac6ed2a7aac10a57c52316b9bd718f24aaae3b5863e546a6080e75e14"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/no_mask_control/completion.json",
+      "chars": 11448,
+      "sha256": "d5a47c2db1ff51a0039950c9b758b6002a8b73da478e91833bb5508e825a445f"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/no_mask_control/config.json",
+      "chars": 6937,
+      "sha256": "cc240430b34d1081b69e09053dd1b7f04b341ca117560cf0f95464b400ab3142"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/no_mask_control/history.json",
+      "chars": 11988,
+      "sha256": "d9be5e37fbea43d87f5ede99d6dddc0d27691eacf4468f1f7faeb262a07b0e61"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/no_mask_control/status.json",
+      "chars": 11471,
+      "sha256": "92f68f89c93b5cb21143cfa6981297e8d2cafaa9fa8ff29fff5f0f7b16571d9a"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/pretrain/completion.json",
+      "chars": 11634,
+      "sha256": "7c97afdfe809fcc52e7126d2c090549e3326432e9ed6013d03cc1d61e152bd16"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/pretrain/config.json",
+      "chars": 7801,
+      "sha256": "ea343a1077fa2feb5980a5f81973c3cb98b58683c3a75f0a47fff2c71c369067"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/pretrain/history.json",
+      "chars": 24350,
+      "sha256": "53c8cd96b4168ffc5241e1eb62d2c11c98eaecbd57dbc00a258d97c04990a5e0"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/pretrain/status.json",
+      "chars": 11657,
+      "sha256": "5d5ee318bfaee320f84eb83ce00834dd43155f0d747df18750ae999c07227171"
+    },
+    {
+      "path": "motif/adjacency_diffusion/test_masked_bonds.py",
+      "chars": 7648,
+      "sha256": "fa123eecc9577393d2c733e59fcf80d9ba0b77a239a2ca528a0924c678d18d02"
+    },
+    {
+      "path": "motif/adjacency_diffusion/typed_bonds.py",
+      "chars": 8508,
+      "sha256": "4106a4f63f214f6926fe319e0c044ff758cb14cf90f09ba335aaed435d7b90d0"
+    },
+    {
+      "path": "motif/adjacency_diffusion/typed_train.py",
+      "chars": 19858,
+      "sha256": "bc339e40c1585abef673ab72328394ea28f96bdc4f28dd9107885072c18d4a80"
+    }
+  ],
+  "local_only_checkpoints": [
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/finetune/best.pt",
+      "bytes": 191952,
+      "sha256": "c63bf382b22e59b3660d931a4f937de72010967d2e3f34c2e1ea72176309e55b"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/finetune/latest.pt",
+      "bytes": 505861,
+      "sha256": "f54368cbd786e68d6403df8f7ff355e155fcb542c5cd1d7f7e9f9db1fdf50aef"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/no_mask_control/best.pt",
+      "bytes": 192274,
+      "sha256": "60e4e945fb1c18e8c64c52a9cb28009816d820dca0af23599e15148e160c92ae"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/no_mask_control/latest.pt",
+      "bytes": 517953,
+      "sha256": "7ccfa25d10bd48d5959446c9bc62ebc37bc1eab7435acbab93a12d9f9e7a2d28"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/pretrain/best.pt",
+      "bytes": 193170,
+      "sha256": "cad92bd89339cdef6a82177356a85617308b290a439ef9f9ae138476fab7ff4a"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/masked_bond_acceptance_20261029/pretrain/latest.pt",
+      "bytes": 526081,
+      "sha256": "1c525a18940409a2c2bedb41ba0773112229aedd4c6e30e2e719e4bbc9948168"
+    }
+  ]
+}

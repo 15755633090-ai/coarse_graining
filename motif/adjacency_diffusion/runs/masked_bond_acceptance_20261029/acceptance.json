@@ -1,0 +1,9 @@
+{
+  "state": "complete",
+  "tests_passed": 33,
+  "masked_pretrain_replay_passed": true,
+  "zero_mask_same_shape_control_replay_passed": true,
+  "clean_finetune_replay_passed": true,
+  "formal_performance_claims": false,
+  "test_evaluated": false
+}

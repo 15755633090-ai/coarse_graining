@@ -1,5 +1,7 @@
 # 邻接扩散：MotiL diffusion priming 机制对齐路径
 
+新增“高斯加噪＋整组化学边特征遮蔽”任务以减少目标残留信息，使用 `typed_train --variant masked --pair-mask-ratio 0.3`；性质分支继续使用完整干净键特征。33项测试及小流程通过，尚无新性能结论。设计、兼容性和同架构对照要求见 [MASKED_RECOVERY_20261029.md](MASKED_RECOVERY_20261029.md)。
+
 最新结论：完整键特征版本的迁移诊断发现原早停会漏掉后期改善；统一实际60轮后，性质验证仍是 scratch .7967、full .8183、bounded .8420，未证明预训练增益。当前不能按较高恢复率把 t≤300 视作性质预测最佳设置。详见 [迁移诊断](TRANSFER_DIAGNOSIS_20261029.md)。下文的二值机制和早期协议作为历史实现记录保留。
 
 本模块与 `brics_atom_diffusion` 的原子属性去噪、`context_denoising` 的基序隐向量去噪分开。对齐 MotiL 正文 Methods / Diffusion priming 公式 1–5 的核心：**保留 X，对 A 加高斯噪声，由预测噪声一步恢复 A，以干净邻接重建误差训练**。
