@@ -1,0 +1,9 @@
+{
+  "all_48_predictions_bitwise_identical_on_verification": true,
+  "full_regression_tests": 50,
+  "full_regression_duration_seconds": 2.372,
+  "export_guard_targeted_tests": 10,
+  "targeted_duration_seconds": 1.925,
+  "new_training_runs": 0,
+  "test_evaluated": false
+}

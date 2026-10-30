@@ -1,0 +1,78 @@
+{
+  "files": [
+    {
+      "path": "_github_sync/check_path_dependencies_20261030.py",
+      "chars": 8510,
+      "sha256": "9625b7d5f33a9ccb49957d705b013fec9768ca373b884c3dc92a6a5d5da19fdd"
+    },
+    {
+      "path": "_github_sync/package_path_dependencies_20261030.py",
+      "chars": 1448,
+      "sha256": "e0c4b988cbbd36f7a9946f33a7e83dfa872b9c1c3bf86d748440accfc82289d2"
+    },
+    {
+      "path": "motif/adjacency_diffusion/masked_bonds.py",
+      "chars": 5324,
+      "sha256": "2e0613291338b9278b59c62b3cba266d4a782e211cd389c8c0cbabf0b503432d"
+    },
+    {
+      "path": "motif/adjacency_diffusion/model.py",
+      "chars": 9534,
+      "sha256": "e2ef765c8c2196219e8116ca7fc498f57d3ec71291ae42be63fd909f78b2f405"
+    },
+    {
+      "path": "motif/adjacency_diffusion/PATH_DEPENDENCIES_20261030.md",
+      "chars": 2338,
+      "sha256": "e6ef774be35f7509a2678873b6b5c0d36efe032c05fc7968ad655a9e1f06c261"
+    },
+    {
+      "path": "motif/adjacency_diffusion/path_gates.py",
+      "chars": 1896,
+      "sha256": "8bb9d67a3156ba2a58a4d9c30a1a546c6d3c64e7d07b046dee9858743528cbdd"
+    },
+    {
+      "path": "motif/adjacency_diffusion/README.md",
+      "chars": 6531,
+      "sha256": "06bce27c1b83ab9910c4ae1640b1923d731c5b8ea996f571b325aa9394ad7f9f"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/path_dependencies_verified_20261030/plan.json",
+      "chars": 5934,
+      "sha256": "9ab2365be0d3a447dfe56ead0b1ba44594fd0d62c96a027db13c92ff2c6f7739"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/path_dependencies_verified_20261030/REPORT.md",
+      "chars": 1896,
+      "sha256": "ca38079035ddc9de1d7252ef888e521f231055e5169fd5bb64eae8bed4a4a381"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/path_dependencies_verified_20261030/results.json",
+      "chars": 66787,
+      "sha256": "27bd4ac4adc08c16275bc364a0aed73e7dcab52df671b0ce200f7e3773a5926d"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/path_dependencies_verified_20261030/status.json",
+      "chars": 249,
+      "sha256": "8a121b5b73716422e2809de4ff72acdcd5db46e3437b95f62e83e4829e1cbe7b"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/path_dependencies_verified_20261030/verification.json",
+      "chars": 271,
+      "sha256": "b89c98b5b58e50c195be729afadbc65662f19af4eef9df1ac756c53928f4fde9"
+    },
+    {
+      "path": "motif/adjacency_diffusion/test_path_gates.py",
+      "chars": 3268,
+      "sha256": "478a951c61b96cb031e0a2265f0df9a9f2868b991dc798e4f40c402743a481cd"
+    },
+    {
+      "path": "motif/adjacency_diffusion/typed_bonds.py",
+      "chars": 8658,
+      "sha256": "a34270c21f9c28ec655683b5a91f0d05fde918388652c699de08fd68ddb6d42a"
+    }
+  ],
+  "local_only_predictions": {
+    "path": "motif/adjacency_diffusion/runs/path_dependencies_verified_20261030/predictions.pt",
+    "sha256": "07c443c13e5bd3449d85976ca1a190cb30b620c56e880d01322b8314389259c5"
+  }
+}

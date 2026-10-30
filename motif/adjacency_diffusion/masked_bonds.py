@@ -86,6 +86,9 @@ class MaskedBondModel(RefinedBondModel):
         return self.property_head(states.sum(1)/condition.nodes.sum(1).clamp_min(1)[:,None])
 
     def checkpoint(self,stage,**extra):
+        from .path_gates import controls,DEFAULT
+        if any(controls(m)!=DEFAULT for m in [self.encoder,*self.encoder.layers]):
+            raise ValueError('Transient diagnostic gates cannot be exported as a normal checkpoint')
         saved=super().checkpoint(stage,**extra)
         saved.update(schema=SCHEMA,mask_ratio=self.mask_ratio,
                      masking='symmetric label-independent pair mask; all 17 channels removed; masked-only objective')

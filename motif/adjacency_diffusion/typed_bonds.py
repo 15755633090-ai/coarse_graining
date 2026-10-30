@@ -10,6 +10,7 @@ from motif.brics_atom_diffusion.data import graph_from_smiles as partition_graph
 from .data import GraphDataset as BinaryDataset,atom_features,condition_from_batch
 from .model import Config,Encoder,mlp,pair_nodes
 from .diffusion import Schedule
+from .path_gates import controls,scaled
 
 SCHEMA='typed_chemical_edge_denoising_v1'
 FEATURE_SCHEMA='atom133_edge17_type6_stereo7_conjugation2_ring2_v1'
@@ -81,7 +82,9 @@ class TypedEncoder(Encoder):
         for layer in self.layers:
             s,h,gate=layer(s,h,edge,weight,condition)
             gates.append(gate)
-        z=self.fuse(torch.cat((s,h),-1) if self.config.dual_state else h)*condition.nodes[...,None]
+        paths=controls(self)
+        z=self.fuse(torch.cat((scaled(s,paths.internal_readout),scaled(h,paths.context_readout)),-1)
+                    if self.config.dual_state else h)*condition.nodes[...,None]
         return {'atoms':z,'internal':s,'context':h,'gates':gates}
 
 

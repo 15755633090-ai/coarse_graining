@@ -5,6 +5,7 @@ from torch import nn
 
 from .data import ATOM_DIM, Condition, condition_from_batch, adjacency_target
 from .diffusion import Schedule
+from .path_gates import controls,scaled
 
 
 @dataclass
@@ -75,6 +76,8 @@ class Layer(nn.Module):
         self.drop = nn.Dropout(config.dropout)
 
     def forward(self, s, h, edge, noisy, condition):
+        paths=controls(self)
+        s=scaled(s,paths.internal_branch)
         a, b = pair_nodes(s)
         hi, hj = pair_nodes(h)
         inside = condition.same_fragment if condition.same_fragment is not None else condition.pairs
@@ -83,12 +86,17 @@ class Layer(nn.Module):
             next_s = self.s_norm(s + self.drop(self.s_update(torch.cat((s, incoming), -1))))
         else:
             next_s = h
+        if self.dual:
+            next_s=scaled(next_s,paths.internal_branch)
         gate = noisy.new_ones(*noisy.shape, 1)
-        if self.gate is not None:
+        if self.gate is not None and paths.boundary_mode=='learned':
             learned = torch.sigmoid(self.gate(torch.cat((a, b, hi, hj, edge), -1)))
             cross = condition.pairs & ~inside
             gate = torch.where(cross[:, :, :, None], learned, gate)
         message = self.h_message(torch.cat((hi, hj, edge), -1)) * gate
+        if paths.context_within!=1 or paths.context_cross!=1:
+            route=torch.where(inside,noisy.new_tensor(paths.context_within),noisy.new_tensor(paths.context_cross))
+            message=message*route[...,None]
         incoming = reduce_messages(message, condition.pairs, noisy, self.message_normalization)
         next_h = self.h_norm(h + self.drop(self.h_update(torch.cat((h, next_s, incoming), -1))))
         node_mask = condition.nodes[:, :, None]
