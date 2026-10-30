@@ -1,0 +1,15 @@
+{
+  "best_epoch": 58,
+  "best_score": 0.8693835658317156,
+  "epochs_run": 60,
+  "elapsed_seconds": 112.5409807,
+  "task_seed": 0,
+  "seed": 7,
+  "validation": {
+    "rmse": 0.8693835658317156,
+    "mae": 0.6422713398933411,
+    "evaluated_tasks": 1.0
+  },
+  "minus_scratch": 0.054406468144898246,
+  "replay_passed": true
+}

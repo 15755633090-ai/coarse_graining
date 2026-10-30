@@ -1,0 +1,390 @@
+{
+  "files": [
+    {
+      "path": "_github_sync/check_descriptor_baseline_20261030.py",
+      "chars": 1974,
+      "sha256": "4b6cf98b12f8eca7669e5726f493f4778355fce5db8046c341993926eeab0932"
+    },
+    {
+      "path": "_github_sync/finalize_chemical_anchor_20261030.py",
+      "chars": 8115,
+      "sha256": "1f738f221084fd043fdf48d3fb9064ec125a9fc08eba938dc4a173fd0d1036cf"
+    },
+    {
+      "path": "_github_sync/package_chemical_anchor_20261030.py",
+      "chars": 2128,
+      "sha256": "f9c353993df1dee74767a8ad5dc09fe73038f6a5813ea7e37c0afb20df806061"
+    },
+    {
+      "path": "_github_sync/run_chemical_anchor_20261030.py",
+      "chars": 11387,
+      "sha256": "f13d4a865fde29585558edc7b5a761e8846f4c127db8c7a5212ecdf4cafe8a0e"
+    },
+    {
+      "path": "_github_sync/run_in_domain_chemical_anchor_20261030.py",
+      "chars": 1796,
+      "sha256": "260363eb853606ac05ce18207512e9428ade976ecfbc13164b71272ea02c39c1"
+    },
+    {
+      "path": "motif/adjacency_diffusion/CHEMICAL_ANCHOR_20261030.md",
+      "chars": 4346,
+      "sha256": "17db1172834ae00cf25e6573ae0d9f17a158d3bad818b64620d42dd9e664636f"
+    },
+    {
+      "path": "motif/adjacency_diffusion/CHEMICAL_ANCHOR_TESTS_20261030.json",
+      "chars": 372,
+      "sha256": "18a7eb22cf02eafdc57137b0f6db126872fd2dcc51878ef33ff134c6a71422f8"
+    },
+    {
+      "path": "motif/adjacency_diffusion/chemical_targets.py",
+      "chars": 2951,
+      "sha256": "b3f0ff3adfb8caf3529984065f4f6f6f66aedcf34c6aba5df38a9d4ebf7fbe25"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/acceptance.json",
+      "chars": 10450,
+      "sha256": "2d0dbddaafd994d0a394bcea4f054d686d089f4ade1f1476d5c3914cac8ff830"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/descriptor_baseline.json",
+      "chars": 1490,
+      "sha256": "f6781596540c14b1df49694549f4acd4f6616973791d7982116015cbc972bf82"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/frozen_source_archive.json",
+      "chars": 14885,
+      "sha256": "5c7e8ad2d016477ed6d97f03dd3bc22d2f36e7aabc740c30d9118d9eb99353cc"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/plan.json",
+      "chars": 233524,
+      "sha256": "d50344843355b13499a25a90637b09a137af63982d9686851cf023b233bb9dff"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/pretraining/seed_1/history.json",
+      "chars": 2509,
+      "sha256": "22324a2a422e9ebe30be8d66b2883585c1d4f947261ddb5cc60f69b87b85e530"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/pretraining/seed_2/history.json",
+      "chars": 2510,
+      "sha256": "309ae67a0c40b940c413b76024c39e848d737fead3c6cecf684a1c148acc7fc3"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/pretraining/seed_7/history.json",
+      "chars": 2519,
+      "sha256": "884564d0fc20e6756e174134420f3f83db04423dbb6d3c2d6c09ae797b74e997"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_0/completion.json",
+      "chars": 324,
+      "sha256": "5d6287f0011ae322edac98e185df795ae7f36d13d33db26751bbe19bdb29a48b"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_0/config.json",
+      "chars": 12776,
+      "sha256": "2aed3794b918f0c6335213371de3e5f657b392b3af3d54fd498f965280fd1f4f"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_0/history.json",
+      "chars": 15926,
+      "sha256": "aee0591b292e3f7241d2853a22e59135034d8310f04c353e31346fcf6b0861b3"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_0/status.json",
+      "chars": 60,
+      "sha256": "c8975c82b670161c1421541ddec4f6df76677f9094b4515e3bc298936d17de83"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_1/completion.json",
+      "chars": 330,
+      "sha256": "f0b6e53aa7fddf785486840206bd4917377180b07301d39bbdec461a388c0181"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_1/config.json",
+      "chars": 12776,
+      "sha256": "d5b6ca3433472290dba00cf534c4c43e017a11ec35f59d123d4214ac6a243ffb"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_1/history.json",
+      "chars": 15934,
+      "sha256": "f94217e7eabee9f6e0a28004ecb048529ef65f05b77ebdf0da29248c55548c7a"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_1/status.json",
+      "chars": 60,
+      "sha256": "cce3094b464fdaaca5a4cb8ef2b986a7169f56474595217b83ac168effdb61ec"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_2/completion.json",
+      "chars": 328,
+      "sha256": "c8093c0391717f8c11af0e3e893b58270ce521d27104e2ab4af7bbde2f4d8521"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_2/config.json",
+      "chars": 12768,
+      "sha256": "ebb9acc02d489aa8aaa5394104a3a28cf9ec9b9fd223bbb6a5bc7010def8e61d"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_2/history.json",
+      "chars": 15923,
+      "sha256": "c3f39e2ed14011fc0b1a74ea3953b14c5a9253a4a3ff5622b6623aa1ebd8aa27"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_2/status.json",
+      "chars": 60,
+      "sha256": "31da3a447bc39fabb69fb4b0ccbef2bff55805f76ca1af0ca3cef46fd8e8881e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/REPORT.md",
+      "chars": 922,
+      "sha256": "fb411228c6df23dbb967a8670bfde67f02106891567a673d5a2a2ad0579b6886"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/results.json",
+      "chars": 1616,
+      "sha256": "81c577c22545ab81ef4fb168608526059aeb0325d67b66adfaa2c08c4216a3e4"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/sources.json",
+      "chars": 3817,
+      "sha256": "fd253fc15ac774249ef29a0ad3fd9f9b18e06b26844b6ce44a686c390490c675"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/status.json",
+      "chars": 173,
+      "sha256": "1cfd05dcbce9989631f7d0ed78924e0ad920aee805305d1e8d007c5577ee1244"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/target_statistics.json",
+      "chars": 23999,
+      "sha256": "a1ea2274652dd10dc82c52939b3891e7a13446270b907b6f8d99f78c1c949ddd"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/acceptance.json",
+      "chars": 10523,
+      "sha256": "f0ccc5c557d4c29ea9565f9b654f60918814a4fd70e249ce8c2b4848be21cd6b"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/frozen_source_archive.json",
+      "chars": 15015,
+      "sha256": "7918442b67f49cdb78f54f6650d864f71061838cb1a44638ea8daef877faebb1"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/plan.json",
+      "chars": 49139,
+      "sha256": "69129a99c693b84a9fd910024d7bcbe7a4bcc2fb9361caa5e7cdcc073fff763e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/pretraining/seed_1/history.json",
+      "chars": 2512,
+      "sha256": "e3a9eb4f31fc9a81e62ee0032805b2b84d1839344a40a07e6cfcc43c234e5e26"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/pretraining/seed_2/history.json",
+      "chars": 2509,
+      "sha256": "5228974732e5c5e9ff1a4a254616f847aa75c11e2403c36804f108b5325c3f11"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/pretraining/seed_7/history.json",
+      "chars": 2517,
+      "sha256": "9ce3099d6522f9cb8fbccefaf4571dcabb3ff1a7c1e4fb4e39a5b0f3f090238f"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_0/completion.json",
+      "chars": 323,
+      "sha256": "5247aabdde2ad1a6a986eefc36f8d9e899b53685086728b3cbbf06c1920d7ca4"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_0/config.json",
+      "chars": 12775,
+      "sha256": "abe3806d5fb65fbd51d8e85df66769769d3fc60ea62980d878e36daf4751e088"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_0/history.json",
+      "chars": 15887,
+      "sha256": "38babf88d818deb9a81754a61781ac2d4b769067ddbb3e17a26c711423b53df8"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_0/status.json",
+      "chars": 60,
+      "sha256": "cce3094b464fdaaca5a4cb8ef2b986a7169f56474595217b83ac168effdb61ec"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_1/completion.json",
+      "chars": 331,
+      "sha256": "7ac2eb830a638e936b1e1e3c456641122ef96fd661d6fefb66676f2bd237120b"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_1/config.json",
+      "chars": 12782,
+      "sha256": "5fbea92de2c963654081ccd9102f823a3ae9d2074e9d80b9935dbd55bdf2c5af"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_1/history.json",
+      "chars": 15913,
+      "sha256": "1607daa87f79fcb4fc9dd106cebb2451c976fc3c77fe316c2c70ace83af5ff1a"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_1/status.json",
+      "chars": 60,
+      "sha256": "b974d63f2ee7ee9dfc55cda0e8f452c03ab176cab3bc4feb32ca563836ef7399"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_2/completion.json",
+      "chars": 332,
+      "sha256": "12549388bf30a6da6cd874becce62c1f1f6a5029ea4873d2a72c3c624d1b7de6"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_2/config.json",
+      "chars": 12783,
+      "sha256": "1dd560c970dabc498b2ba93bdb4759133d17e2d1c2b358f3aad0513cdc875fb1"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_2/history.json",
+      "chars": 15891,
+      "sha256": "ca06914280cad63665c69ea1383a102e757a0978de36147a142e9fc9dd1c7253"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_2/status.json",
+      "chars": 60,
+      "sha256": "31da3a447bc39fabb69fb4b0ccbef2bff55805f76ca1af0ca3cef46fd8e8881e"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/REPORT.md",
+      "chars": 922,
+      "sha256": "29f91582ddaecbfb33335e2fb784d0109fc1e6c7769afc54a7d55eb3700192c3"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/results.json",
+      "chars": 1620,
+      "sha256": "b40ff268cfb3acc1f2ddcead9a78f010964d77a91739f097a4f7cfe9153c5db5"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/sources.json",
+      "chars": 3837,
+      "sha256": "b08cadbb695374bdfaf32a8b46c066edb9feab04b86d77b6345134c8fb732ad8"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/status.json",
+      "chars": 166,
+      "sha256": "ad3a32477ce1d16b44e7907dc257c688842c423b944638cd2d629187c64ebf87"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/target_statistics.json",
+      "chars": 23195,
+      "sha256": "c2d9e2e162a04d23cccef05556b0eda2b270fdd7d8456132231853c6a1058400"
+    },
+    {
+      "path": "motif/adjacency_diffusion/test_chemical_targets.py",
+      "chars": 2145,
+      "sha256": "fa50a06ca7aa86bad58555d597144a09e437ef21ceef6d5af9c81615da5d2a63"
+    }
+  ],
+  "binary_files": [
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/frozen_source.tar.xz",
+      "bytes": 162760,
+      "sha256": "e3007ccc222cdc263043dfeb5c97232d34189f4b15cf181f1e1eda4a5d301ae8",
+      "base64_chars": 217016
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/frozen_source.tar.xz",
+      "bytes": 163136,
+      "sha256": "7d1f9d4ef562635578e71d409c5757fdbe61a438b72f60698226755993847528",
+      "base64_chars": 217516
+    }
+  ],
+  "local_only_weights": [
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/pretraining/seed_1/encoder.pt",
+      "bytes": 6456445,
+      "sha256": "097e561c9d815687a68a4cc1ae9f6abadcccb010931a71a1a5658d7ec839cff6"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/pretraining/seed_2/encoder.pt",
+      "bytes": 6456445,
+      "sha256": "9fd6ed53fc9afe1450a682703ed7eb68d32ae5cf3440e355d413364250e2c9bd"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/pretraining/seed_7/encoder.pt",
+      "bytes": 6456445,
+      "sha256": "2b724afe9d1e2fd29e570478e678d69fbe42d748219aff959b7d9888ce161f3c"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_0/best.pt",
+      "bytes": 4029557,
+      "sha256": "33b9e943fc1748f6720fbba9767b2c0f543d36fdcf6c979251616ac78be22e23"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_0/latest.pt",
+      "bytes": 10120749,
+      "sha256": "338475e68b9b43ca5c58ba45d72e40342314eb29afb15d6e769602cdf7f05db6"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_1/best.pt",
+      "bytes": 4029557,
+      "sha256": "2672cdea3ad02929f285258d2869ece89e3c59560d0032c41d3f41c9084d152f"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_1/latest.pt",
+      "bytes": 10120749,
+      "sha256": "1117b4a057fac910184d24008afe4ed397d7917f18d9d9a54a76cb6ba2f047fe"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_2/best.pt",
+      "bytes": 4029557,
+      "sha256": "8c126a03e16087db81964928796e645126d357ab6dbb0556dedeb983995a87ad"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/chemical_anchor_20261030/properties/seed_2/latest.pt",
+      "bytes": 10120749,
+      "sha256": "64cd088d4dc329a7b6cb6cf70bc27ae109f12b4335079e0638d6a42f922f0e73"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/pretraining/seed_1/encoder.pt",
+      "bytes": 6456445,
+      "sha256": "82473d82118bfccadce29919943d51d3d432088bbbe8e427dd40b15835bfa563"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/pretraining/seed_2/encoder.pt",
+      "bytes": 6456445,
+      "sha256": "0c8c38ef75f932e82d31cd6a74661a0b82bae4049e808dbb71279596863d45a4"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/pretraining/seed_7/encoder.pt",
+      "bytes": 6456445,
+      "sha256": "da62a6182f1273dc18e5120ca3e9fd0bfec436a2147612d45b3651a33f78eebd"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_0/best.pt",
+      "bytes": 4029557,
+      "sha256": "031af3c8b68cb03b8ddd59e774195c609e69e3ae410dba922139b64d4cc3cb2f"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_0/latest.pt",
+      "bytes": 10120749,
+      "sha256": "93a458441d53db5900bb9d648e88ed41bda1925a636fe57ab596e4bd5a5f13e1"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_1/best.pt",
+      "bytes": 4029557,
+      "sha256": "b86b687555e8b12a9014e35649f71478b790ee01bb1e4d8e7f1dd9727f151451"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_1/latest.pt",
+      "bytes": 10120749,
+      "sha256": "fe854176dc900cafd007c089b41ba6ec8a0de3e721331d3faa6e6c8617d2807a"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_2/best.pt",
+      "bytes": 4029557,
+      "sha256": "bfc92000b23a2c070a38fb840ceb653eab8ed8f66240765cbaa8f02e1478eeca"
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/in_domain_chemical_anchor_20261030/properties/seed_2/latest.pt",
+      "bytes": 10120749,
+      "sha256": "0390406165d8c62ce051ed8ae5eb2e0e335063a7655efd3ee0ca41c8418c9a72"
+    }
+  ]
+}

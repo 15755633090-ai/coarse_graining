@@ -1,0 +1,11 @@
+{
+  "new_unittest_cases": 2,
+  "passed": true,
+  "runtime_seconds": 0.102,
+  "command": "python -m unittest motif.adjacency_diffusion.test_chemical_targets -v",
+  "python": "3.9.23 | packaged by conda-forge | (main, Jun  4 2025, 17:49:16) [MSC v.1929 64 bit (AMD64)]",
+  "torch": "2.8.0+cu128",
+  "rdkit": "2025.03.5",
+  "torch_geometric": "2.6.1",
+  "sklearn": "1.6.1"
+}

@@ -1,0 +1,110 @@
+[
+  {
+    "step": 100,
+    "loss": 0.7265196442604065,
+    "parts": {
+      "descriptor_mse": 0.19883035123348236,
+      "fingerprint_bce": 0.5276892781257629
+    },
+    "pre_clip_norm": 1.6681721210479736
+  },
+  {
+    "step": 200,
+    "loss": 0.7091490626335144,
+    "parts": {
+      "descriptor_mse": 0.08288848400115967,
+      "fingerprint_bce": 0.6262605786323547
+    },
+    "pre_clip_norm": 1.1956465244293213
+  },
+  {
+    "step": 300,
+    "loss": 0.6184049844741821,
+    "parts": {
+      "descriptor_mse": 0.06013542413711548,
+      "fingerprint_bce": 0.5582695603370667
+    },
+    "pre_clip_norm": 0.6757132411003113
+  },
+  {
+    "step": 400,
+    "loss": 0.6759455800056458,
+    "parts": {
+      "descriptor_mse": 0.08714501559734344,
+      "fingerprint_bce": 0.5888005495071411
+    },
+    "pre_clip_norm": 1.058613657951355
+  },
+  {
+    "step": 500,
+    "loss": 0.5526411533355713,
+    "parts": {
+      "descriptor_mse": 0.06769143044948578,
+      "fingerprint_bce": 0.4849497377872467
+    },
+    "pre_clip_norm": 0.6549878120422363
+  },
+  {
+    "step": 600,
+    "loss": 0.37912267446517944,
+    "parts": {
+      "descriptor_mse": 0.06760609149932861,
+      "fingerprint_bce": 0.31151658296585083
+    },
+    "pre_clip_norm": 0.9491247534751892
+  },
+  {
+    "step": 700,
+    "loss": 0.5798220038414001,
+    "parts": {
+      "descriptor_mse": 0.043658576905727386,
+      "fingerprint_bce": 0.5361634492874146
+    },
+    "pre_clip_norm": 0.6829962134361267
+  },
+  {
+    "step": 800,
+    "loss": 0.9791617393493652,
+    "parts": {
+      "descriptor_mse": 0.16303735971450806,
+      "fingerprint_bce": 0.8161243796348572
+    },
+    "pre_clip_norm": 1.4569088220596313
+  },
+  {
+    "step": 900,
+    "loss": 0.5278988480567932,
+    "parts": {
+      "descriptor_mse": 0.02591906115412712,
+      "fingerprint_bce": 0.5019797682762146
+    },
+    "pre_clip_norm": 0.4617930054664612
+  },
+  {
+    "step": 1000,
+    "loss": 0.6645314693450928,
+    "parts": {
+      "descriptor_mse": 0.04584657400846481,
+      "fingerprint_bce": 0.6186848878860474
+    },
+    "pre_clip_norm": 0.878459095954895
+  },
+  {
+    "step": 1100,
+    "loss": 0.4580252468585968,
+    "parts": {
+      "descriptor_mse": 0.011536723002791405,
+      "fingerprint_bce": 0.44648852944374084
+    },
+    "pre_clip_norm": 0.4104013442993164
+  },
+  {
+    "step": 1200,
+    "loss": 0.7574419379234314,
+    "parts": {
+      "descriptor_mse": 0.03659430891275406,
+      "fingerprint_bce": 0.7208476066589355
+    },
+    "pre_clip_norm": 0.4474277198314667
+  }
+]

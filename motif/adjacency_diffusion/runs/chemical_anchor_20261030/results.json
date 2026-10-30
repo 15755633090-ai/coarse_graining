@@ -1,0 +1,63 @@
+{
+  "runs": [
+    {
+      "best_epoch": 37,
+      "best_score": 0.8158196710242009,
+      "epochs_run": 60,
+      "elapsed_seconds": 105.1085463,
+      "task_seed": 0,
+      "seed": 7,
+      "validation": {
+        "rmse": 0.8158196710242009,
+        "mae": 0.6221734881401062,
+        "evaluated_tasks": 1.0
+      },
+      "minus_scratch": 0.0008425733373835786,
+      "replay_passed": true
+    },
+    {
+      "best_epoch": 58,
+      "best_score": 0.7851961799450926,
+      "epochs_run": 60,
+      "elapsed_seconds": 110.51411449999998,
+      "task_seed": 1,
+      "seed": 1,
+      "validation": {
+        "rmse": 0.7851961799450926,
+        "mae": 0.6192641854286194,
+        "evaluated_tasks": 1.0
+      },
+      "minus_scratch": 0.026304063793185617,
+      "replay_passed": true
+    },
+    {
+      "best_epoch": 52,
+      "best_score": 0.759232910426155,
+      "epochs_run": 60,
+      "elapsed_seconds": 119.50281659999996,
+      "task_seed": 2,
+      "seed": 2,
+      "validation": {
+        "rmse": 0.759232910426155,
+        "mae": 0.5909186005592346,
+        "evaluated_tasks": 1.0
+      },
+      "minus_scratch": -0.02822593820877972,
+      "replay_passed": true
+    }
+  ],
+  "mean_rmse": 0.7867495871318162,
+  "sd_rmse": 0.02832534508458747,
+  "scratch_reference": {
+    "n": 3,
+    "mean_rmse": 0.7871093541578864,
+    "sample_sd": 0.02804412413028663
+  },
+  "expanded_edge_reference": {
+    "n": 3,
+    "mean_rmse": 0.8428769931987412,
+    "sample_sd": 0.016842317141882456
+  },
+  "test_evaluated": false,
+  "limits": "reused validation, n3; joint target/input recipe; no independent task replication"
+}

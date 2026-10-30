@@ -1,0 +1,46 @@
+{
+  "recipe": "12 RDKit descriptors -> train-only StandardScaler -> Ridge(alpha1), intercept; no search",
+  "purpose": "test direct task relevance of the fixed chemical targets; not a GNN or pretraining gain",
+  "n_train": 902,
+  "n_valid": 113,
+  "test_evaluated": false,
+  "coefficients_standardized_features": {
+    "MolWt": -0.4601046144962311,
+    "MolLogP": -1.4679114818572998,
+    "TPSA": -0.3982752561569214,
+    "HDonors": -0.0026744422502815723,
+    "HAcceptors": 0.365487277507782,
+    "RotatableBonds": -0.1521168202161789,
+    "AromaticRings": -0.2513432204723358,
+    "AliphaticRings": 0.0027020161505788565,
+    "FractionCSP3": -0.2287721335887909,
+    "RingCount": -0.18604783713817596,
+    "HeavyAtomCount": -0.4644891023635864,
+    "ValenceElectrons": 0.592308521270752
+  },
+  "intercept": -2.866875648498535,
+  "source_script_sha256": "4b6cf98b12f8eca7669e5726f493f4778355fce5db8046c341993926eeab0932",
+  "descriptor_names": [
+    "MolWt",
+    "MolLogP",
+    "TPSA",
+    "HDonors",
+    "HAcceptors",
+    "RotatableBonds",
+    "AromaticRings",
+    "AliphaticRings",
+    "FractionCSP3",
+    "RingCount",
+    "HeavyAtomCount",
+    "ValenceElectrons"
+  ],
+  "limits": "single deterministic fit on reused ESOL validation; calculated descriptors supplied directly, richer inference features than graph-only model",
+  "train": {
+    "rmse": 0.8904135823249817,
+    "mae": 0.7002214789390564
+  },
+  "valid": {
+    "rmse": 1.3522800207138062,
+    "mae": 0.9798928499221802
+  }
+}

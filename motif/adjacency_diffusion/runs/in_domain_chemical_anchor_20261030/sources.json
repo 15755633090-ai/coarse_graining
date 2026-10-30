@@ -1,0 +1,95 @@
+{
+  "7": {
+    "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\in_domain_chemical_anchor_20261030\\pretraining\\seed_7\\encoder.pt",
+    "sha256": "da62a6182f1273dc18e5120ca3e9fd0bfec436a2147612d45b3651a33f78eebd",
+    "initial_encoder_hash": "f833ea3c0995d859c4485a53c313912f1b5b9dccc286cf116bebeff05ee69bb7",
+    "before": {
+      "n": 128,
+      "objective": 3.412209987640381,
+      "constant_objective": 3.4300732612609863,
+      "descriptor_mse": 1.9162791967391968,
+      "constant_descriptor_mse": 1.9385035037994385,
+      "fingerprint_bce": 1.4959309101104736,
+      "constant_fingerprint_bce": 1.4915698766708374,
+      "effective_rank": 3.05342698097229,
+      "dimension_std": 0.021065855398774147
+    },
+    "after": {
+      "n": 128,
+      "objective": 1.0131347179412842,
+      "constant_objective": 3.4300732612609863,
+      "descriptor_mse": 0.18028494715690613,
+      "constant_descriptor_mse": 1.9385035037994385,
+      "fingerprint_bce": 0.8328498005867004,
+      "constant_fingerprint_bce": 1.4915698766708374,
+      "effective_rank": 4.890167713165283,
+      "dimension_std": 0.49021151661872864
+    },
+    "unique_seen": 902,
+    "graph_draws": 9600,
+    "encoder_graph_passes": 9600,
+    "wall_seconds": 30.2553686
+  },
+  "1": {
+    "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\in_domain_chemical_anchor_20261030\\pretraining\\seed_1\\encoder.pt",
+    "sha256": "82473d82118bfccadce29919943d51d3d432088bbbe8e427dd40b15835bfa563",
+    "initial_encoder_hash": "5a660c00c92b7c12df3c8a0222d7f5059e85301c87d983eaf016c9720f9d642f",
+    "before": {
+      "n": 128,
+      "objective": 3.4717164039611816,
+      "constant_objective": 3.4300732612609863,
+      "descriptor_mse": 1.9795746803283691,
+      "constant_descriptor_mse": 1.9385035037994385,
+      "fingerprint_bce": 1.492141842842102,
+      "constant_fingerprint_bce": 1.4915698766708374,
+      "effective_rank": 3.1933505535125732,
+      "dimension_std": 0.01985086128115654
+    },
+    "after": {
+      "n": 128,
+      "objective": 1.1054027080535889,
+      "constant_objective": 3.4300732612609863,
+      "descriptor_mse": 0.2306349277496338,
+      "constant_descriptor_mse": 1.9385035037994385,
+      "fingerprint_bce": 0.8747678399085999,
+      "constant_fingerprint_bce": 1.4915698766708374,
+      "effective_rank": 5.708393573760986,
+      "dimension_std": 0.5372147560119629
+    },
+    "unique_seen": 902,
+    "graph_draws": 9600,
+    "encoder_graph_passes": 9600,
+    "wall_seconds": 30.097889199999997
+  },
+  "2": {
+    "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\in_domain_chemical_anchor_20261030\\pretraining\\seed_2\\encoder.pt",
+    "sha256": "0c8c38ef75f932e82d31cd6a74661a0b82bae4049e808dbb71279596863d45a4",
+    "initial_encoder_hash": "4d3eea72eea3187540f7b5e1ce4cf8cba7a02eb6af3d7af4b5884c8fa708261f",
+    "before": {
+      "n": 128,
+      "objective": 3.4514691829681396,
+      "constant_objective": 3.4300732612609863,
+      "descriptor_mse": 1.9562938213348389,
+      "constant_descriptor_mse": 1.9385035037994385,
+      "fingerprint_bce": 1.4951753616333008,
+      "constant_fingerprint_bce": 1.4915698766708374,
+      "effective_rank": 3.004382848739624,
+      "dimension_std": 0.01845412142574787
+    },
+    "after": {
+      "n": 128,
+      "objective": 1.0575220584869385,
+      "constant_objective": 3.4300732612609863,
+      "descriptor_mse": 0.19187963008880615,
+      "constant_descriptor_mse": 1.9385035037994385,
+      "fingerprint_bce": 0.8656424283981323,
+      "constant_fingerprint_bce": 1.4915698766708374,
+      "effective_rank": 5.767670154571533,
+      "dimension_std": 0.5229799747467041
+    },
+    "unique_seen": 902,
+    "graph_draws": 9600,
+    "encoder_graph_passes": 9600,
+    "wall_seconds": 33.160423500000036
+  }
+}

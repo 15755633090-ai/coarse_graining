@@ -1,0 +1,315 @@
+{
+  "passed": true,
+  "audit_script_sha256": "1f738f221084fd043fdf48d3fb9064ec125a9fc08eba938dc4a173fd0d1036cf",
+  "source_hashes_verified": 137,
+  "upstream_excludes_all_esol": true,
+  "upstream_esol_training_structures_only": false,
+  "upstream_records": 4096,
+  "upstream_canonical_unique": 4096,
+  "train_only_target_stats_replayed": true,
+  "property_replays_passed": true,
+  "fixed_three_seeds_complete": true,
+  "test_evaluated": false,
+  "runs": [
+    {
+      "seed": 7,
+      "task_seed": 0,
+      "source_sha256": "2b724afe9d1e2fd29e570478e678d69fbe42d748219aff959b7d9888ce161f3c",
+      "property_best_sha256": "33b9e943fc1748f6720fbba9767b2c0f543d36fdcf6c979251616ac78be22e23",
+      "confirmation_per_descriptor": {
+        "MolWt": {
+          "mse": 0.2259943038225174,
+          "constant_mse": 1.0374490022659302
+        },
+        "MolLogP": {
+          "mse": 0.06442918628454208,
+          "constant_mse": 1.010610580444336
+        },
+        "TPSA": {
+          "mse": 0.02865588665008545,
+          "constant_mse": 1.0332283973693848
+        },
+        "HDonors": {
+          "mse": 0.012782886624336243,
+          "constant_mse": 1.0472174882888794
+        },
+        "HAcceptors": {
+          "mse": 0.0675470307469368,
+          "constant_mse": 1.013063907623291
+        },
+        "RotatableBonds": {
+          "mse": 0.07240811735391617,
+          "constant_mse": 0.8107063174247742
+        },
+        "AromaticRings": {
+          "mse": 0.06321050971746445,
+          "constant_mse": 1.112730622291565
+        },
+        "AliphaticRings": {
+          "mse": 0.10281366109848022,
+          "constant_mse": 0.7974858283996582
+        },
+        "FractionCSP3": {
+          "mse": 0.0247743409126997,
+          "constant_mse": 1.0757752656936646
+        },
+        "RingCount": {
+          "mse": 0.091851145029068,
+          "constant_mse": 0.9022309184074402
+        },
+        "HeavyAtomCount": {
+          "mse": 0.03977081552147865,
+          "constant_mse": 0.8783767223358154
+        },
+        "ValenceElectrons": {
+          "mse": 0.06161333620548248,
+          "constant_mse": 0.9126070737838745
+        }
+      },
+      "confirmation_macro_fp_AP": 0.8512881521433141,
+      "esol_train_structures_descriptor_mse": {
+        "MolWt": 8.226981163024902,
+        "MolLogP": 0.5524613857269287,
+        "TPSA": 0.213638037443161,
+        "HDonors": 0.46468493342399597,
+        "HAcceptors": 0.33566075563430786,
+        "RotatableBonds": 3.469945192337036,
+        "AromaticRings": 0.29321086406707764,
+        "AliphaticRings": 0.537693977355957,
+        "FractionCSP3": 0.7774246335029602,
+        "RingCount": 0.8437358140945435,
+        "HeavyAtomCount": 5.368841648101807,
+        "ValenceElectrons": 5.35171365737915
+      },
+      "common_source_scaled_esol_train_descriptor_mse": {
+        "MolWt": 8.226981163024902,
+        "MolLogP": 0.5524613857269287,
+        "TPSA": 0.213638037443161,
+        "HDonors": 0.46468493342399597,
+        "HAcceptors": 0.33566075563430786,
+        "RotatableBonds": 3.469945192337036,
+        "AromaticRings": 0.29321086406707764,
+        "AliphaticRings": 0.5376940369606018,
+        "FractionCSP3": 0.7774244546890259,
+        "RingCount": 0.8437358140945435,
+        "HeavyAtomCount": 5.368841648101807,
+        "ValenceElectrons": 5.351714134216309
+      },
+      "confirmation_macro_fp_prevalence": 0.7332305908203125,
+      "fp_AP_valid_bits": 512,
+      "best_property_metrics": {
+        "train": {
+          "rmse": 0.3743232342271195,
+          "mae": 0.2831988036632538,
+          "evaluated_tasks": 1.0
+        },
+        "valid": {
+          "rmse": 0.8158196710242009,
+          "mae": 0.6221734881401062,
+          "evaluated_tasks": 1.0
+        }
+      },
+      "epochs": 60
+    },
+    {
+      "seed": 1,
+      "task_seed": 1,
+      "source_sha256": "097e561c9d815687a68a4cc1ae9f6abadcccb010931a71a1a5658d7ec839cff6",
+      "property_best_sha256": "2672cdea3ad02929f285258d2869ece89e3c59560d0032c41d3f41c9084d152f",
+      "confirmation_per_descriptor": {
+        "MolWt": {
+          "mse": 0.12477591633796692,
+          "constant_mse": 1.0374490022659302
+        },
+        "MolLogP": {
+          "mse": 0.05711621046066284,
+          "constant_mse": 1.010610580444336
+        },
+        "TPSA": {
+          "mse": 0.024548031389713287,
+          "constant_mse": 1.0332283973693848
+        },
+        "HDonors": {
+          "mse": 0.010932008735835552,
+          "constant_mse": 1.0472174882888794
+        },
+        "HAcceptors": {
+          "mse": 0.0656895861029625,
+          "constant_mse": 1.013063907623291
+        },
+        "RotatableBonds": {
+          "mse": 0.0651525929570198,
+          "constant_mse": 0.8107063174247742
+        },
+        "AromaticRings": {
+          "mse": 0.07555699348449707,
+          "constant_mse": 1.112730622291565
+        },
+        "AliphaticRings": {
+          "mse": 0.07503228634595871,
+          "constant_mse": 0.7974858283996582
+        },
+        "FractionCSP3": {
+          "mse": 0.020247623324394226,
+          "constant_mse": 1.0757752656936646
+        },
+        "RingCount": {
+          "mse": 0.07011085003614426,
+          "constant_mse": 0.9022309184074402
+        },
+        "HeavyAtomCount": {
+          "mse": 0.029140401631593704,
+          "constant_mse": 0.8783767223358154
+        },
+        "ValenceElectrons": {
+          "mse": 0.026898398995399475,
+          "constant_mse": 0.9126070737838745
+        }
+      },
+      "confirmation_macro_fp_AP": 0.8519740451195562,
+      "esol_train_structures_descriptor_mse": {
+        "MolWt": 10.228710174560547,
+        "MolLogP": 0.6623027920722961,
+        "TPSA": 0.14678515493869781,
+        "HDonors": 0.10286210477352142,
+        "HAcceptors": 0.23203803598880768,
+        "RotatableBonds": 1.032593011856079,
+        "AromaticRings": 0.13885505497455597,
+        "AliphaticRings": 0.32759594917297363,
+        "FractionCSP3": 0.8192269802093506,
+        "RingCount": 0.3813811242580414,
+        "HeavyAtomCount": 4.122093200683594,
+        "ValenceElectrons": 4.825972080230713
+      },
+      "common_source_scaled_esol_train_descriptor_mse": {
+        "MolWt": 10.228710174560547,
+        "MolLogP": 0.6623026728630066,
+        "TPSA": 0.14678515493869781,
+        "HDonors": 0.10286208242177963,
+        "HAcceptors": 0.23203802108764648,
+        "RotatableBonds": 1.032593011856079,
+        "AromaticRings": 0.13885502517223358,
+        "AliphaticRings": 0.32759594917297363,
+        "FractionCSP3": 0.8192270398139954,
+        "RingCount": 0.3813811242580414,
+        "HeavyAtomCount": 4.122093200683594,
+        "ValenceElectrons": 4.825972080230713
+      },
+      "confirmation_macro_fp_prevalence": 0.7332305908203125,
+      "fp_AP_valid_bits": 512,
+      "best_property_metrics": {
+        "train": {
+          "rmse": 0.34896223815707006,
+          "mae": 0.26143860816955566,
+          "evaluated_tasks": 1.0
+        },
+        "valid": {
+          "rmse": 0.7851961799450926,
+          "mae": 0.6192641854286194,
+          "evaluated_tasks": 1.0
+        }
+      },
+      "epochs": 60
+    },
+    {
+      "seed": 2,
+      "task_seed": 2,
+      "source_sha256": "9fd6ed53fc9afe1450a682703ed7eb68d32ae5cf3440e355d413364250e2c9bd",
+      "property_best_sha256": "8c126a03e16087db81964928796e645126d357ab6dbb0556dedeb983995a87ad",
+      "confirmation_per_descriptor": {
+        "MolWt": {
+          "mse": 0.15307916700839996,
+          "constant_mse": 1.0374490022659302
+        },
+        "MolLogP": {
+          "mse": 0.09676912426948547,
+          "constant_mse": 1.010610580444336
+        },
+        "TPSA": {
+          "mse": 0.03557823225855827,
+          "constant_mse": 1.0332283973693848
+        },
+        "HDonors": {
+          "mse": 0.014233479276299477,
+          "constant_mse": 1.0472174882888794
+        },
+        "HAcceptors": {
+          "mse": 0.06867638230323792,
+          "constant_mse": 1.013063907623291
+        },
+        "RotatableBonds": {
+          "mse": 0.06123056262731552,
+          "constant_mse": 0.8107063174247742
+        },
+        "AromaticRings": {
+          "mse": 0.08947466313838959,
+          "constant_mse": 1.112730622291565
+        },
+        "AliphaticRings": {
+          "mse": 0.09531423449516296,
+          "constant_mse": 0.7974858283996582
+        },
+        "FractionCSP3": {
+          "mse": 0.03407330438494682,
+          "constant_mse": 1.0757752656936646
+        },
+        "RingCount": {
+          "mse": 0.08842190355062485,
+          "constant_mse": 0.9022309184074402
+        },
+        "HeavyAtomCount": {
+          "mse": 0.06858830153942108,
+          "constant_mse": 0.8783767223358154
+        },
+        "ValenceElectrons": {
+          "mse": 0.05462237074971199,
+          "constant_mse": 0.9126070737838745
+        }
+      },
+      "confirmation_macro_fp_AP": 0.8515223655896628,
+      "esol_train_structures_descriptor_mse": {
+        "MolWt": 11.670729637145996,
+        "MolLogP": 0.5198072195053101,
+        "TPSA": 0.44675686955451965,
+        "HDonors": 0.1860591322183609,
+        "HAcceptors": 0.33313998579978943,
+        "RotatableBonds": 1.0772860050201416,
+        "AromaticRings": 0.18264836072921753,
+        "AliphaticRings": 0.5181987881660461,
+        "FractionCSP3": 0.4539697766304016,
+        "RingCount": 0.6490004062652588,
+        "HeavyAtomCount": 5.222995281219482,
+        "ValenceElectrons": 6.062193393707275
+      },
+      "common_source_scaled_esol_train_descriptor_mse": {
+        "MolWt": 11.670729637145996,
+        "MolLogP": 0.5198072195053101,
+        "TPSA": 0.44675683975219727,
+        "HDonors": 0.1860591322183609,
+        "HAcceptors": 0.33313995599746704,
+        "RotatableBonds": 1.0772861242294312,
+        "AromaticRings": 0.18264834582805634,
+        "AliphaticRings": 0.5181988477706909,
+        "FractionCSP3": 0.4539697468280792,
+        "RingCount": 0.6490004062652588,
+        "HeavyAtomCount": 5.222995281219482,
+        "ValenceElectrons": 6.062192916870117
+      },
+      "confirmation_macro_fp_prevalence": 0.7332305908203125,
+      "fp_AP_valid_bits": 512,
+      "best_property_metrics": {
+        "train": {
+          "rmse": 0.3634523378526598,
+          "mae": 0.28143012523651123,
+          "evaluated_tasks": 1.0
+        },
+        "valid": {
+          "rmse": 0.759232910426155,
+          "mae": 0.5909186005592346,
+          "evaluated_tasks": 1.0
+        }
+      },
+      "epochs": 60
+    }
+  ]
+}

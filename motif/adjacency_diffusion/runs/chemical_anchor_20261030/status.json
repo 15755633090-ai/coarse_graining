@@ -1,0 +1,8 @@
+{
+  "state": "complete",
+  "new_pretrain_runs": 3,
+  "new_property_runs": 3,
+  "all_replays_passed": true,
+  "wall_seconds": 428.75700159999997,
+  "test_evaluated": false
+}
