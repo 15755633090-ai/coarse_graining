@@ -1,0 +1,400 @@
+{
+  "scope": "Gradient and stochastic-state diagnostics: 8 fixed training batches, first 128 train molecules. Grouped clean evaluation: original train/validation splits, saved best checkpoints. No updates, new model selection, or test evaluation.",
+  "limitations": "Endpoint, batch-local gradients do not reconstruct training trajectories or prove validation causality. Stochastic losses are not additively decomposable.",
+  "arms": {
+    "task_augmentation": {
+      "checkpoint_sha256": "45539ed2a744f7942ed907bceeac4fe2bd3d69efd424ed7fb7139593a4d672aa",
+      "best_epoch": 58,
+      "means": {
+        "clean_loss": 0.05423050350509584,
+        "noisy_loss": 0.05350018059834838,
+        "train_aux": 0.021338993101380765,
+        "eval_corruption_mse": 0.009012807655381039,
+        "eval_zero_mse": 0.0,
+        "train_clean_clean_dropout_mse": 0.01811512536369264,
+        "cos_aux_vs_clean_property": -0.04551866653491743,
+        "cos_aux_vs_joint_property": -0.03950948531564791,
+        "cos_noisy_joint_vs_clean_property": 0.9969132840633392,
+        "weighted_aux_norm_over_joint_property": 0.08599831210449338
+      },
+      "negative_aux_joint_batches": 4,
+      "batches": [
+        {
+          "batch": 0,
+          "graphs": 16,
+          "eligible": 7,
+          "selected_atoms": 52,
+          "clean_loss": 0.05651221424341202,
+          "noisy_loss": 0.05942552536725998,
+          "train_aux": 0.009414388798177242,
+          "eval_corruption_mse": 0.00852938462048769,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.008649099618196487,
+          "cos_aux_vs_clean_property": 0.22399944067001343,
+          "cos_aux_vs_joint_property": 0.22531457245349884,
+          "cos_noisy_joint_vs_clean_property": 0.9957175850868225,
+          "weighted_aux_norm_over_joint_property": 0.016951655969023705
+        },
+        {
+          "batch": 1,
+          "graphs": 16,
+          "eligible": 9,
+          "selected_atoms": 44,
+          "clean_loss": 0.022587796673178673,
+          "noisy_loss": 0.021350614726543427,
+          "train_aux": 0.04508262127637863,
+          "eval_corruption_mse": 0.009911696426570415,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.0465504489839077,
+          "cos_aux_vs_clean_property": 0.0010963173117488623,
+          "cos_aux_vs_joint_property": 0.0017952354392036796,
+          "cos_noisy_joint_vs_clean_property": 0.9920672178268433,
+          "weighted_aux_norm_over_joint_property": 0.37367311120033264
+        },
+        {
+          "batch": 2,
+          "graphs": 16,
+          "eligible": 7,
+          "selected_atoms": 44,
+          "clean_loss": 0.07629062235355377,
+          "noisy_loss": 0.0763620138168335,
+          "train_aux": 0.013817043043673038,
+          "eval_corruption_mse": 0.011039991863071918,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.006368662230670452,
+          "cos_aux_vs_clean_property": -0.18053068220615387,
+          "cos_aux_vs_joint_property": -0.17318189144134521,
+          "cos_noisy_joint_vs_clean_property": 0.9989745020866394,
+          "weighted_aux_norm_over_joint_property": 0.02647552452981472
+        },
+        {
+          "batch": 3,
+          "graphs": 16,
+          "eligible": 10,
+          "selected_atoms": 58,
+          "clean_loss": 0.040922537446022034,
+          "noisy_loss": 0.04176955297589302,
+          "train_aux": 0.015347986482083797,
+          "eval_corruption_mse": 0.004650601651519537,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.0125905005261302,
+          "cos_aux_vs_clean_property": 0.2793346047401428,
+          "cos_aux_vs_joint_property": 0.2730013430118561,
+          "cos_noisy_joint_vs_clean_property": 0.9958763122558594,
+          "weighted_aux_norm_over_joint_property": 0.04341307282447815
+        },
+        {
+          "batch": 4,
+          "graphs": 16,
+          "eligible": 6,
+          "selected_atoms": 33,
+          "clean_loss": 0.060879506170749664,
+          "noisy_loss": 0.05395239591598511,
+          "train_aux": 0.02270347997546196,
+          "eval_corruption_mse": 0.02237517200410366,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.02691909670829773,
+          "cos_aux_vs_clean_property": -0.4142650067806244,
+          "cos_aux_vs_joint_property": -0.401751846075058,
+          "cos_noisy_joint_vs_clean_property": 0.9973875284194946,
+          "weighted_aux_norm_over_joint_property": 0.08012591302394867
+        },
+        {
+          "batch": 5,
+          "graphs": 16,
+          "eligible": 7,
+          "selected_atoms": 65,
+          "clean_loss": 0.03580404072999954,
+          "noisy_loss": 0.035191357135772705,
+          "train_aux": 0.022488167509436607,
+          "eval_corruption_mse": 0.006234722677618265,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.012924712151288986,
+          "cos_aux_vs_clean_property": -0.19040687382221222,
+          "cos_aux_vs_joint_property": -0.18555283546447754,
+          "cos_noisy_joint_vs_clean_property": 0.9982478618621826,
+          "weighted_aux_norm_over_joint_property": 0.03183314576745033
+        },
+        {
+          "batch": 6,
+          "graphs": 16,
+          "eligible": 5,
+          "selected_atoms": 41,
+          "clean_loss": 0.06402142345905304,
+          "noisy_loss": 0.06362228095531464,
+          "train_aux": 0.024618802592158318,
+          "eval_corruption_mse": 0.00645614555105567,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.02202872931957245,
+          "cos_aux_vs_clean_property": 0.024297362193465233,
+          "cos_aux_vs_joint_property": 0.023646412417292595,
+          "cos_noisy_joint_vs_clean_property": 0.9993078708648682,
+          "weighted_aux_norm_over_joint_property": 0.06139388307929039
+        },
+        {
+          "batch": 7,
+          "graphs": 16,
+          "eligible": 6,
+          "selected_atoms": 34,
+          "clean_loss": 0.07682588696479797,
+          "noisy_loss": 0.07632770389318466,
+          "train_aux": 0.01723945513367653,
+          "eval_corruption_mse": 0.002904746448621154,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.008889753371477127,
+          "cos_aux_vs_clean_property": -0.1076744943857193,
+          "cos_aux_vs_joint_property": -0.07934687286615372,
+          "cos_noisy_joint_vs_clean_property": 0.9977273941040039,
+          "weighted_aux_norm_over_joint_property": 0.05412019044160843
+        }
+      ]
+    },
+    "task_denoising": {
+      "checkpoint_sha256": "d4c1634d7ce2487744bf52563b5e9722f96920f862bb30390f84a9052c5632a8",
+      "best_epoch": 42,
+      "means": {
+        "clean_loss": 0.04590762220323086,
+        "noisy_loss": 0.04665226652286947,
+        "train_aux": 0.012694400269538164,
+        "eval_corruption_mse": 0.005608008315903135,
+        "eval_zero_mse": 0.0,
+        "train_clean_clean_dropout_mse": 0.008487461745971814,
+        "cos_aux_vs_clean_property": -0.029670005198568106,
+        "cos_aux_vs_joint_property": -0.02092904143501073,
+        "cos_noisy_joint_vs_clean_property": 0.9911686033010483,
+        "weighted_aux_norm_over_joint_property": 0.046612555626779795
+      },
+      "negative_aux_joint_batches": 4,
+      "batches": [
+        {
+          "batch": 0,
+          "graphs": 16,
+          "eligible": 7,
+          "selected_atoms": 52,
+          "clean_loss": 0.05422252416610718,
+          "noisy_loss": 0.06466184556484222,
+          "train_aux": 0.008479645475745201,
+          "eval_corruption_mse": 0.0055500539019703865,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.006011881399899721,
+          "cos_aux_vs_clean_property": 0.11277202516794205,
+          "cos_aux_vs_joint_property": 0.11248432844877243,
+          "cos_noisy_joint_vs_clean_property": 0.9764496684074402,
+          "weighted_aux_norm_over_joint_property": 0.03668167442083359
+        },
+        {
+          "batch": 1,
+          "graphs": 16,
+          "eligible": 9,
+          "selected_atoms": 44,
+          "clean_loss": 0.023570410907268524,
+          "noisy_loss": 0.023616328835487366,
+          "train_aux": 0.016814028844237328,
+          "eval_corruption_mse": 0.0085586067289114,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.012905769981443882,
+          "cos_aux_vs_clean_property": 0.019396349787712097,
+          "cos_aux_vs_joint_property": 0.01401840802282095,
+          "cos_noisy_joint_vs_clean_property": 0.990664005279541,
+          "weighted_aux_norm_over_joint_property": 0.04901348426938057
+        },
+        {
+          "batch": 2,
+          "graphs": 16,
+          "eligible": 7,
+          "selected_atoms": 44,
+          "clean_loss": 0.07792794704437256,
+          "noisy_loss": 0.07758387923240662,
+          "train_aux": 0.008605964481830597,
+          "eval_corruption_mse": 0.004279749002307653,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.0038356955628842115,
+          "cos_aux_vs_clean_property": -0.02390003204345703,
+          "cos_aux_vs_joint_property": -0.041937194764614105,
+          "cos_noisy_joint_vs_clean_property": 0.9973913431167603,
+          "weighted_aux_norm_over_joint_property": 0.01815030537545681
+        },
+        {
+          "batch": 3,
+          "graphs": 16,
+          "eligible": 10,
+          "selected_atoms": 58,
+          "clean_loss": 0.03942883759737015,
+          "noisy_loss": 0.03804555535316467,
+          "train_aux": 0.017518797889351845,
+          "eval_corruption_mse": 0.005985236261039972,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.008283200673758984,
+          "cos_aux_vs_clean_property": -0.1353415697813034,
+          "cos_aux_vs_joint_property": -0.13071541488170624,
+          "cos_noisy_joint_vs_clean_property": 0.9941099286079407,
+          "weighted_aux_norm_over_joint_property": 0.06743074953556061
+        },
+        {
+          "batch": 4,
+          "graphs": 16,
+          "eligible": 6,
+          "selected_atoms": 33,
+          "clean_loss": 0.03487291932106018,
+          "noisy_loss": 0.03450459986925125,
+          "train_aux": 0.013017535209655762,
+          "eval_corruption_mse": 0.010280292481184006,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.012503223493695259,
+          "cos_aux_vs_clean_property": -0.19897331297397614,
+          "cos_aux_vs_joint_property": -0.1740046888589859,
+          "cos_noisy_joint_vs_clean_property": 0.9946537017822266,
+          "weighted_aux_norm_over_joint_property": 0.04552040249109268
+        },
+        {
+          "batch": 5,
+          "graphs": 16,
+          "eligible": 7,
+          "selected_atoms": 65,
+          "clean_loss": 0.026529334485530853,
+          "noisy_loss": 0.028529180213809013,
+          "train_aux": 0.012477151118218899,
+          "eval_corruption_mse": 0.0038282566238194704,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.010123692452907562,
+          "cos_aux_vs_clean_property": -0.009328994899988174,
+          "cos_aux_vs_joint_property": 0.030506446957588196,
+          "cos_noisy_joint_vs_clean_property": 0.9863950610160828,
+          "weighted_aux_norm_over_joint_property": 0.0706927478313446
+        },
+        {
+          "batch": 6,
+          "graphs": 16,
+          "eligible": 5,
+          "selected_atoms": 41,
+          "clean_loss": 0.06054306775331497,
+          "noisy_loss": 0.05938374251127243,
+          "train_aux": 0.010804406367242336,
+          "eval_corruption_mse": 0.0015191625570878386,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.006603864021599293,
+          "cos_aux_vs_clean_property": 0.27101215720176697,
+          "cos_aux_vs_joint_property": 0.2739090323448181,
+          "cos_noisy_joint_vs_clean_property": 0.9983550310134888,
+          "weighted_aux_norm_over_joint_property": 0.03015637956559658
+        },
+        {
+          "batch": 7,
+          "graphs": 16,
+          "eligible": 6,
+          "selected_atoms": 34,
+          "clean_loss": 0.05016593635082245,
+          "noisy_loss": 0.04689300060272217,
+          "train_aux": 0.013837672770023346,
+          "eval_corruption_mse": 0.00486270897090435,
+          "eval_zero_mse": 0.0,
+          "train_clean_clean_dropout_mse": 0.007632366381585598,
+          "cos_aux_vs_clean_property": -0.2729966640472412,
+          "cos_aux_vs_joint_property": -0.2516932487487793,
+          "cos_noisy_joint_vs_clean_property": 0.991330087184906,
+          "weighted_aux_norm_over_joint_property": 0.055254701524972916
+        }
+      ]
+    }
+  },
+  "clean_checkpoint_group_evaluation": {
+    "original": {
+      "train": {
+        "all": {
+          "n": 902,
+          "rmse": 0.4695363388606806
+        },
+        "single": {
+          "n": 464,
+          "rmse": 0.42138899087799725
+        },
+        "multiple": {
+          "n": 438,
+          "rmse": 0.5156611144902963
+        }
+      },
+      "valid": {
+        "all": {
+          "n": 113,
+          "rmse": 0.8149770779038035
+        },
+        "single": {
+          "n": 63,
+          "rmse": 0.7645561320308129
+        },
+        "multiple": {
+          "n": 50,
+          "rmse": 0.8743774935328732
+        }
+      }
+    },
+    "task_augmentation": {
+      "train": {
+        "all": {
+          "n": 902,
+          "rmse": 0.45297424824271243
+        },
+        "single": {
+          "n": 464,
+          "rmse": 0.41679135863752037
+        },
+        "multiple": {
+          "n": 438,
+          "rmse": 0.48838962137879566
+        }
+      },
+      "valid": {
+        "all": {
+          "n": 113,
+          "rmse": 0.8245046072397484
+        },
+        "single": {
+          "n": 63,
+          "rmse": 0.7068487130950086
+        },
+        "multiple": {
+          "n": 50,
+          "rmse": 0.9522738602920402
+        }
+      }
+    },
+    "task_denoising": {
+      "train": {
+        "all": {
+          "n": 902,
+          "rmse": 0.44862889775888654
+        },
+        "single": {
+          "n": 464,
+          "rmse": 0.3995528596602085
+        },
+        "multiple": {
+          "n": 438,
+          "rmse": 0.49534251010351976
+        }
+      },
+      "valid": {
+        "all": {
+          "n": 113,
+          "rmse": 0.8449333382809053
+        },
+        "single": {
+          "n": 63,
+          "rmse": 0.8195259750287928
+        },
+        "multiple": {
+          "n": 50,
+          "rmse": 0.875897907493766
+        }
+      }
+    }
+  },
+  "source_sha256": {
+    "_github_sync/diagnose_task_latent_20261030.py": "686af45ca564314463edb12902a251bcd01b937b46ed72a20ffd73f7c126025f",
+    "motif/adjacency_diffusion/task_latent_denoising.py": "239a0db3b35e22f83fea8a7de2ddb84892a0c22b906a1b5112159994830f5141",
+    "motif/adjacency_diffusion/model.py": "e2ef765c8c2196219e8116ca7fc498f57d3ec71291ae42be63fd909f78b2f405",
+    "motif/adjacency_diffusion/masked_bonds.py": "2e0613291338b9278b59c62b3cba266d4a782e211cd389c8c0cbabf0b503432d",
+    "motif/adjacency_diffusion/typed_bonds.py": "a34270c21f9c28ec655683b5a91f0d05fde918388652c699de08fd68ddb6d42a",
+    "motif/adjacency_diffusion/data.py": "f15ad9b99b3fbf03d7f49c98ed03d0a1157e235f156f99eb31463bcd8f79cf5f"
+  }
+}
