@@ -1,0 +1,962 @@
+[
+  {
+    "epoch": 1,
+    "objective": 0.6727374419569969,
+    "clean_property": 0.6738154192765554,
+    "noisy_property": 0.67165947012734,
+    "feature_mse": 0.19987289816663975,
+    "pre_clip_norm": 2.781345734470769,
+    "clip_fraction": 0.12280701754385964,
+    "eligible_molecules": 438,
+    "selected_atoms": 3088,
+    "validation": {
+      "rmse": 1.1511429041649548,
+      "mae": 0.9668750762939453,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 2,
+    "objective": 0.2899596419250756,
+    "clean_property": 0.28842369924511824,
+    "noisy_property": 0.29149558212150606,
+    "feature_mse": 0.0645386854170315,
+    "pre_clip_norm": 3.5662308915665277,
+    "clip_fraction": 0.21052631578947367,
+    "eligible_molecules": 438,
+    "selected_atoms": 3065,
+    "validation": {
+      "rmse": 1.3771943442440984,
+      "mae": 1.0839308500289917,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 3,
+    "objective": 0.20969969929571738,
+    "clean_property": 0.20867369219399334,
+    "noisy_property": 0.2107257077045608,
+    "feature_mse": 0.03914409509876318,
+    "pre_clip_norm": 2.029173972313864,
+    "clip_fraction": 0.03508771929824561,
+    "eligible_molecules": 438,
+    "selected_atoms": 2936,
+    "validation": {
+      "rmse": 1.2311550587875095,
+      "mae": 0.9831393361091614,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 4,
+    "objective": 0.17403329059220196,
+    "clean_property": 0.17389911269409614,
+    "noisy_property": 0.1741674697974272,
+    "feature_mse": 0.028565260777740104,
+    "pre_clip_norm": 2.0500761197324384,
+    "clip_fraction": 0.03508771929824561,
+    "eligible_molecules": 438,
+    "selected_atoms": 2971,
+    "validation": {
+      "rmse": 1.136891460079344,
+      "mae": 0.910170316696167,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 5,
+    "objective": 0.18880174126018556,
+    "clean_property": 0.18922900147082514,
+    "noisy_property": 0.1883744819645296,
+    "feature_mse": 0.02465087075701408,
+    "pre_clip_norm": 2.453235037494124,
+    "clip_fraction": 0.017543859649122806,
+    "eligible_molecules": 438,
+    "selected_atoms": 3024,
+    "validation": {
+      "rmse": 1.1175567443573147,
+      "mae": 0.9064388275146484,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 6,
+    "objective": 0.1613563172388495,
+    "clean_property": 0.1613402770538079,
+    "noisy_property": 0.16137235755460305,
+    "feature_mse": 0.024541283377625962,
+    "pre_clip_norm": 1.7658235388889647,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 3023,
+    "validation": {
+      "rmse": 1.1428627116203873,
+      "mae": 0.8972654938697815,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 7,
+    "objective": 0.15782260443819196,
+    "clean_property": 0.1580387644077602,
+    "noisy_property": 0.15760644335757223,
+    "feature_mse": 0.019944959426331416,
+    "pre_clip_norm": 2.013511218522724,
+    "clip_fraction": 0.03508771929824561,
+    "eligible_molecules": 438,
+    "selected_atoms": 2878,
+    "validation": {
+      "rmse": 0.9229333589018806,
+      "mae": 0.7392467260360718,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 8,
+    "objective": 0.14414345446908683,
+    "clean_property": 0.14416691660881042,
+    "noisy_property": 0.14411999076081997,
+    "feature_mse": 0.01927442164895566,
+    "pre_clip_norm": 1.646832184310545,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2809,
+    "validation": {
+      "rmse": 1.0215725395710535,
+      "mae": 0.7972390055656433,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 9,
+    "objective": 0.12643496904587537,
+    "clean_property": 0.1263448826380466,
+    "noisy_property": 0.12652505568245,
+    "feature_mse": 0.020593286802371342,
+    "pre_clip_norm": 1.5419298616940516,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2974,
+    "validation": {
+      "rmse": 1.144585513758703,
+      "mae": 0.9370086789131165,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 10,
+    "objective": 0.11849777495259778,
+    "clean_property": 0.1183439180777784,
+    "noisy_property": 0.11865163293846867,
+    "feature_mse": 0.021253087222902922,
+    "pre_clip_norm": 1.4932144807096113,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 3013,
+    "validation": {
+      "rmse": 0.991209794969323,
+      "mae": 0.77224200963974,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 11,
+    "objective": 0.11494507065467667,
+    "clean_property": 0.11481442942953947,
+    "noisy_property": 0.11507571116089821,
+    "feature_mse": 0.019569268834107277,
+    "pre_clip_norm": 1.3813393189196002,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2900,
+    "validation": {
+      "rmse": 1.003014669560174,
+      "mae": 0.8143486976623535,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 12,
+    "objective": 0.10269689540329732,
+    "clean_property": 0.10250418116910416,
+    "noisy_property": 0.10288960996427034,
+    "feature_mse": 0.017994027029265437,
+    "pre_clip_norm": 1.1828134713465708,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 3074,
+    "validation": {
+      "rmse": 0.9662098961881012,
+      "mae": 0.7736637592315674,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 13,
+    "objective": 0.10854797280932728,
+    "clean_property": 0.10747531102153293,
+    "noisy_property": 0.10962063413962983,
+    "feature_mse": 0.02087959922490674,
+    "pre_clip_norm": 1.3943393669630353,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2893,
+    "validation": {
+      "rmse": 1.024388635718017,
+      "mae": 0.7915228009223938,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 14,
+    "objective": 0.09651977510044449,
+    "clean_property": 0.09641342034988236,
+    "noisy_property": 0.09662612945887081,
+    "feature_mse": 0.017753663530017724,
+    "pre_clip_norm": 1.2117340339903246,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2986,
+    "validation": {
+      "rmse": 1.0468202832854079,
+      "mae": 0.8036606311798096,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 15,
+    "objective": 0.09420532144998249,
+    "clean_property": 0.0939594645772064,
+    "noisy_property": 0.09445117799597874,
+    "feature_mse": 0.017949817555123253,
+    "pre_clip_norm": 1.137429692243275,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2951,
+    "validation": {
+      "rmse": 1.0126301552274355,
+      "mae": 0.779539942741394,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 16,
+    "objective": 0.08812581486346428,
+    "clean_property": 0.08796511400948491,
+    "noisy_property": 0.08828651620761345,
+    "feature_mse": 0.021792694354397162,
+    "pre_clip_norm": 1.0861528097537525,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2930,
+    "validation": {
+      "rmse": 0.975242668910514,
+      "mae": 0.7598713636398315,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 17,
+    "objective": 0.10039871627170789,
+    "clean_property": 0.10005328934966472,
+    "noisy_property": 0.1007441448276503,
+    "feature_mse": 0.024348719012841843,
+    "pre_clip_norm": 1.2402549103686684,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2987,
+    "validation": {
+      "rmse": 0.9339588999415005,
+      "mae": 0.7250528335571289,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 18,
+    "objective": 0.08721053626453668,
+    "clean_property": 0.08729254526265881,
+    "noisy_property": 0.08712852693963469,
+    "feature_mse": 0.019598155021013922,
+    "pre_clip_norm": 1.0581592676932352,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 3011,
+    "validation": {
+      "rmse": 0.9095511655817536,
+      "mae": 0.7171311378479004,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 19,
+    "objective": 0.07945666056975983,
+    "clean_property": 0.07888475080069743,
+    "noisy_property": 0.08002857046953418,
+    "feature_mse": 0.02760669303110294,
+    "pre_clip_norm": 0.9640953373490718,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2895,
+    "validation": {
+      "rmse": 0.9759905246348929,
+      "mae": 0.756442666053772,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 20,
+    "objective": 0.08708009267585319,
+    "clean_property": 0.08747225931208384,
+    "noisy_property": 0.08668792666050426,
+    "feature_mse": 0.02358109959842343,
+    "pre_clip_norm": 1.1272552672185396,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2993,
+    "validation": {
+      "rmse": 0.9556129689828354,
+      "mae": 0.7459617257118225,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 21,
+    "objective": 0.08726376412730467,
+    "clean_property": 0.08702358551192702,
+    "noisy_property": 0.08750394231786854,
+    "feature_mse": 0.026264424631862265,
+    "pre_clip_norm": 1.1127791352439345,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2996,
+    "validation": {
+      "rmse": 0.9933774225693383,
+      "mae": 0.7795246243476868,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 22,
+    "objective": 0.0912003556364461,
+    "clean_property": 0.09129612945150911,
+    "noisy_property": 0.09110458142924727,
+    "feature_mse": 0.022411972921537727,
+    "pre_clip_norm": 1.0574872671512134,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2870,
+    "validation": {
+      "rmse": 0.907541275872235,
+      "mae": 0.7031949758529663,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 23,
+    "objective": 0.07436056987366133,
+    "clean_property": 0.07418710957362987,
+    "noisy_property": 0.07453402867050547,
+    "feature_mse": 0.019514369778335094,
+    "pre_clip_norm": 0.8737601193419674,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2884,
+    "validation": {
+      "rmse": 0.9967999815741089,
+      "mae": 0.782341718673706,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 24,
+    "objective": 0.07740509745321776,
+    "clean_property": 0.07780751840848672,
+    "noisy_property": 0.07700267564832118,
+    "feature_mse": 0.0293857271439935,
+    "pre_clip_norm": 0.9982196056006247,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2940,
+    "validation": {
+      "rmse": 0.9509385153633085,
+      "mae": 0.7158334255218506,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 25,
+    "objective": 0.0746566712235411,
+    "clean_property": 0.07432332422518939,
+    "noisy_property": 0.07499001838528273,
+    "feature_mse": 0.02548923951230551,
+    "pre_clip_norm": 0.9576053269076765,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2963,
+    "validation": {
+      "rmse": 0.9045311972307885,
+      "mae": 0.7045602798461914,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 26,
+    "objective": 0.06997330901784855,
+    "clean_property": 0.07006900930744514,
+    "noisy_property": 0.06987760970859151,
+    "feature_mse": 0.02769230752203025,
+    "pre_clip_norm": 0.943388909624334,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2944,
+    "validation": {
+      "rmse": 1.0942777178022902,
+      "mae": 0.8732821941375732,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 27,
+    "objective": 0.06775142090689194,
+    "clean_property": 0.06761453098110985,
+    "noisy_property": 0.06788831060392815,
+    "feature_mse": 0.031409928428107185,
+    "pre_clip_norm": 0.8632675997520748,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 3004,
+    "validation": {
+      "rmse": 1.1609555968238539,
+      "mae": 0.9345133900642395,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 28,
+    "objective": 0.10362225277512743,
+    "clean_property": 0.10334241386960473,
+    "noisy_property": 0.10390209292241356,
+    "feature_mse": 0.025512721111769218,
+    "pre_clip_norm": 1.4005899178354364,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2874,
+    "validation": {
+      "rmse": 0.8527901925216367,
+      "mae": 0.7111771106719971,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 29,
+    "objective": 0.07303497056362399,
+    "clean_property": 0.07276021921190254,
+    "noisy_property": 0.07330972237283723,
+    "feature_mse": 0.02501864641447339,
+    "pre_clip_norm": 0.8326607001455206,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2927,
+    "validation": {
+      "rmse": 1.009760135362707,
+      "mae": 0.7618050575256348,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 30,
+    "objective": 0.07546525487774297,
+    "clean_property": 0.07536339746755466,
+    "noisy_property": 0.07556711251667717,
+    "feature_mse": 0.025601845136598536,
+    "pre_clip_norm": 0.9768099047635731,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2995,
+    "validation": {
+      "rmse": 0.9515201314880225,
+      "mae": 0.7288048267364502,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 31,
+    "objective": 0.07016068076093991,
+    "clean_property": 0.0700240560006677,
+    "noisy_property": 0.07029730522711027,
+    "feature_mse": 0.02196929430621758,
+    "pre_clip_norm": 0.8342495795927549,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2937,
+    "validation": {
+      "rmse": 0.9748739063204468,
+      "mae": 0.7299778461456299,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 32,
+    "objective": 0.0749860743158742,
+    "clean_property": 0.07447749771700617,
+    "noisy_property": 0.0754946494769109,
+    "feature_mse": 0.026588933934506617,
+    "pre_clip_norm": 0.9092530012130737,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2786,
+    "validation": {
+      "rmse": 0.9805596905970235,
+      "mae": 0.7479151487350464,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 33,
+    "objective": 0.07718905100696966,
+    "clean_property": 0.07749668149310246,
+    "noisy_property": 0.07688142074958275,
+    "feature_mse": 0.03197493317553349,
+    "pre_clip_norm": 0.9422951361589265,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2885,
+    "validation": {
+      "rmse": 0.9316467988711346,
+      "mae": 0.7289418578147888,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 34,
+    "objective": 0.08136125975860316,
+    "clean_property": 0.08090455807222609,
+    "noisy_property": 0.08181796115087836,
+    "feature_mse": 0.026648454139368574,
+    "pre_clip_norm": 1.06258250433102,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2993,
+    "validation": {
+      "rmse": 1.0585679054624502,
+      "mae": 0.829335629940033,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 35,
+    "objective": 0.06497560444761787,
+    "clean_property": 0.06532367933214757,
+    "noisy_property": 0.06462752995522399,
+    "feature_mse": 0.02663965565724331,
+    "pre_clip_norm": 0.8455256683784619,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2951,
+    "validation": {
+      "rmse": 0.9317791274021264,
+      "mae": 0.7012527585029602,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 36,
+    "objective": 0.07213231578077141,
+    "clean_property": 0.07251467706080068,
+    "noisy_property": 0.0717499552196578,
+    "feature_mse": 0.027004940598680263,
+    "pre_clip_norm": 0.996172475187402,
+    "clip_fraction": 0.017543859649122806,
+    "eligible_molecules": 438,
+    "selected_atoms": 2927,
+    "validation": {
+      "rmse": 0.9314529581810013,
+      "mae": 0.7144097685813904,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 37,
+    "objective": 0.07961749504402019,
+    "clean_property": 0.07904358280071042,
+    "noisy_property": 0.08019140715661802,
+    "feature_mse": 0.02898594701107134,
+    "pre_clip_norm": 0.9781382167548464,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2993,
+    "validation": {
+      "rmse": 0.9261026267264578,
+      "mae": 0.7087470293045044,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 38,
+    "objective": 0.060045599577981126,
+    "clean_property": 0.059869987922802306,
+    "noisy_property": 0.060221210742990174,
+    "feature_mse": 0.03533153668895625,
+    "pre_clip_norm": 0.7237578687960642,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2853,
+    "validation": {
+      "rmse": 0.921495294768998,
+      "mae": 0.699483335018158,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 39,
+    "objective": 0.065353278626214,
+    "clean_property": 0.06500084430240748,
+    "noisy_property": 0.06570571170825708,
+    "feature_mse": 0.031026331707835197,
+    "pre_clip_norm": 0.8839577525331263,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2798,
+    "validation": {
+      "rmse": 0.9385787479528309,
+      "mae": 0.7451072335243225,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 40,
+    "objective": 0.0633489675493094,
+    "clean_property": 0.06314969177178123,
+    "noisy_property": 0.06354824326148159,
+    "feature_mse": 0.027682790401996227,
+    "pre_clip_norm": 0.8291395643824025,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2900,
+    "validation": {
+      "rmse": 0.9854925260855556,
+      "mae": 0.7471462488174438,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 41,
+    "objective": 0.06496937739613809,
+    "clean_property": 0.06482809350678795,
+    "noisy_property": 0.06511066017443673,
+    "feature_mse": 0.03128278583876396,
+    "pre_clip_norm": 0.7852514903796347,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2944,
+    "validation": {
+      "rmse": 0.8799808629621072,
+      "mae": 0.6595283150672913,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 42,
+    "objective": 0.06109016725237955,
+    "clean_property": 0.061472942725869645,
+    "noisy_property": 0.06070739135407565,
+    "feature_mse": 0.024106499395872418,
+    "pre_clip_norm": 0.7461433891664472,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2771,
+    "validation": {
+      "rmse": 0.9437065986101859,
+      "mae": 0.7032890915870667,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 43,
+    "objective": 0.07231972082272957,
+    "clean_property": 0.0721345075585863,
+    "noisy_property": 0.07250493425026275,
+    "feature_mse": 0.024546691739376177,
+    "pre_clip_norm": 0.8740818432548589,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2942,
+    "validation": {
+      "rmse": 0.9191987583049094,
+      "mae": 0.710514485836029,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 44,
+    "objective": 0.06506628077477217,
+    "clean_property": 0.06520999638004261,
+    "noisy_property": 0.06492256526753568,
+    "feature_mse": 0.032009622702995934,
+    "pre_clip_norm": 0.8609023031435514,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2955,
+    "validation": {
+      "rmse": 0.8688176615870218,
+      "mae": 0.6741506457328796,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 45,
+    "objective": 0.06370549861407071,
+    "clean_property": 0.06425601606698413,
+    "noisy_property": 0.0631549807036655,
+    "feature_mse": 0.02743952242624864,
+    "pre_clip_norm": 0.8266931782689011,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2920,
+    "validation": {
+      "rmse": 0.952008265423356,
+      "mae": 0.7168792486190796,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 46,
+    "objective": 0.05564903059418787,
+    "clean_property": 0.05513032457154048,
+    "noisy_property": 0.056167737074327054,
+    "feature_mse": 0.039986734000737205,
+    "pre_clip_norm": 0.70487968074648,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 3110,
+    "validation": {
+      "rmse": 0.9282549551973583,
+      "mae": 0.706297755241394,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 47,
+    "objective": 0.05717042519858009,
+    "clean_property": 0.05675956574186944,
+    "noisy_property": 0.05758128543956238,
+    "feature_mse": 0.028220043256225295,
+    "pre_clip_norm": 0.7449124612306294,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2799,
+    "validation": {
+      "rmse": 0.8898701731683136,
+      "mae": 0.6787785887718201,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 48,
+    "objective": 0.05068071127722138,
+    "clean_property": 0.05077640104450678,
+    "noisy_property": 0.05058502150993598,
+    "feature_mse": 0.028203430601902175,
+    "pre_clip_norm": 0.6503024639790518,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2916,
+    "validation": {
+      "rmse": 0.9484844114463421,
+      "mae": 0.738800048828125,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 49,
+    "objective": 0.06106023817208775,
+    "clean_property": 0.06131519161556896,
+    "noisy_property": 0.06080528410772482,
+    "feature_mse": 0.024036914829099386,
+    "pre_clip_norm": 0.8022565036489252,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2856,
+    "validation": {
+      "rmse": 0.9148528114085092,
+      "mae": 0.6895850300788879,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 50,
+    "objective": 0.055445329351514056,
+    "clean_property": 0.05535852199975859,
+    "noisy_property": 0.05553213680130348,
+    "feature_mse": 0.030648606445378902,
+    "pre_clip_norm": 0.7202457824819967,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2856,
+    "validation": {
+      "rmse": 0.9568903293789491,
+      "mae": 0.7101190686225891,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 51,
+    "objective": 0.0584240025072767,
+    "clean_property": 0.057966914322031174,
+    "noisy_property": 0.058881089940928576,
+    "feature_mse": 0.0323719791251055,
+    "pre_clip_norm": 0.8173703415352002,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2916,
+    "validation": {
+      "rmse": 0.8273074595099031,
+      "mae": 0.6323213577270508,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 52,
+    "objective": 0.05484304302617123,
+    "clean_property": 0.0549297310542642,
+    "noisy_property": 0.054756354442552516,
+    "feature_mse": 0.030396955839374608,
+    "pre_clip_norm": 0.7279619041242098,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2896,
+    "validation": {
+      "rmse": 0.8848606420700109,
+      "mae": 0.6630776524543762,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 53,
+    "objective": 0.05375211408133047,
+    "clean_property": 0.05378002746912994,
+    "noisy_property": 0.053724201412446666,
+    "feature_mse": 0.025865323253368076,
+    "pre_clip_norm": 0.7654325308506948,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2946,
+    "validation": {
+      "rmse": 0.8278783754870029,
+      "mae": 0.6378002762794495,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 54,
+    "objective": 0.05122481325739309,
+    "clean_property": 0.051249995533573,
+    "noisy_property": 0.05119963104656914,
+    "feature_mse": 0.03708285949470704,
+    "pre_clip_norm": 0.7000741404399538,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 3008,
+    "validation": {
+      "rmse": 0.8919021417327976,
+      "mae": 0.6619408130645752,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 55,
+    "objective": 0.05252361568834698,
+    "clean_property": 0.05224381874135712,
+    "noisy_property": 0.052803413092828634,
+    "feature_mse": 0.026831579884808315,
+    "pre_clip_norm": 0.7592371822449199,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2955,
+    "validation": {
+      "rmse": 0.9308654631280726,
+      "mae": 0.6753358244895935,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 56,
+    "objective": 0.051338391476555875,
+    "clean_property": 0.051526040802791453,
+    "noisy_property": 0.05115074229737123,
+    "feature_mse": 0.03023919626547579,
+    "pre_clip_norm": 0.6795249387883303,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2888,
+    "validation": {
+      "rmse": 0.8543946651938688,
+      "mae": 0.605668842792511,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 57,
+    "objective": 0.061259662471058074,
+    "clean_property": 0.061513198343546766,
+    "noisy_property": 0.061006126075721624,
+    "feature_mse": 0.03344979086531359,
+    "pre_clip_norm": 0.8383406411137497,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2958,
+    "validation": {
+      "rmse": 0.8732845998287879,
+      "mae": 0.6556412577629089,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 58,
+    "objective": 0.05458204003802517,
+    "clean_property": 0.05434466424610531,
+    "noisy_property": 0.05481941605869092,
+    "feature_mse": 0.026306092306121923,
+    "pre_clip_norm": 0.7439350621742115,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2897,
+    "validation": {
+      "rmse": 0.8245046038548247,
+      "mae": 0.6496980786323547,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 59,
+    "objective": 0.05266317589567941,
+    "clean_property": 0.052808669477439764,
+    "noisy_property": 0.05251768231391907,
+    "feature_mse": 0.031315508216880915,
+    "pre_clip_norm": 0.7232550102890584,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2923,
+    "validation": {
+      "rmse": 0.8954419493504449,
+      "mae": 0.6800388097763062,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 60,
+    "objective": 0.05082698123889011,
+    "clean_property": 0.05039788936183118,
+    "noisy_property": 0.051256073867542704,
+    "feature_mse": 0.03093594428674694,
+    "pre_clip_norm": 0.679105995517028,
+    "clip_fraction": 0.0,
+    "eligible_molecules": 438,
+    "selected_atoms": 2891,
+    "validation": {
+      "rmse": 0.9046508228200221,
+      "mae": 0.6673107147216797,
+      "evaluated_tasks": 1.0
+    }
+  }
+]

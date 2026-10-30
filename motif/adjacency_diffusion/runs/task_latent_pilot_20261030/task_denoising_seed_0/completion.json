@@ -1,0 +1,24 @@
+{
+  "best_epoch": 42,
+  "epochs_run": 60,
+  "validation": {
+    "rmse": 0.844933315839833,
+    "mae": 0.6593644618988037,
+    "evaluated_tasks": 1.0
+  },
+  "train": {
+    "rmse": 0.4486289091027607,
+    "mae": 0.33073142170906067,
+    "evaluated_tasks": 1.0
+  },
+  "elapsed_seconds": 227.7843579,
+  "replay_passed": true,
+  "noise_rng_sha256": {
+    "mask": "6b6100ee3f47ef5274f99ecdfdda4f3742be45db6c8a1c741952d93e39a89f90",
+    "sigma": "f84e72288a7ba8962c6f9b5995b345eeb8ca0a1b996bec31bcbeb708d4fcadd3",
+    "epsilon": "197f4eb61a37a05f091e94db7c4f82bb825498feb6081a8dcf7367c5782dd49b"
+  },
+  "arm": "task_denoising",
+  "seed": 0,
+  "minus_original": 0.029956218153015635
+}

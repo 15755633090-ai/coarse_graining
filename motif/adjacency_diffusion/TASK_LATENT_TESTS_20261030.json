@@ -1,0 +1,8 @@
+{
+  "command": "python -m unittest motif.adjacency_diffusion.test_task_latent_denoising -v",
+  "cases": 4,
+  "passed": true,
+  "seconds": 0.194,
+  "smoke_v2": "two arms, 2epochs, original64dim backbone; source/head initial hashes and noise-stream pairing passed",
+  "initial_smoke_failure": "missing frozen path_gates.py dependency, before training; preserved original plan/status"
+}

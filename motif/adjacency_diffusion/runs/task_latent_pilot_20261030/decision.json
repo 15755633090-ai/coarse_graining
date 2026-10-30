@@ -1,0 +1,8 @@
+{
+  "pilot_augmentation": 0.8245046038548247,
+  "pilot_denoising": 0.844933315839833,
+  "original_seed0": 0.8149770976868174,
+  "replicate": false,
+  "rule": "replicate seeds1,2 only if denoising seed0 beats both original scratch seed0 and augmentation by at least .01 validation RMSE",
+  "smoke": false
+}

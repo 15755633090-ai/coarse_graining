@@ -1,0 +1,77 @@
+{
+  "checks": {
+    "task_latent_smoke_20261030": {
+      "source_files_verified": 127,
+      "state": "failed_before_training"
+    },
+    "task_latent_smoke_v2_20261030": {
+      "source_files_verified": 138,
+      "runs_verified": 2,
+      "history_minimum_checkpoint_and_replay_consistent": true,
+      "paired_noise_rng": true,
+      "same_original_initialization": true
+    },
+    "task_latent_pilot_20261030": {
+      "source_files_verified": 138,
+      "runs_verified": 2,
+      "history_minimum_checkpoint_and_replay_consistent": true,
+      "paired_noise_rng": true,
+      "same_original_initialization": true
+    }
+  },
+  "source_archive": {
+    "path": "motif/adjacency_diffusion/TASK_LATENT_SOURCE_SNAPSHOTS_20261030.zip",
+    "sha256": "b82b05336b2324bae5b95a063102d403bc63643952e1bc9449ff59a34dcaac71"
+  },
+  "local_checkpoints": [
+    {
+      "path": "motif/adjacency_diffusion/runs/task_latent_smoke_v2_20261030/task_augmentation_seed_0/best.pt",
+      "bytes": 4025909,
+      "sha256": "a133e99fda55c087f624fe9aeb127e011aa86f04c57c44b396be32226dd9a0bb",
+      "published": false
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/task_latent_smoke_v2_20261030/task_augmentation_seed_0/latest.pt",
+      "bytes": 10108329,
+      "sha256": "b775913c0bbc0aeedb2ab652506e96e8fc8db720969de046cae88749559207d4",
+      "published": false
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/task_latent_smoke_v2_20261030/task_denoising_seed_0/best.pt",
+      "bytes": 4025909,
+      "sha256": "4ba71cb6e0d30084f94537835f624faf740e8e82bac232c8840bbcdc171f2c1b",
+      "published": false
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/task_latent_smoke_v2_20261030/task_denoising_seed_0/latest.pt",
+      "bytes": 10108329,
+      "sha256": "c9b78d009738e41095246dd6ed8f06def12f85c0eebbee0aa415a1c62b2043dd",
+      "published": false
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/task_latent_pilot_20261030/task_augmentation_seed_0/best.pt",
+      "bytes": 4028725,
+      "sha256": "45539ed2a744f7942ed907bceeac4fe2bd3d69efd424ed7fb7139593a4d672aa",
+      "published": false
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/task_latent_pilot_20261030/task_augmentation_seed_0/latest.pt",
+      "bytes": 10123753,
+      "sha256": "68bae795dbff6bdbb9cdc817e06b156d18085b68425f6b77ae53e6a9c4984520",
+      "published": false
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/task_latent_pilot_20261030/task_denoising_seed_0/best.pt",
+      "bytes": 4028725,
+      "sha256": "d4c1634d7ce2487744bf52563b5e9722f96920f862bb30390f84a9052c5632a8",
+      "published": false
+    },
+    {
+      "path": "motif/adjacency_diffusion/runs/task_latent_pilot_20261030/task_denoising_seed_0/latest.pt",
+      "bytes": 10123753,
+      "sha256": "769f794c3021d0e559950a8d31b4ab84c9f2234c825384487fc1d39752755eb6",
+      "published": false
+    }
+  ],
+  "test_evaluated": false
+}
