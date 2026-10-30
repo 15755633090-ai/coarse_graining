@@ -3,7 +3,8 @@ import torch
 from .model import Config,mlp,pair_nodes
 from .data import condition_from_batch
 from .typed_bonds import (TypedEncoder,EDGE_DIM,FEATURE_SCHEMA,edge_target,corrupt,reconstruction_objective)
-from .typed_refined import RefinedBondModel
+from .typed_refined import RefinedBondModel,evidence_scale
+from .diffusion import Schedule
 
 SCHEMA='typed_gaussian_pair_mask_v1'
 
@@ -34,9 +35,18 @@ class MaskedEncoder(TypedEncoder):
         super().__init__(config)
         self.edge=mlp(self.input_dim,config.hidden_dim,config.hidden_dim)
         self.register_buffer('unknown_presence_prior',1-type_prior[0])
+        if config.observation_weighting=='gaussian_posterior':
+            self.register_buffer('type_prior',type_prior.clone())
+            self.evidence_schedule=Schedule(config.noise_steps,config.beta_min,config.beta_max)
 
     def observation_weight(self,noisy,t):
-        visible=super().observation_weight(noisy,t)
+        if self.config.observation_weighting=='gaussian_posterior':
+            # Local categorical posterior for the actually received Gaussian data.
+            # Equal-norm one-hot means make the class-independent quadratic cancel.
+            logits=noisy[...,:6]*evidence_scale(self.evidence_schedule,noisy,t)+self.type_prior.log()
+            visible=1-logits.softmax(-1)[...,0]
+        else:
+            visible=super().observation_weight(noisy,t)
         return torch.where(noisy[...,-1]>.5,self.unknown_presence_prior,visible)
 
 

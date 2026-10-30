@@ -15,6 +15,10 @@ from motif.brics_atom_diffusion.pretrain import read_smiles
 
 
 def training_checkpoint(path,model):
+    if hasattr(model,'readout_norm'):
+        from .task_readout import load_model
+        _,saved=load_model(path)
+        return saved
     if hasattr(model,'mask_ratio'):
         from .masked_bonds import load_model
         _,saved=load_model(path)
@@ -108,6 +112,14 @@ def make_optimizer(model,args):
     head=[p for p in parameters if id(p) not in identities]
     return torch.optim.Adam([{'params':encoder,'lr':encoder_lr},{'params':head,'lr':args.learning_rate}],
                             weight_decay=args.weight_decay)
+
+
+def initialize_encoder_transfer(model,state,reset_output_projection=False):
+    """Load into a fresh model, optionally keeping its fresh output projection."""
+    fresh={k:v.detach().clone() for k,v in model.encoder.fuse.state_dict().items()} if reset_output_projection else None
+    model.encoder.load_state_dict(state,strict=True)
+    if fresh is not None:
+        model.encoder.fuse.load_state_dict(fresh,strict=True)
 
 
 def fit(model,train,valid,args,metadata,spec=None,scaler=None,weight=None):
@@ -204,8 +216,17 @@ def main():
     p.add_argument('--pair-mask-ratio',type=float)
     p.add_argument('--training-max-t',type=int)
     p.add_argument('--encoder-learning-rate',type=float)
+    p.add_argument('--message-normalization',choices=('candidate','observation_mass'),default='candidate')
+    p.add_argument('--observation-weighting',choices=('softmax','gaussian_posterior'),default='softmax')
+    p.add_argument('--reset-output-projection',action='store_true')
     args=p.parse_args()
     config=io.initialize(args)
+    config.message_normalization=args.message_normalization
+    config.observation_weighting=args.observation_weighting
+    if args.reset_output_projection and (args.stage!='finetune' or not args.pretrained):
+        raise ValueError('Reset output projection requires finetune with --pretrained')
+    if args.observation_weighting!='softmax' and args.variant!='masked':
+        raise ValueError('Gaussian-posterior weighting requires --variant masked')
     if args.pair_mask_ratio is not None and (args.variant!='masked' or not 0<=args.pair_mask_ratio<=1):
         raise ValueError('Pair mask ratio requires --variant masked and a value in [0,1]')
     if args.training_max_t is not None and (args.variant=='v1' or not 1<=args.training_max_t<=config.noise_steps):
@@ -242,7 +263,11 @@ def main():
                 _,saved=load_model(args.pretrained)
                 if args.variant!='masked' and saved['variant']!=args.variant:
                     raise ValueError('Pretrained recovery variant mismatch')
-            if saved['stage']!='pretrain' or saved['config']!=asdict(config):
+            from .model import Config
+            saved_config=asdict(Config(**saved['config']))
+            # Dropout is a recorded task adaptation, not an encoder weight shape.
+            saved_config['dropout']=config.dropout
+            if saved['stage']!='pretrain' or saved_config!=asdict(config):
                 raise ValueError('Typed encoder pretraining configuration mismatch')
             corpus=saved['run_metadata']['inputs']
             seen=set(corpus['train_smiles'])|set(corpus['valid_smiles'])
@@ -276,7 +301,7 @@ def main():
             model.training_max_t=expected
         model.initialize_priors()
     if args.stage=='finetune' and args.pretrained:
-        model.encoder.load_state_dict(saved['encoder'],strict=True)
+        initialize_encoder_transfer(model,saved['encoder'],args.reset_output_projection)
     model.to(args.device)
     metadata={'schema':model.checkpoint(args.stage)['schema'],'feature_schema':FEATURE_SCHEMA,'config':asdict(config),'inputs':inputs,
               'args':{k:str(v.resolve()) if isinstance(v,Path) else v for k,v in vars(args).items() if k!='resume'},
@@ -284,6 +309,7 @@ def main():
                            if getattr(model,'mask_ratio',0)>0 else 'presence BCE plus independently normalized conditional type CE plus three auxiliary block CE'
                            if getattr(model,'factorized',False) else 'sum of four block CE; type on all pairs; remaining attributes on true bonds; per-graph normalized'),
               'recovery_variant':args.variant,
+              'transfer_strategy':'pretrained_except_fuse' if args.reset_output_projection else 'full_encoder' if args.pretrained else 'scratch',
               'pair_mask_ratio':getattr(model,'mask_ratio',None),
               'masked_only_objective':bool(getattr(model,'mask_ratio',0)>0),
               'class_priors':{name:getattr(model,'prior_'+name).tolist() for name in BLOCKS} if hasattr(model,'variant') else None,

@@ -1,0 +1,8 @@
+{
+  "state": "complete",
+  "completed_pretrain_jobs": 3,
+  "completed_property_jobs": 3,
+  "all_replays_passed": true,
+  "all_target_counts_matched": true,
+  "test_evaluated": false
+}

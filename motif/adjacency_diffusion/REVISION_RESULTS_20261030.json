@@ -1,0 +1,97 @@
+{
+  "scope": "exploratory ESOL scaffold validation; all arms supervised at task stage; no test evaluation",
+  "new_full_property_runs": 25,
+  "new_pretraining_runs": 7,
+  "upstream_training_molecules": 512,
+  "upstream_updates": 1200,
+  "property_epochs_each": 60,
+  "rows": [
+    {
+      "label": "原均值读出：从头训练",
+      "mean_rmse": 0.7871093541578864,
+      "sample_sd": 0.02804412413028663,
+      "n": 3
+    },
+    {
+      "label": "原均值读出：无遮蔽预训练",
+      "mean_rmse": 0.7960594404450024,
+      "sample_sd": 0.005946465796765499,
+      "n": 3
+    },
+    {
+      "label": "原均值读出：遮蔽预训练",
+      "mean_rmse": 0.8144564146293961,
+      "sample_sd": 0.051139826581606936,
+      "n": 3
+    },
+    {
+      "label": "较强正则：从头训练",
+      "mean_rmse": 0.9642539759335742,
+      "sample_sd": 0.013959760471407479,
+      "n": 3
+    },
+    {
+      "label": "较强正则：遮蔽预训练",
+      "mean_rmse": 0.8457018456712725,
+      "sample_sd": 0.034649873030412524,
+      "n": 3
+    },
+    {
+      "label": "后验权重：全时间范围",
+      "mean_rmse": 0.8217495654339048,
+      "sample_sd": 0.023364820128611314,
+      "n": 3
+    },
+    {
+      "label": "后验权重：t≤300",
+      "mean_rmse": 0.8624395759433647,
+      "sample_sd": 0.08117123954904897,
+      "n": 3
+    },
+    {
+      "label": "新归一化＋大小读出：从头训练",
+      "mean_rmse": 0.8100860411931606,
+      "sample_sd": 0.01405326817140696,
+      "n": 3
+    },
+    {
+      "label": "新归一化＋大小读出：遮蔽预训练",
+      "mean_rmse": 0.8197705940184598,
+      "sample_sd": 0.060024171225883986,
+      "n": 3
+    },
+    {
+      "label": "保留预训练主干、重置输出投影",
+      "mean_rmse": 0.8470806557252564,
+      "sample_sd": 0.06304469204847332,
+      "n": 3
+    }
+  ],
+  "lowest_observed_mean": {
+    "label": "原均值读出：从头训练",
+    "mean_rmse": 0.7871093541578864,
+    "sample_sd": 0.02804412413028663,
+    "n": 3
+  },
+  "readout_paired_deltas": [
+    {
+      "seed": 0,
+      "masked_minus_scratch": -0.02496148312427504
+    },
+    {
+      "seed": 1,
+      "masked_minus_scratch": -0.00972461428050786
+    },
+    {
+      "seed": 2,
+      "masked_minus_scratch": 0.06373975588068026
+    }
+  ],
+  "test_evaluated": false,
+  "limitations": [
+    "adaptive reused validation search",
+    "three seeds",
+    "single downstream dataset",
+    "no isolated boundary-gate or fixed-target context intervention"
+  ]
+}

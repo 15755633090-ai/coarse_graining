@@ -1,0 +1,11 @@
+{
+  "state": "complete",
+  "property_runs": 3,
+  "pretraining_runs": 3,
+  "all_60_epochs": true,
+  "all_checkpoints_replayed": true,
+  "all_source_hashes_match": true,
+  "equal_supervision_counts_verified": true,
+  "clean_scratch_prediction_gradient_equivalence_verified": true,
+  "test_evaluated": false
+}

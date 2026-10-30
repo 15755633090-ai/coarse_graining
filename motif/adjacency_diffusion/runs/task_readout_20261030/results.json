@@ -1,0 +1,145 @@
+{
+  "runs": [
+    {
+      "best_epoch": 58,
+      "best_score": 0.7949243119036089,
+      "epochs_run": 60,
+      "elapsed_seconds": 98.16876300000001,
+      "arm": "scratch",
+      "seed": 0,
+      "validation": {
+        "rmse": 0.7949243119036089,
+        "mae": 0.596672534942627,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+        "head": "e2828768db85095aafc0593cf35787d516c3bf212a6f810437a3a8eaed42e403",
+        "norm": "ea2bf4422353c9757734e99046ec19e34d3ecb5c107a20fdfb209086b104423b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 58,
+      "best_score": 0.7699628287793339,
+      "epochs_run": 60,
+      "elapsed_seconds": 102.1658055,
+      "arm": "masked",
+      "seed": 0,
+      "validation": {
+        "rmse": 0.7699628287793339,
+        "mae": 0.6155843734741211,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+        "head": "e2828768db85095aafc0593cf35787d516c3bf212a6f810437a3a8eaed42e403",
+        "norm": "ea2bf4422353c9757734e99046ec19e34d3ecb5c107a20fdfb209086b104423b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 52,
+      "best_score": 0.8126583311893723,
+      "epochs_run": 60,
+      "elapsed_seconds": 118.31189680000003,
+      "arm": "scratch",
+      "seed": 1,
+      "validation": {
+        "rmse": 0.8126583311893723,
+        "mae": 0.6207609176635742,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "cb08249be4784a70efd2aa8888d9b71dca8831cd8166c34e62bddf5b00111b7f",
+        "head": "6f9e9bfcf7bfa30a57128e22faa3830bdc65f2235632f3d6e96b307cc192f2f9",
+        "norm": "ea2bf4422353c9757734e99046ec19e34d3ecb5c107a20fdfb209086b104423b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 44,
+      "best_score": 0.8029337169088644,
+      "epochs_run": 60,
+      "elapsed_seconds": 105.08635720000001,
+      "arm": "masked",
+      "seed": 1,
+      "validation": {
+        "rmse": 0.8029337169088644,
+        "mae": 0.6335973143577576,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "cb08249be4784a70efd2aa8888d9b71dca8831cd8166c34e62bddf5b00111b7f",
+        "head": "6f9e9bfcf7bfa30a57128e22faa3830bdc65f2235632f3d6e96b307cc192f2f9",
+        "norm": "ea2bf4422353c9757734e99046ec19e34d3ecb5c107a20fdfb209086b104423b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 52,
+      "best_score": 0.8226754804865009,
+      "epochs_run": 60,
+      "elapsed_seconds": 105.2959131,
+      "arm": "scratch",
+      "seed": 2,
+      "validation": {
+        "rmse": 0.8226754804865009,
+        "mae": 0.6347200274467468,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "49bb247783c58fbe1a6282becc2d5c5435a2f4307d246d50363c263e7aedec1f",
+        "head": "93aad9075cf681d2f3017f26cd440d15aea187a825d5b8a8bfdb23b5eb36b764",
+        "norm": "ea2bf4422353c9757734e99046ec19e34d3ecb5c107a20fdfb209086b104423b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 55,
+      "best_score": 0.8864152363671811,
+      "epochs_run": 60,
+      "elapsed_seconds": 110.8171923000001,
+      "arm": "masked",
+      "seed": 2,
+      "validation": {
+        "rmse": 0.8864152363671811,
+        "mae": 0.7076766490936279,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "49bb247783c58fbe1a6282becc2d5c5435a2f4307d246d50363c263e7aedec1f",
+        "head": "93aad9075cf681d2f3017f26cd440d15aea187a825d5b8a8bfdb23b5eb36b764",
+        "norm": "ea2bf4422353c9757734e99046ec19e34d3ecb5c107a20fdfb209086b104423b"
+      },
+      "checkpoint_replay_passed": true
+    }
+  ],
+  "aggregate": {
+    "scratch": {
+      "mean_rmse": 0.8100860411931606,
+      "sample_sd": 0.01405326817140696,
+      "n": 3
+    },
+    "masked": {
+      "mean_rmse": 0.8197705940184598,
+      "sample_sd": 0.060024171225883986,
+      "n": 3
+    }
+  },
+  "paired": [
+    {
+      "seed": 0,
+      "masked_minus_scratch": -0.02496148312427504
+    },
+    {
+      "seed": 1,
+      "masked_minus_scratch": -0.00972461428050786
+    },
+    {
+      "seed": 2,
+      "masked_minus_scratch": 0.06373975588068026
+    }
+  ],
+  "test_evaluated": false
+}

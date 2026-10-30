@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-30",
+  "command": "python -m unittest motif.adjacency_diffusion.test_interfaces motif.adjacency_diffusion.test_masked_bonds motif.adjacency_diffusion.test_typed_bonds motif.adjacency_diffusion.test_typed_refined motif.adjacency_diffusion.test_message_normalization motif.adjacency_diffusion.test_posterior_masked motif.adjacency_diffusion.test_task_readout motif.adjacency_diffusion.test_partial_transfer",
+  "cases": 46,
+  "passed": true,
+  "duration_seconds": 3.76,
+  "scope": "relevant interface and typed/masked paths; includes repeated masking/resume cases under three weighting/normalization configurations; not the whole repository",
+  "cli_help_passed": true,
+  "test_split_evaluated": false,
+  "legacy_checkpoint_cli_finetune_smoke": {
+    "passed": true,
+    "one_epoch": true,
+    "limit": 16,
+    "dropout_adaptation": "pretrain0 to task0.1",
+    "checkpoint_replay_passed": true,
+    "performance_evidence": false
+  },
+  "normalized_size_readout_smoke": {
+    "passed": true,
+    "arms": 2,
+    "epochs_each": 2,
+    "limit": 16,
+    "checkpoint_replay_passed": true,
+    "performance_evidence": false
+  },
+  "selective_transfer_tests_passed": true
+}

@@ -1,0 +1,10 @@
+{
+  "state": "complete",
+  "all_60_epochs": true,
+  "all_source_hashes_match": true,
+  "all_replays_passed": true,
+  "paired_initialization_verified": true,
+  "original_active_parameters": 489476,
+  "new_active_parameters": 489668,
+  "test_evaluated": false
+}

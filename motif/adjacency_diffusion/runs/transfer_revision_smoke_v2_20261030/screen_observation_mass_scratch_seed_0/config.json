@@ -1,0 +1,71 @@
+{
+  "candidate": "observation_mass",
+  "settings": {
+    "lr": 0.001,
+    "encoder_lr": null,
+    "wd": 0.0,
+    "dropout": 0.1,
+    "norm": "observation_mass"
+  },
+  "seed": 0,
+  "arm": "scratch",
+  "phase": "screen",
+  "config": {
+    "hidden_dim": 64,
+    "layers": 3,
+    "dropout": 0.1,
+    "noise_steps": 1000,
+    "beta_min": 0.0001,
+    "beta_max": 0.02,
+    "motif_prior": true,
+    "conditional_gate": true,
+    "dual_state": true,
+    "time_mode": "random",
+    "message_normalization": "observation_mass"
+  },
+  "initial": {
+    "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+    "head": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b"
+  },
+  "source": null,
+  "splits": {
+    "train": [
+      2,
+      5,
+      6,
+      7,
+      11,
+      12,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      22,
+      23,
+      24
+    ],
+    "valid": [
+      32,
+      34,
+      72,
+      88,
+      91,
+      156,
+      164,
+      186,
+      195,
+      200,
+      213,
+      226,
+      232,
+      240,
+      254,
+      262
+    ]
+  },
+  "test_evaluated": false,
+  "plan_sha256": "736474dda390dfdf694c444c72f6a5dd7845da930a2ab16f0e800e67df2ca20e"
+}

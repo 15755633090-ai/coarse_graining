@@ -19,6 +19,8 @@ class Config:
     conditional_gate: bool = False
     dual_state: bool = True
     time_mode: str = "terminal"
+    message_normalization: str = "candidate"
+    observation_weighting: str = "softmax"
 
     def __post_init__(self):
         if self.hidden_dim < 4 or self.layers < 1 or not 0 <= self.dropout < 1:
@@ -27,6 +29,10 @@ class Config:
             raise ValueError("Boundary gating requires the explicitly declared BRICS prior")
         if self.time_mode not in ("terminal", "random"):
             raise ValueError("time_mode must be terminal or random")
+        if self.message_normalization not in ("candidate", "observation_mass"):
+            raise ValueError("Unknown message normalization")
+        if self.observation_weighting not in ("softmax", "gaussian_posterior"):
+            raise ValueError("Unknown observation weighting")
 
 
 def mlp(inputs, hidden, outputs):
@@ -38,11 +44,18 @@ def pair_nodes(x):
     return x[:, :, None, :].expand(-1, -1, n, -1), x[:, None, :, :].expand(-1, n, -1, -1)
 
 
-def reduce_messages(messages, mask, noisy):
-    # Candidate count, never clean degree or sum(gates). Negative noisy weights
-    # are retained; true edges are not used to prune the candidate support.
+def reduce_messages(messages, mask, noisy, normalization="candidate"):
+    # The default retains signed noisy weights and candidate-count normalization.
+    # The optional typed mode normalizes received nonnegative weights, never gates
+    # or hidden clean degree. True target edges do not prune candidate support.
     weighted = messages * noisy[:, :, :, None] * mask[:, :, :, None]
-    return weighted.sum(2) / mask.sum(2).clamp_min(1)[:, :, None]
+    if normalization == "observation_mass":
+        # Only received weights define the denominator; no target/clean support.
+        # This mode is intended for nonnegative typed-edge probability weights.
+        denominator=(noisy*mask).sum(2).clamp_min(1e-8)
+    else:
+        denominator=mask.sum(2).clamp_min(1)
+    return weighted.sum(2) / denominator[:, :, None]
 
 
 class Layer(nn.Module):
@@ -50,6 +63,7 @@ class Layer(nn.Module):
         super().__init__()
         d = config.hidden_dim
         self.dual = config.dual_state
+        self.message_normalization = config.message_normalization
         if self.dual:
             self.s_message = mlp(3*d, 2*d, d)
             self.s_update = mlp(2*d, 2*d, d)
@@ -65,7 +79,7 @@ class Layer(nn.Module):
         hi, hj = pair_nodes(h)
         inside = condition.same_fragment if condition.same_fragment is not None else condition.pairs
         if self.dual:
-            incoming = reduce_messages(self.s_message(torch.cat((a, b, edge), -1)), inside, noisy)
+            incoming = reduce_messages(self.s_message(torch.cat((a, b, edge), -1)), inside, noisy, self.message_normalization)
             next_s = self.s_norm(s + self.drop(self.s_update(torch.cat((s, incoming), -1))))
         else:
             next_s = h
@@ -75,7 +89,7 @@ class Layer(nn.Module):
             cross = condition.pairs & ~inside
             gate = torch.where(cross[:, :, :, None], learned, gate)
         message = self.h_message(torch.cat((hi, hj, edge), -1)) * gate
-        incoming = reduce_messages(message, condition.pairs, noisy)
+        incoming = reduce_messages(message, condition.pairs, noisy, self.message_normalization)
         next_h = self.h_norm(h + self.drop(self.h_update(torch.cat((h, next_s, incoming), -1))))
         node_mask = condition.nodes[:, :, None]
         return next_s * node_mask, next_h * node_mask, gate.squeeze(-1) * condition.pairs

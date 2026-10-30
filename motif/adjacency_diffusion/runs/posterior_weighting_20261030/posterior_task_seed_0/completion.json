@@ -1,0 +1,16 @@
+{
+  "best_epoch": 38,
+  "best_score": 0.7979816531483942,
+  "epochs_run": 60,
+  "elapsed_seconds": 103.29835010000002,
+  "seed": 0,
+  "validation": {
+    "rmse": 0.7979816531483942,
+    "mae": 0.6019211411476135,
+    "evaluated_tasks": 1.0
+  },
+  "scratch_rmse": 0.8149770976868174,
+  "original_masked_rmse": 0.8704874982511301,
+  "clean_scratch_equivalence_passed": true,
+  "checkpoint_replay_passed": true
+}

@@ -1,0 +1,9 @@
+{
+  "state": "complete",
+  "all_60_epochs": true,
+  "all_source_hashes_match": true,
+  "all_checkpoint_replays_passed": true,
+  "selective_transfer_and_fresh_projection_verified": true,
+  "same_architecture_and_capacity_as_original": true,
+  "test_evaluated": false
+}

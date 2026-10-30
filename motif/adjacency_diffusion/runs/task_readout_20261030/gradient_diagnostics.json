@@ -1,0 +1,38 @@
+[
+  {
+    "arm": "scratch",
+    "seed": 0,
+    "mean_clip_fraction": 0.010818713450292398,
+    "mean_pre_clip_norm": 1.270382364338253
+  },
+  {
+    "arm": "masked",
+    "seed": 0,
+    "mean_clip_fraction": 0.0029239766081871343,
+    "mean_pre_clip_norm": 0.977490925697381
+  },
+  {
+    "arm": "scratch",
+    "seed": 1,
+    "mean_clip_fraction": 0.006432748538011695,
+    "mean_pre_clip_norm": 1.2280149872714317
+  },
+  {
+    "arm": "masked",
+    "seed": 1,
+    "mean_clip_fraction": 0.0032163742690058477,
+    "mean_pre_clip_norm": 0.9442150390679724
+  },
+  {
+    "arm": "scratch",
+    "seed": 2,
+    "mean_clip_fraction": 0.02134502923976608,
+    "mean_pre_clip_norm": 1.3700340892182805
+  },
+  {
+    "arm": "masked",
+    "seed": 2,
+    "mean_clip_fraction": 0.006432748538011695,
+    "mean_pre_clip_norm": 1.0279173692895307
+  }
+]

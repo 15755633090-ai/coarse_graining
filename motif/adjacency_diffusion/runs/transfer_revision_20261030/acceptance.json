@@ -1,0 +1,12 @@
+{
+  "state": "complete",
+  "property_jobs": 10,
+  "all_60_epochs": true,
+  "all_best_checkpoints_replayed": true,
+  "paired_initialization_verified": true,
+  "mass_pretraining_initialization_matches_original_masked": true,
+  "frozen_source_hashes_match": true,
+  "test_evaluated": false,
+  "selected": "strong_regularized",
+  "interpretation": "screen seed0 selected; seeds1,2 are seed replication on reused ESOL validation, not untouched tests"
+}

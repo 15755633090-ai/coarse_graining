@@ -1,0 +1,145 @@
+{
+  "runs": [
+    {
+      "best_epoch": 1,
+      "best_score": 2.0584754982269127,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.5049878000000003,
+      "candidate": "slow_regularized",
+      "seed": 0,
+      "arm": "scratch",
+      "phase": "screen",
+      "validation": {
+        "rmse": 2.0584754982269127,
+        "mae": 1.6440892219543457,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+        "head": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 2,
+      "best_score": 2.143462813022551,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.4450073999999997,
+      "candidate": "slow_regularized",
+      "seed": 0,
+      "arm": "masked",
+      "phase": "screen",
+      "validation": {
+        "rmse": 2.143462813022551,
+        "mae": 1.6807347536087036,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+        "head": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 1,
+      "best_score": 2.0966759349858712,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.4397870000000008,
+      "candidate": "strong_regularized",
+      "seed": 0,
+      "arm": "scratch",
+      "phase": "screen",
+      "validation": {
+        "rmse": 2.0966759349858712,
+        "mae": 1.6909778118133545,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+        "head": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 1,
+      "best_score": 2.1435796019337983,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.6256953999999997,
+      "candidate": "strong_regularized",
+      "seed": 0,
+      "arm": "masked",
+      "phase": "screen",
+      "validation": {
+        "rmse": 2.1435796019337983,
+        "mae": 1.6902379989624023,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+        "head": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 1,
+      "best_score": 2.105036816852659,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.45187810000000006,
+      "candidate": "observation_mass",
+      "seed": 0,
+      "arm": "scratch",
+      "phase": "screen",
+      "validation": {
+        "rmse": 2.105036816852659,
+        "mae": 1.6996692419052124,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+        "head": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b"
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 1,
+      "best_score": 2.0938751411048524,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.4622539999999997,
+      "candidate": "observation_mass",
+      "seed": 0,
+      "arm": "masked",
+      "phase": "screen",
+      "validation": {
+        "rmse": 2.0938751411048524,
+        "mae": 1.6916611194610596,
+        "evaluated_tasks": 1.0
+      },
+      "initial": {
+        "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+        "head": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b"
+      },
+      "checkpoint_replay_passed": true
+    }
+  ],
+  "selected": "observation_mass",
+  "aggregate_selected": {
+    "scratch": {
+      "n": 1,
+      "mean_rmse": 2.105036816852659,
+      "sd": null
+    },
+    "masked": {
+      "n": 1,
+      "mean_rmse": 2.0938751411048524,
+      "sd": null
+    }
+  },
+  "paired": [
+    {
+      "seed": 0,
+      "masked_minus_scratch": -0.011161675747806576
+    }
+  ],
+  "test_evaluated": false,
+  "selection_bias": "seed0 used for selection; seeds1,2 only seed replication on reused validation split"
+}

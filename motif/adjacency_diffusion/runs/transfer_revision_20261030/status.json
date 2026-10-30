@@ -1,0 +1,9 @@
+{
+  "state": "complete",
+  "completed_property_jobs": 10,
+  "selected": "strong_regularized",
+  "all_replays_passed": true,
+  "paired_initializations_passed": true,
+  "elapsed_seconds": 1080.0397123,
+  "test_evaluated": false
+}

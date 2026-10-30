@@ -1,0 +1,17 @@
+{
+  "state": "complete",
+  "best_epoch": 1,
+  "best_score": 2.1492062944434718,
+  "epochs_run": 1,
+  "elapsed_seconds": 0.2662439999999986,
+  "validation": {
+    "rmse": 2.1492062944434718,
+    "mae": 1.7444031238555908,
+    "evaluated_tasks": 1.0
+  },
+  "schema": "typed_gaussian_pair_mask_v1",
+  "variant": "masked",
+  "test_evaluated": false,
+  "checkpoint_replay_passed": true,
+  "smoke_only": true
+}

@@ -1,0 +1,20 @@
+{
+  "best_epoch": 12,
+  "best_score": 0.8843466332944417,
+  "epochs_run": 60,
+  "elapsed_seconds": 105.3432707,
+  "candidate": "strong_regularized",
+  "seed": 0,
+  "arm": "masked",
+  "phase": "screen",
+  "validation": {
+    "rmse": 0.8843466332944417,
+    "mae": 0.7109613418579102,
+    "evaluated_tasks": 1.0
+  },
+  "initial": {
+    "encoder": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+    "head": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b"
+  },
+  "checkpoint_replay_passed": true
+}

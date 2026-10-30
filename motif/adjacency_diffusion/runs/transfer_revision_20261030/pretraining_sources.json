@@ -1,0 +1,8 @@
+[
+  {
+    "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\transfer_revision_20261030\\pretraining\\mass_seed_7\\encoder.pt",
+    "sha256": "4be280356a485d27f364f2c024f86b218e2b4d39e2dc042a9a019d778cc78df6",
+    "initial_state_hash": "f61a548409f49d13c3f21d1c438b0ebc3e95da30694bd432d27aeb4b66397054",
+    "checkpoint_replay_passed": true
+  }
+]

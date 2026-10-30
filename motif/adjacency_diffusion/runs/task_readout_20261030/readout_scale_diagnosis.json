@@ -1,0 +1,47 @@
+{
+  "scratch_initial": {
+    "mean_graph_embedding_l2": 1.4448797702789307,
+    "mean_dimension_std_across_graphs": 0.02700052224099636,
+    "min_dimension_std": 0.007931271567940712
+  },
+  "masked_pretrained": {
+    "mean_graph_embedding_l2": 9.009306907653809,
+    "mean_dimension_std_across_graphs": 0.8903701305389404,
+    "min_dimension_std": 0.24669083952903748
+  },
+  "scope": "first32 ESOL training molecules; no target labels used; task seed0 / pretrain seed7 only",
+  "train_ids": [
+    2,
+    5,
+    6,
+    7,
+    11,
+    12,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    29,
+    30,
+    31,
+    33,
+    35,
+    37,
+    39,
+    40,
+    41,
+    43,
+    44,
+    45,
+    46
+  ]
+}
