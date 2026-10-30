@@ -1,0 +1,53 @@
+{
+  "arm": "directed",
+  "seed": 0,
+  "config": {
+    "hidden_dim": 12,
+    "layers": 1,
+    "dropout": 0.1,
+    "readout_steps": 2,
+    "boundary": false
+  },
+  "splits": {
+    "train": [
+      2,
+      5,
+      6,
+      7,
+      11,
+      12,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      22,
+      23,
+      24
+    ],
+    "valid": [
+      32,
+      34,
+      72,
+      88,
+      91,
+      156,
+      164,
+      186,
+      195,
+      200,
+      213,
+      226,
+      232,
+      240,
+      254,
+      262
+    ]
+  },
+  "active_parameters": 5425,
+  "shared_initial_hash": "39872a2ebc57946f5dc5c87b01963c4c80acaed74558d92b55a85e4b32229440",
+  "plan_sha256": "656ce0b37ee8e2be4eaa7c52f9f106554dea140f8fea37bc665ea7d431b716c0",
+  "test_evaluated": false
+}

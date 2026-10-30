@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "scope": "frozen-source hashes, histories, runtime checkpoint replay assertions and paired initialization",
+  "auditor_sha256": "d15e647edcf7686e7af70c9f9169490fab6b0552f1835c68a1b6556fddb6fa80",
+  "runs": [
+    {
+      "arm": "directed",
+      "seed": 0,
+      "best_sha256": "1b37b2e32b33544292f98ae45b36a778eeae0570355e2dae7818ba7dfa624707",
+      "latest_sha256": "16cc115442f4c23bb0748794992cee581e1bef05e23b070cad5622059ad713e3",
+      "history_sha256": "68a22883ad125f4b318a42288518bc6374f7654e05515ed297dce7021f10b52c",
+      "active_parameters": 5425,
+      "epochs": 2
+    },
+    {
+      "arm": "boundary",
+      "seed": 0,
+      "best_sha256": "9ca88f54c5b7d4099f3d22328b5924de799fd99421ba9d8091765c7cf1d2006b",
+      "latest_sha256": "387ee558acb75a23398ae96833640bed6e125c91b56e4ec989a26ce14a01acf9",
+      "history_sha256": "99b716658874aa4cf6446549dc14479c71d849518712cac33f3fdb14d0c648ec",
+      "active_parameters": 9554,
+      "epochs": 2
+    }
+  ],
+  "test_evaluated": false
+}

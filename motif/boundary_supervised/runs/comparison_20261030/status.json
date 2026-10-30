@@ -1,0 +1,9 @@
+{
+  "state": "complete",
+  "new_supervised_runs": 6,
+  "all_replays_passed": true,
+  "paired_shared_initialization": true,
+  "wall_seconds": 477.1323986,
+  "test_evaluated": false,
+  "smoke": false
+}

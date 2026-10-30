@@ -1,0 +1,360 @@
+{
+  "files": [
+    {
+      "path": "_github_sync/finalize_boundary_supervised_20261030.py",
+      "chars": 3365,
+      "sha256": "d15e647edcf7686e7af70c9f9169490fab6b0552f1835c68a1b6556fddb6fa80"
+    },
+    {
+      "path": "_github_sync/package_boundary_supervised_20261030.py",
+      "chars": 1917,
+      "sha256": "0c2245321cd3c02205dd01d75f56f70e5e997a73c47534288188721300ac1059"
+    },
+    {
+      "path": "_github_sync/run_boundary_supervised_20261030.py",
+      "chars": 7063,
+      "sha256": "561248a6dd70f8b013425ece98023b120e3f971a074fd2f36cfc5cafddd7f4b9"
+    },
+    {
+      "path": "motif/boundary_supervised/__init__.py",
+      "chars": 77,
+      "sha256": "ec0f0c8ac191471ff6a8a81f1098898b91f3020b72cdd7c0e09eb2f755ca13b2"
+    },
+    {
+      "path": "motif/boundary_supervised/METHOD_20261030.md",
+      "chars": 2672,
+      "sha256": "90a565e3b6a24f994e87a1e20bb4e9bc351f7aecbbb882bbc51079551c8cb07e"
+    },
+    {
+      "path": "motif/boundary_supervised/model.py",
+      "chars": 5714,
+      "sha256": "cc1e689968f6e7e196e2d8e0271789218840089740ff74b93b951cbff028e849"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/acceptance.json",
+      "chars": 2545,
+      "sha256": "312baa9e3116985c05b5ef340edfd0de487e7e1282957adf0445abd77678cc64"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_0/completion.json",
+      "chars": 435,
+      "sha256": "b208556ec9725b02bf3ec3844514ec364192d88961ee4b6162e1e3020f1d8d7b"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_0/config.json",
+      "chars": 11669,
+      "sha256": "b1553d31bf3e88578325a87bdd1368367065c8b86a33e42fb2b26fa34d3613a9"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_0/history.json",
+      "chars": 16277,
+      "sha256": "c295b38599be43ac0e1e386af670baf669c6fe7c5a489f857149023b9e95f381"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_0/status.json",
+      "chars": 60,
+      "sha256": "c8975c82b670161c1421541ddec4f6df76677f9094b4515e3bc298936d17de83"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_1/completion.json",
+      "chars": 442,
+      "sha256": "327142d7c3d0b9418a5152fe085e15c9aa6dcb60a53cf1c671e46089c62c2863"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_1/config.json",
+      "chars": 11669,
+      "sha256": "178a905193053ab805520530ddf22cfa03f714f2a860bdfdcf8f65afeb3fb954"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_1/history.json",
+      "chars": 16350,
+      "sha256": "9dadc11d9bd20f2840d00788bb6a19dbcffe050e9313dc139adecaa8d93a618e"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_1/status.json",
+      "chars": 60,
+      "sha256": "3c1e4252fc13bdd62533976912aa4195a4064dd5b39ea9892e8a1ba98ff47a0a"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_2/completion.json",
+      "chars": 441,
+      "sha256": "43cce948b0cdde9cea514405de6979a6cce547f60b02bc5f8be345322cac01f9"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_2/config.json",
+      "chars": 11669,
+      "sha256": "13717ff7deece26e4adcca78b9d33699d1671fd6367dd1c52e4576b893365432"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_2/history.json",
+      "chars": 16273,
+      "sha256": "3d8506d1e88775b9a67bea8b1d6e0be2ba9a79e1a258301dcc5c52033838fade"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_2/status.json",
+      "chars": 60,
+      "sha256": "fc3e9449f5e6749975472d76f271e80ed00d751de2b05436afae0663504f8469"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_0/completion.json",
+      "chars": 434,
+      "sha256": "583b7686f3de922c4288b6659911dd527361674e83e14d44f207683befdc7b8c"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_0/config.json",
+      "chars": 11669,
+      "sha256": "62869785508daaeb7047b0710928be05de951afc5d3aff52585de4b9b31c6f99"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_0/history.json",
+      "chars": 16577,
+      "sha256": "9cc9f7eb8c1f29a3cdef6c8164cbd85b5ce774e1f4b3fe3c4b409de4893b07d5"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_0/status.json",
+      "chars": 60,
+      "sha256": "0426271b367850bf3c32bd3ec0d40de75e0e347a758a07274d21215bcbc1e80d"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_1/completion.json",
+      "chars": 434,
+      "sha256": "d50ae598e5dfc42b337c2ece85809e75bdc50b7c6a40a92b8b33efc18e73bb81"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_1/config.json",
+      "chars": 11669,
+      "sha256": "4312f3391eab8f93413fb7922806296d4c1cebefca31c86c9c2c23cb559fb905"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_1/history.json",
+      "chars": 16608,
+      "sha256": "f0d09cc31805f0a437d1e3e21bc485332c9c152323c0467f3d72a1f296e250ea"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_1/status.json",
+      "chars": 60,
+      "sha256": "c8975c82b670161c1421541ddec4f6df76677f9094b4515e3bc298936d17de83"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_2/completion.json",
+      "chars": 441,
+      "sha256": "8c407de9cf08a1d82d255fe10e94fdb7456f03d2341b8b550bd995778986d007"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_2/config.json",
+      "chars": 11669,
+      "sha256": "cbaa043813e5f09b8132ce316e4bdac05443d1d817dbf27481fb9da94235ddea"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_2/history.json",
+      "chars": 16554,
+      "sha256": "51b14185b690485f592b44d4f0accc932544af45cc3f570e75e6496d1b9c5757"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_2/status.json",
+      "chars": 60,
+      "sha256": "cce3094b464fdaaca5a4cb8ef2b986a7169f56474595217b83ac168effdb61ec"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/frozen_source_archive.json",
+      "chars": 15330,
+      "sha256": "88e9a38db332d234be1c8b2156fb5b8fecda54e3ba985886882447a458a33741"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/plan.json",
+      "chars": 16149,
+      "sha256": "002ae35b62a5558bf027087fdcb171d3f3f1100ba5137e6e2a45bd448849d73d"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/REPORT.md",
+      "chars": 1089,
+      "sha256": "d743341854b300485bb427f17ac1627c254fea7fe1e7156842d72b588d4e1f9a"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/results.json",
+      "chars": 3433,
+      "sha256": "dbfe8c5dd2c34fe52a657ff533bdaab218f1d988b3c4bd31a577b8a7de6f8f29"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/status.json",
+      "chars": 200,
+      "sha256": "fbb97422c772346404528c95837f7b8d071f321a07962c8195fd0ffdf2a51fe2"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/acceptance.json",
+      "chars": 1018,
+      "sha256": "3b5473ea4ef1fde81516f12b2a6176421cc2cc6ba6bf5f2144f37e2da99a336b"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/boundary_seed_0/completion.json",
+      "chars": 439,
+      "sha256": "e476a38901a4bd28596aed298edabfd13f38974382b83efa7ee2dfa20dbe4596"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/boundary_seed_0/config.json",
+      "chars": 781,
+      "sha256": "f32afcab23861c21245cb3babb1cffeec8130736822cee69ee6c72b438f33bc2"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/boundary_seed_0/history.json",
+      "chars": 529,
+      "sha256": "89c28262f562fa7d65c9f4032c5f1bb86b30f5698c7c1ddcab5cc72c8c03619f"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/boundary_seed_0/status.json",
+      "chars": 58,
+      "sha256": "402ba6b14a6983535af7c1dd4054ec1a2a5d311daed8ee1c552e76ceee2ffcef"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/directed_seed_0/completion.json",
+      "chars": 436,
+      "sha256": "372646ca7971737e20118e4dee4636378924ccd9abde6fccf56ed4f03f5c3928"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/directed_seed_0/config.json",
+      "chars": 782,
+      "sha256": "77e94f638dd55c700eea8dbec4558c7a98cbf657516a1275d8b3737b0f416ea6"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/directed_seed_0/history.json",
+      "chars": 529,
+      "sha256": "f6a25444ec691243eb42727166869c17e7dc3469caeb06f159142a8567d388f2"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/directed_seed_0/status.json",
+      "chars": 58,
+      "sha256": "402ba6b14a6983535af7c1dd4054ec1a2a5d311daed8ee1c552e76ceee2ffcef"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/frozen_source_archive.json",
+      "chars": 15330,
+      "sha256": "88e9a38db332d234be1c8b2156fb5b8fecda54e3ba985886882447a458a33741"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/plan.json",
+      "chars": 16134,
+      "sha256": "668da0fd180635a35c2481e1e2c14c3366976fa0fe0a470c2169172eb0e82fc9"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/REPORT.md",
+      "chars": 808,
+      "sha256": "9f9abd7691716204b9ecab31e59b54ff77cb94e4789b801ad5d9bf965ffc31ed"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/results.json",
+      "chars": 1324,
+      "sha256": "6a8b738dd7503e0bb2fc90b00612116052d905efe6c9794433fc051dbc0eae3b"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/status.json",
+      "chars": 206,
+      "sha256": "beb535e384c089dd212a20813034a2f17c5b90c62ef58762585549e4906ee42e"
+    },
+    {
+      "path": "motif/boundary_supervised/test_model.py",
+      "chars": 3004,
+      "sha256": "2b5d7dbb12fb15f20dab72ca0b483a7ba7ccb3e5c896bb2b5b31c97ab6d48263"
+    },
+    {
+      "path": "motif/boundary_supervised/TESTS_20261030.json",
+      "chars": 434,
+      "sha256": "03ef519735fcb2509e803a7a1153ea4aa7351a48fb5e42b65ac115ec5717de69"
+    }
+  ],
+  "binary_files": [
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/frozen_source.tar.xz",
+      "bytes": 162812,
+      "sha256": "4cfe8a0dc87a3a55e34249fd4d2e657a720d2cf03e9f8a9b9a3cde02cd2a5516",
+      "base64_chars": 217084
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/frozen_source.tar.xz",
+      "bytes": 162812,
+      "sha256": "4cfe8a0dc87a3a55e34249fd4d2e657a720d2cf03e9f8a9b9a3cde02cd2a5516",
+      "base64_chars": 217084
+    }
+  ],
+  "local_only_weights": [
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/boundary_seed_0/best.pt",
+      "bytes": 49652,
+      "sha256": "9ca88f54c5b7d4099f3d22328b5924de799fd99421ba9d8091765c7cf1d2006b"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/boundary_seed_0/latest.pt",
+      "bytes": 216145,
+      "sha256": "387ee558acb75a23398ae96833640bed6e125c91b56e4ec989a26ce14a01acf9"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/directed_seed_0/best.pt",
+      "bytes": 29089,
+      "sha256": "1b37b2e32b33544292f98ae45b36a778eeae0570355e2dae7818ba7dfa624707"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/smoke_20261030/directed_seed_0/latest.pt",
+      "bytes": 128871,
+      "sha256": "16cc115442f4c23bb0748794992cee581e1bef05e23b070cad5622059ad713e3"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_0/best.pt",
+      "bytes": 1067610,
+      "sha256": "dcb528d8bdab4b6845c76cae3b635da2995b39870a1cfe6c4fd92de9472b1c7c"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_0/latest.pt",
+      "bytes": 4298661,
+      "sha256": "d4fa4a45b7905f4dbd4e7530d1e5298aee4c7b16daf96aefbe87672f7e9940d1"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_1/best.pt",
+      "bytes": 1067610,
+      "sha256": "fad86c28f54bbc50582192b6d89f57f01f772ae7c5dd56cec2b24976bf6e7208"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_1/latest.pt",
+      "bytes": 4298661,
+      "sha256": "7370d2afcad0df6c2b14f7311188dee61a3fb6c0f0dd1c03f609169cc6baf14b"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_2/best.pt",
+      "bytes": 1067610,
+      "sha256": "d7dcf52f0c8f43ae1d271e906618a0f908044cb7daa3fd72e2c6daea6a93544f"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/boundary_seed_2/latest.pt",
+      "bytes": 4298661,
+      "sha256": "f52ca59fddf0d4f13fbbd36cf457e2fa71fedc8a36228b37481e8fe472a783e0"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_0/best.pt",
+      "bytes": 333461,
+      "sha256": "1b878ee3efe5f5f025167b3f3d6268618e215d93186166548fe60c97f79f987f"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_0/latest.pt",
+      "bytes": 1349887,
+      "sha256": "591f71fce2d2578558aaa489be11712dbbf80d77df5b696d846f66db6be2c494"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_1/best.pt",
+      "bytes": 333461,
+      "sha256": "93c51f2ee27136fb2e5fd3d02ee752b0a2f8e5592ac610b2e5fcd800312b4c14"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_1/latest.pt",
+      "bytes": 1349887,
+      "sha256": "73b8efbb2c9f021c8ffa7d9a7ec6fef4bed54826cdcddf7a55d9601e52e4d0fe"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_2/best.pt",
+      "bytes": 333461,
+      "sha256": "6a96ff0ce78a5058332302734f659a742f2a1dfb33c0ca71cd0c01242f0911d3"
+    },
+    {
+      "path": "motif/boundary_supervised/runs/comparison_20261030/directed_seed_2/latest.pt",
+      "bytes": 1349887,
+      "sha256": "bb42766529184abbf6e484a6fcd2d47cbf64a3f4eb4dfad75f0493afe0b6a0e9"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "command": "python -m unittest motif.boundary_supervised.test_model -v",
+  "cases": 3,
+  "passed": true,
+  "seconds": 0.057,
+  "checkpoint_test": "in-memory torch serialization roundtrip; disk checkpoints exercised by smoke/formal runners",
+  "torch": "2.8.0+cu128",
+  "torch_geometric": "2.6.1",
+  "rdkit": "2025.03.5",
+  "python": "3.9.23 | packaged by conda-forge | (main, Jun  4 2025, 17:49:16) [MSC v.1929 64 bit (AMD64)]"
+}

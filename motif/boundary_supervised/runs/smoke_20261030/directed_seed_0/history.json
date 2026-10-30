@@ -1,0 +1,24 @@
+[
+  {
+    "epoch": 1,
+    "train_loss_batch_mean": 1.0054055452346802,
+    "pre_clip_norm": 0.31901758909225464,
+    "clip_fraction": 0.0,
+    "validation": {
+      "rmse": 2.047446251281334,
+      "mae": 1.6347229480743408,
+      "evaluated_tasks": 1.0
+    }
+  },
+  {
+    "epoch": 2,
+    "train_loss_batch_mean": 1.006513237953186,
+    "pre_clip_norm": 0.28352469205856323,
+    "clip_fraction": 0.0,
+    "validation": {
+      "rmse": 2.0505388389095947,
+      "mae": 1.6386882066726685,
+      "evaluated_tasks": 1.0
+    }
+  }
+]

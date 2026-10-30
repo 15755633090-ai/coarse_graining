@@ -1,0 +1,138 @@
+{
+  "runs": [
+    {
+      "best_epoch": 53,
+      "best_score": 0.9454977941583151,
+      "epochs_run": 60,
+      "elapsed_seconds": 57.6069524,
+      "arm": "directed",
+      "seed": 0,
+      "active_parameters": 80513,
+      "validation": {
+        "rmse": 0.9454977941583151,
+        "mae": 0.7728323340415955,
+        "evaluated_tasks": 1.0
+      },
+      "train": {
+        "rmse": 0.3938254284137349,
+        "mae": 0.29176685214042664,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 37,
+      "best_score": 0.9620903666853081,
+      "epochs_run": 60,
+      "elapsed_seconds": 94.8538215,
+      "arm": "boundary",
+      "seed": 0,
+      "active_parameters": 260996,
+      "validation": {
+        "rmse": 0.9620903666853081,
+        "mae": 0.8013814687728882,
+        "evaluated_tasks": 1.0
+      },
+      "train": {
+        "rmse": 0.42614018770871803,
+        "mae": 0.3164798319339752,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 37,
+      "best_score": 0.9299872740520885,
+      "epochs_run": 60,
+      "elapsed_seconds": 60.2243435,
+      "arm": "directed",
+      "seed": 1,
+      "active_parameters": 80513,
+      "validation": {
+        "rmse": 0.9299872740520885,
+        "mae": 0.7398505806922913,
+        "evaluated_tasks": 1.0
+      },
+      "train": {
+        "rmse": 0.44961909823008267,
+        "mae": 0.3510228395462036,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 47,
+      "best_score": 0.9358544530945299,
+      "epochs_run": 60,
+      "elapsed_seconds": 99.26013359999999,
+      "arm": "boundary",
+      "seed": 1,
+      "active_parameters": 260996,
+      "validation": {
+        "rmse": 0.9358544530945299,
+        "mae": 0.7483189702033997,
+        "evaluated_tasks": 1.0
+      },
+      "train": {
+        "rmse": 0.3795103586099986,
+        "mae": 0.28553086519241333,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 58,
+      "best_score": 0.8871356135476954,
+      "epochs_run": 60,
+      "elapsed_seconds": 60.65053139999998,
+      "arm": "directed",
+      "seed": 2,
+      "active_parameters": 80513,
+      "validation": {
+        "rmse": 0.8871356135476954,
+        "mae": 0.7244947552680969,
+        "evaluated_tasks": 1.0
+      },
+      "train": {
+        "rmse": 0.4147429183863555,
+        "mae": 0.31160199642181396,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 32,
+      "best_score": 0.9343038436179364,
+      "epochs_run": 60,
+      "elapsed_seconds": 99.89112499999999,
+      "arm": "boundary",
+      "seed": 2,
+      "active_parameters": 260996,
+      "validation": {
+        "rmse": 0.9343038436179364,
+        "mae": 0.7612503170967102,
+        "evaluated_tasks": 1.0
+      },
+      "train": {
+        "rmse": 0.4519850268763938,
+        "mae": 0.3601073920726776,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    }
+  ],
+  "aggregate": {
+    "directed": {
+      "mean_rmse": 0.920873560586033,
+      "sample_sd": 0.030229635480148766,
+      "n": 3
+    },
+    "boundary": {
+      "mean_rmse": 0.9440828877992581,
+      "sample_sd": 0.015614194481652828,
+      "n": 3
+    }
+  },
+  "test_evaluated": false,
+  "smoke": false
+}

@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "scope": "frozen-source hashes, histories, runtime checkpoint replay assertions and paired initialization",
+  "auditor_sha256": "d15e647edcf7686e7af70c9f9169490fab6b0552f1835c68a1b6556fddb6fa80",
+  "runs": [
+    {
+      "arm": "directed",
+      "seed": 0,
+      "best_sha256": "1b878ee3efe5f5f025167b3f3d6268618e215d93186166548fe60c97f79f987f",
+      "latest_sha256": "591f71fce2d2578558aaa489be11712dbbf80d77df5b696d846f66db6be2c494",
+      "history_sha256": "ae442edfbd5228dbd2e6df0bcaa599c0d007880044c8305e116f2cb0a6ff91df",
+      "active_parameters": 80513,
+      "epochs": 60
+    },
+    {
+      "arm": "boundary",
+      "seed": 0,
+      "best_sha256": "dcb528d8bdab4b6845c76cae3b635da2995b39870a1cfe6c4fd92de9472b1c7c",
+      "latest_sha256": "d4fa4a45b7905f4dbd4e7530d1e5298aee4c7b16daf96aefbe87672f7e9940d1",
+      "history_sha256": "437d638d56de1282751f7ba9fc84589818b31b521957f04d9700326716f5001c",
+      "active_parameters": 260996,
+      "epochs": 60
+    },
+    {
+      "arm": "directed",
+      "seed": 1,
+      "best_sha256": "93c51f2ee27136fb2e5fd3d02ee752b0a2f8e5592ac610b2e5fcd800312b4c14",
+      "latest_sha256": "73b8efbb2c9f021c8ffa7d9a7ec6fef4bed54826cdcddf7a55d9601e52e4d0fe",
+      "history_sha256": "cbdb3ac6fa6615f8037a91529b801bedbfca5b30d2a442234467e0654695364c",
+      "active_parameters": 80513,
+      "epochs": 60
+    },
+    {
+      "arm": "boundary",
+      "seed": 1,
+      "best_sha256": "fad86c28f54bbc50582192b6d89f57f01f772ae7c5dd56cec2b24976bf6e7208",
+      "latest_sha256": "7370d2afcad0df6c2b14f7311188dee61a3fb6c0f0dd1c03f609169cc6baf14b",
+      "history_sha256": "82f2e51cb3b30c12c70bebb7b9c68ab4c7dc05110de720a07a6a42c8dec9cf44",
+      "active_parameters": 260996,
+      "epochs": 60
+    },
+    {
+      "arm": "directed",
+      "seed": 2,
+      "best_sha256": "6a96ff0ce78a5058332302734f659a742f2a1dfb33c0ca71cd0c01242f0911d3",
+      "latest_sha256": "bb42766529184abbf6e484a6fcd2d47cbf64a3f4eb4dfad75f0493afe0b6a0e9",
+      "history_sha256": "e5b069ee000b7f6439bf20da2b990baebd8ed2cdab7c7747a9eb0fc8f63d1a06",
+      "active_parameters": 80513,
+      "epochs": 60
+    },
+    {
+      "arm": "boundary",
+      "seed": 2,
+      "best_sha256": "d7dcf52f0c8f43ae1d271e906618a0f908044cb7daa3fd72e2c6daea6a93544f",
+      "latest_sha256": "f52ca59fddf0d4f13fbbd36cf457e2fa71fedc8a36228b37481e8fe472a783e0",
+      "history_sha256": "0bf2a01a3420db3ab24ec33670fd9ec1cb5df9558a07c734c70d73d1613903c2",
+      "active_parameters": 260996,
+      "epochs": 60
+    }
+  ],
+  "test_evaluated": false
+}
