@@ -1,0 +1,85 @@
+{
+  "runs": [
+    {
+      "best_epoch": 1,
+      "best_score": 2.070025730065287,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.1245080999999999,
+      "arm": "scratch",
+      "task_seed": 0,
+      "pretrain_seed": null,
+      "validation": {
+        "rmse": 2.070025730065287,
+        "mae": 1.6594722270965576,
+        "evaluated_tasks": 1.0
+      },
+      "head_initial_hash": "41bdbb8c907628cca7007ce726f2e92adea12b7ab8ac3dc0f92cc679f0136a42",
+      "encoder_initial_hash": "6d2d6cb97972eb0450a962363d98cc9f984646f315d7c437e823c990f8e20bbf",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 1,
+      "best_score": 2.0698492719533848,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.08409980000000061,
+      "arm": "unmasked",
+      "task_seed": 0,
+      "pretrain_seed": 7,
+      "validation": {
+        "rmse": 2.0698492719533848,
+        "mae": 1.6579432487487793,
+        "evaluated_tasks": 1.0
+      },
+      "head_initial_hash": "41bdbb8c907628cca7007ce726f2e92adea12b7ab8ac3dc0f92cc679f0136a42",
+      "encoder_initial_hash": "6d2d6cb97972eb0450a962363d98cc9f984646f315d7c437e823c990f8e20bbf",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 1,
+      "best_score": 2.0706189198725653,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.08775179999999949,
+      "arm": "masked",
+      "task_seed": 0,
+      "pretrain_seed": 7,
+      "validation": {
+        "rmse": 2.0706189198725653,
+        "mae": 1.6592875719070435,
+        "evaluated_tasks": 1.0
+      },
+      "head_initial_hash": "41bdbb8c907628cca7007ce726f2e92adea12b7ab8ac3dc0f92cc679f0136a42",
+      "encoder_initial_hash": "6d2d6cb97972eb0450a962363d98cc9f984646f315d7c437e823c990f8e20bbf",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true
+    }
+  ],
+  "aggregate": {
+    "scratch": {
+      "n": 1,
+      "mean_rmse": 2.070025730065287,
+      "sample_sd": null
+    },
+    "unmasked": {
+      "n": 1,
+      "mean_rmse": 2.0698492719533848,
+      "sample_sd": null
+    },
+    "masked": {
+      "n": 1,
+      "mean_rmse": 2.0706189198725653,
+      "sample_sd": null
+    }
+  },
+  "paired_deltas": [
+    {
+      "task_seed": 0,
+      "unmasked_minus_scratch": -0.0001764581119023667,
+      "masked_minus_scratch": 0.0005931898072781827,
+      "masked_minus_unmasked": 0.0007696479191805494
+    }
+  ],
+  "planned_runs": 3,
+  "test_evaluated": false
+}

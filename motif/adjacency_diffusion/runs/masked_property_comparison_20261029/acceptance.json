@@ -1,0 +1,12 @@
+{
+  "state": "complete",
+  "model_code_matches_7c1cc1e": true,
+  "same_18_channel_architecture": true,
+  "pretrain_initialization_paired": true,
+  "property_initialization_paired": true,
+  "all_property_runs_60_epochs": true,
+  "all_checkpoint_replays_passed": true,
+  "masked_target_counts_disclosed": true,
+  "context_dependence_proven": false,
+  "test_evaluated": false
+}

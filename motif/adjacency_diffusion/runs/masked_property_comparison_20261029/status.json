@@ -1,0 +1,9 @@
+{
+  "state": "complete",
+  "completed_pretrain_jobs": 6,
+  "completed_property_jobs": 9,
+  "initialization_verified": true,
+  "all_checkpoint_replays_passed": true,
+  "test_evaluated": false,
+  "elapsed_seconds": 1167.2854636
+}

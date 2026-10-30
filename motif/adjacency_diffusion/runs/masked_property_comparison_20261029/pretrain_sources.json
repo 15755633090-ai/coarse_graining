@@ -1,0 +1,44 @@
+{
+  "7": {
+    "unmasked": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_property_comparison_20261029\\pretraining\\unmasked_seed_7\\encoder.pt",
+      "sha256": "f0727273a041198a7a0ac2e7e7b1d577b63874c0c357db082839b7145868f91d",
+      "ratio": 0.0,
+      "initial_state_hash": "f61a548409f49d13c3f21d1c438b0ebc3e95da30694bd432d27aeb4b66397054"
+    },
+    "masked": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_property_comparison_20261029\\pretraining\\masked_seed_7\\encoder.pt",
+      "sha256": "2262cb9571f12e925a5f9760c259e1ecae698faa7fd2bf0b1bc788c84c4b1121",
+      "ratio": 0.3,
+      "initial_state_hash": "f61a548409f49d13c3f21d1c438b0ebc3e95da30694bd432d27aeb4b66397054"
+    }
+  },
+  "1": {
+    "unmasked": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_property_comparison_20261029\\pretraining\\unmasked_seed_1\\encoder.pt",
+      "sha256": "6a2ad2b84460d4e98e18708c99b0871440e2412a7b0f84e085ac542d9fbf3ecb",
+      "ratio": 0.0,
+      "initial_state_hash": "e28f88f9a76ee377e6abe5c838f501e3c39eac293a4ff037529dd14f273bd372"
+    },
+    "masked": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_property_comparison_20261029\\pretraining\\masked_seed_1\\encoder.pt",
+      "sha256": "8341b6727575a0bf0b993e5f973251fa5d7f7dc52f24330151b724348dc0df9f",
+      "ratio": 0.3,
+      "initial_state_hash": "e28f88f9a76ee377e6abe5c838f501e3c39eac293a4ff037529dd14f273bd372"
+    }
+  },
+  "2": {
+    "unmasked": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_property_comparison_20261029\\pretraining\\unmasked_seed_2\\encoder.pt",
+      "sha256": "d27611b1b6224470dc75c26f3412183ffb7749dd3685bc638a3a905dcbb3555a",
+      "ratio": 0.0,
+      "initial_state_hash": "3b722bd92df3f043def5737539a21e98a6d555712c07fbe12642c235db9b3934"
+    },
+    "masked": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_property_comparison_20261029\\pretraining\\masked_seed_2\\encoder.pt",
+      "sha256": "7d90691b538d908a65ba6e56b61b4ea268444d6ff1df561a6b33118f36c69519",
+      "ratio": 0.3,
+      "initial_state_hash": "3b722bd92df3f043def5737539a21e98a6d555712c07fbe12642c235db9b3934"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "7": {
+    "unmasked": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_property_tool_smoke_20261029\\pretraining\\unmasked_seed_7\\encoder.pt",
+      "sha256": "0f224191f3ea360e3214f7511d6ad83bade87b80fe9b502faede39a4338a2e0a",
+      "ratio": 0.0,
+      "initial_state_hash": "5ef5787fd60d0982cd97e54ffd2a4b8ca5aee60596c9f6ef2a92cb3d54388d0a"
+    },
+    "masked": {
+      "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_property_tool_smoke_20261029\\pretraining\\masked_seed_7\\encoder.pt",
+      "sha256": "28c40a73b9f160531cad3d01555f153387c56f9573636a98162cfc3f1e1ecd2d",
+      "ratio": 0.3,
+      "initial_state_hash": "5ef5787fd60d0982cd97e54ffd2a4b8ca5aee60596c9f6ef2a92cb3d54388d0a"
+    }
+  }
+}

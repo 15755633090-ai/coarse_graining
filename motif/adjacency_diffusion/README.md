@@ -2,6 +2,8 @@
 
 新增“高斯加噪＋整组化学边特征遮蔽”任务以减少目标残留信息，使用 `typed_train --variant masked --pair-mask-ratio 0.3`；性质分支继续使用完整干净键特征。33项测试及小流程通过，尚无新性能结论。设计、兼容性和同架构对照要求见 [MASKED_RECOVERY_20261029.md](MASKED_RECOVERY_20261029.md)。
 
+已固定同18通道的 scratch/unmasked/masked 三种子对照，采用6组预训练与9组完整60轮ESOL性质训练；准确任务是“在高斯受损周围环境中恢复完全遮蔽化学边”，不直接比较新旧总损失，也不提前声称上下文依赖增强。见 [固定性能协议](MASKED_PROPERTY_PROTOCOL_20261029.md)。
+
 最新结论：完整键特征版本的迁移诊断发现原早停会漏掉后期改善；统一实际60轮后，性质验证仍是 scratch .7967、full .8183、bounded .8420，未证明预训练增益。当前不能按较高恢复率把 t≤300 视作性质预测最佳设置。详见 [迁移诊断](TRANSFER_DIAGNOSIS_20261029.md)。下文的二值机制和早期协议作为历史实现记录保留。
 
 本模块与 `brics_atom_diffusion` 的原子属性去噪、`context_denoising` 的基序隐向量去噪分开。对齐 MotiL 正文 Methods / Diffusion priming 公式 1–5 的核心：**保留 X，对 A 加高斯噪声，由预测噪声一步恢复 A，以干净邻接重建误差训练**。
@@ -105,3 +107,4 @@ $py = 'C:/Users/12775/miniconda3/envs/polyolefin_ml/python.exe'
 acceptance.json 记录：latest 提交后/best 未导出时模拟中断，并置入 epoch999 的错误 best/history；恢复权重、历史和 RNG 与连续预训练一致，导出恢复正确。四份下游最佳检查点重载复现验证指标，属性去噪旧检查点被拒绝。
 
 终点 T=1000 的两轮小训练重建误差仍远高于全零邻接基线。**这只说明代码路径和诊断可用，尚不能声称模型已经学会恢复连接、门控有效或达到论文成绩。** 未启动正式论文对标训练，也没有运行完整 MotiL 三阶段基线。
+`n固定18通道的三组对照已完成：ESOL验证RMSE（3种子均值）从头0.78711、无遮蔽预训练0.79606、遮蔽预训练0.81446。遮蔽未改善下游；完整预算、配对差值和限制见 [MASKED_PROPERTY_PROTOCOL_20261029.md](MASKED_PROPERTY_PROTOCOL_20261029.md)。
