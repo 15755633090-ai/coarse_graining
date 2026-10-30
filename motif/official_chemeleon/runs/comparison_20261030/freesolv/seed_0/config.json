@@ -1,0 +1,15 @@
+{
+  "dataset": "freesolv",
+  "seed": 0,
+  "active_parameters": 9329241,
+  "encoder_output_dim": 2048,
+  "target_center": [
+    -3.2594736842105263
+  ],
+  "target_scale": [
+    3.2775297233608893
+  ],
+  "initial_encoder_matches_published_weights": true,
+  "plan_sha256": "a7460bf350978301952e2a824b0f70e8cbc6410bc4d16cb5c7da83ea3d4e0e37",
+  "test_evaluated": false
+}

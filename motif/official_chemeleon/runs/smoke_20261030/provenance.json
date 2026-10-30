@@ -1,0 +1,38 @@
+{
+  "chemprop": "2.2.3",
+  "pinned_source_commit": "c83f4838cfc05a072f6741ae5b9700a1453ed571",
+  "core_sha256": {
+    "models/model.py": "15b526c28806f67b29152c02f34f2bc4a261890e815c55540005608ffa3b0fc7",
+    "nn/message_passing/base.py": "57b911ae87af933d51d1dd22bb3a52ecc40e68e13bc59c30ccbcd7db3d4bce1c",
+    "nn/agg.py": "ca9025b3a1292790a170d4c1bd889d78a9b51a50df6a4f7d693b660a11a66edd",
+    "nn/predictors.py": "a558e67a7eaa2a9701ffa4506efe0447cf28089f8c3add15827a8446c597d938",
+    "nn/transforms.py": "f25ff20cb179e6419ccbe2a3a5ac4b4abe5afc26fd15f7d26ab4035010671075",
+    "data/datasets.py": "fbe42d5ccdd8c813cdc2528885e01e86d1986d10c857c388f28f758fa74ad6b7",
+    "data/dataloader.py": "b14889bc4087b8caf9af823b9a37bcfb10e30f5f534c4238b483c666d6447d94",
+    "featurizers/atom.py": "1e75b5006b19882592bbb2070119421500098f8b6cd833c13596b36b32b14610",
+    "featurizers/bond.py": "8befd5ea46123b077ead6b4dcacfe36a934b6b68169b37ecd7fd4dd87581fb66",
+    "featurizers/molgraph/molecule.py": "b62a2525af9f7036bc641d85e476e73aad3c8bd99b1e21a5f37afe10dce40664",
+    "schedulers.py": "dd14f2941b7c567866e62a98d11be7986078710a9c9fc153ed88e0c496f0db17"
+  },
+  "weight_sha256": "c376624d3407204e780a0ed13a9ac097cc9bb1c13ef89cdbc633c1715c183651",
+  "weight_md5": "6a80b54fdb7de37ef0374d302f01e8ce",
+  "hyper_parameters": {
+    "d_v": "72",
+    "d_e": "14",
+    "d_h": "2048",
+    "bias": "False",
+    "depth": "6",
+    "dropout": "0.0",
+    "activation": "relu",
+    "undirected": "False",
+    "d_vd": "None",
+    "V_d_transform": "None",
+    "graph_transform": "None"
+  },
+  "python": "3.11.17 | packaged by conda-forge | (main, Oct  6 2026, 23:51:21) [MSC v.1944 64 bit (AMD64)]",
+  "torch": "2.13.0+cu132",
+  "rdkit": "2026.09.1",
+  "lightning": "2.6.6",
+  "device": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "pretraining_overlap": "unknown"
+}

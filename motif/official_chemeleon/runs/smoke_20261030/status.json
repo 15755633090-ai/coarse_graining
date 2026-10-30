@@ -1,0 +1,8 @@
+{
+  "state": "complete",
+  "new_finetune_runs": 2,
+  "all_replays_passed": true,
+  "test_evaluated": false,
+  "wall_seconds": 6.341620699968189,
+  "smoke": true
+}

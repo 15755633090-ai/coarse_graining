@@ -1,0 +1,1192 @@
+{
+  "files": [
+    {
+      "path": "_github_sync/check_official_search_data_20261030.py",
+      "chars": 1117,
+      "sha256": "2175af1e03cc3adb15605e7d5a5f99ad0dca831db6954faa2106db1d0f60189e",
+      "git_blob_sha1": "18d107603695fe950fcc93ad9d75eed0626933f7"
+    },
+    {
+      "path": "_github_sync/export_normalized_descriptors_20261030.py",
+      "chars": 1419,
+      "sha256": "288abe03a0c553ec658ed09bcc5953156a258a704b803e5fd19af311a2ed3b33",
+      "git_blob_sha1": "f22a61191311e9b0cf2840c5f0b1dab4eeab0289"
+    },
+    {
+      "path": "_github_sync/finalize_official_search_20261030.py",
+      "chars": 7862,
+      "sha256": "94ff8922983df3facd4dd3b1f44881fe0e6ee877fe4679085ac17c4fead71439",
+      "git_blob_sha1": "02d1c8f2b720f0d2a31a23926d3c4deca7fd8f98"
+    },
+    {
+      "path": "_github_sync/package_official_search_20261030.py",
+      "chars": 3296,
+      "sha256": "682bb4c2ea395eaf1d54c825d0084047a656c210d5b4ec8b49eaffffb92b291b",
+      "git_blob_sha1": "6840ad8b99049b201d7f392a2bb4659ce05d8a58"
+    },
+    {
+      "path": "_github_sync/recheck_chemeleon_ridge_float64_20261030.py",
+      "chars": 2784,
+      "sha256": "192fced87df3c654184424537a8bfe450a0eb6a8dbcb02e78dd2516c5f8c6e58",
+      "git_blob_sha1": "72942719895bf645dbd6a97c48e3f1bce5534062"
+    },
+    {
+      "path": "_github_sync/run_descriptor_xgboost_20261030.py",
+      "chars": 4818,
+      "sha256": "f1d0688ce5deeb8a2588cef3d5d97882591382c6b5082024f9c9d41db75ee8e8",
+      "git_blob_sha1": "0a716062eb240efc47cc46d96e4199ba8f2f5b48"
+    },
+    {
+      "path": "_github_sync/run_frozen_chemeleon_ridge_20261030.py",
+      "chars": 4881,
+      "sha256": "199ff7854debd833361f4980515758686fbfae62bef9d78947b081d21d95fc8c",
+      "git_blob_sha1": "4b5f653a4c75d749216778dd2a8f511cdbe41793"
+    },
+    {
+      "path": "_github_sync/run_official_chemeleon_20261030.py",
+      "chars": 12351,
+      "sha256": "cc1bfb72d2bade2d33b1453039168f0301d78b52b3e696842359307cdf5f5834",
+      "git_blob_sha1": "1a0af195dce35d235d85ffb0e63c6cee08cd7260"
+    },
+    {
+      "path": "_github_sync/run_official_chemprop_rich_20261030.py",
+      "chars": 9663,
+      "sha256": "6bf9141b26024c7640e9de92e7f8efb7995b8243b3c3811c51069ad427f50f3d",
+      "git_blob_sha1": "4a7b54fe1af52cf435387435f00f85f5814b5dc6"
+    },
+    {
+      "path": "_github_sync/verify_descriptor_svr_20261030.py",
+      "chars": 2123,
+      "sha256": "92ccd89518cf8417b79eeba6901eced28499e01fed514dd59bdd36df6ad89a89",
+      "git_blob_sha1": "8652ccd37d31c2207d522a7b8541454719c7795e"
+    },
+    {
+      "path": "motif/official_chemeleon/METHOD_20261030.md",
+      "chars": 2785,
+      "sha256": "57f0ab0f58b3bbe5a64ab116a2fe2780b1a49db470a4214f9e4db679924d2fed",
+      "git_blob_sha1": "7f9354cb81b57f74e953059e0309b55a45746f3e"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/data/esol_train.csv",
+      "chars": 28663,
+      "sha256": "4384741e39046f79b70f7f527b5cc2ac6bb5ae07f5efe202dfda430691a7dbff",
+      "git_blob_sha1": "0eb3ca9cd59afe60e8334f87a6611e09c84fc844"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/data/esol_valid.csv",
+      "chars": 5030,
+      "sha256": "3db5696d4dc05f453121fd297499e67a4a5b2141b9ecb68c43ec181fec512078",
+      "git_blob_sha1": "eca05c0e4dda312628d8a677b9e1be00c41154b7"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/data/freesolv_train.csv",
+      "chars": 12415,
+      "sha256": "d778580829b95ecc37fc6b31fa7e54a29969425f296b7f770d72e1ddb5a8fa1b",
+      "git_blob_sha1": "a2f6e504e83983b99dec4a506ae848c8f234d9ba"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/data/freesolv_valid.csv",
+      "chars": 2198,
+      "sha256": "25167af45052420ff0f7a3bf91af1dcf91330b83370b3f71f641685ec3e775c0",
+      "git_blob_sha1": "f70f52803eb2724403a9bd04d70497afe1d997f9"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_0/completion.json",
+      "chars": 523,
+      "sha256": "88649ffb022ce3b5f56bd6c86b8633298ebd9f2ea880a308fa4fcb7d9fa5db6c",
+      "git_blob_sha1": "85bd59622ea66db436b94dc16cce05d67116a168"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_0/config.json",
+      "chars": 361,
+      "sha256": "a984e04480062f468a1822c8e8fc22ea922befb9081110223c661049614f6dea",
+      "git_blob_sha1": "5198186fc0a9bf515e0de07938da71a5f406bb93"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_0/history.json",
+      "chars": 13258,
+      "sha256": "a7073cb462dcf3cea75f939707bf78cac1814ac8ede063dbe1e4927bff588ab6",
+      "git_blob_sha1": "dfec0391e0795d9d01c5d4858829512521045b5e"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_0/train_predictions.csv",
+      "chars": 27160,
+      "sha256": "353448ad02e42c3d2d0f2f252480d225ff1a14d38585d90b9a5cb73acac0092f",
+      "git_blob_sha1": "dbfc8e68aa1894cd8d6679b67438bce0f4859946"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_0/valid_predictions.csv",
+      "chars": 3532,
+      "sha256": "5713d49e212785c237d6726db32613c8260cf4c8cd5ccbc36d07dcadac3e5385",
+      "git_blob_sha1": "ed9a0a3170fa367eda82d1ee8a684159f6879fa1"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_1/completion.json",
+      "chars": 524,
+      "sha256": "61ac243cada3edeacd89ccc7d58631b58870ad0c9e52da597adb24f8b4309573",
+      "git_blob_sha1": "fe9de0aae574c30a7156fa985fa91d4128f1d50d"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_1/config.json",
+      "chars": 361,
+      "sha256": "80d0ed684b80a62e4222624292b8c05c9571edd67e8632026edb87ae953d7713",
+      "git_blob_sha1": "8f4c1bc1e017c999a215238da7a5a78e1c25b069"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_1/history.json",
+      "chars": 13236,
+      "sha256": "c37970316a6d0b148664385ae0f7e4367bc35f1e0b67fa15c971cce8d506ebce",
+      "git_blob_sha1": "763a5bc5ed6880c5d3436559e61df8f364e5df36"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_1/train_predictions.csv",
+      "chars": 27192,
+      "sha256": "4670fb01c558a67c62bdbf49578962aa6c7d07c4762a67cef316c9f3b2520b5a",
+      "git_blob_sha1": "07fe7555c9ba57ca67f21eeaf8ddc0b168378a13"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_1/valid_predictions.csv",
+      "chars": 3515,
+      "sha256": "bcfe3d1965b7d44cfde8528bf18a99c33129f994bf458bed64382947a98f0df3",
+      "git_blob_sha1": "50a9c81841fe40772e8e5d8a60a25f126aaf5fa1"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_2/completion.json",
+      "chars": 524,
+      "sha256": "754765b342ce288092fe840d3af59653bf967e836655b78eaed3c45ddd27f6cc",
+      "git_blob_sha1": "6e1543ef85f590486d547302580a76907e2d7abf"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_2/config.json",
+      "chars": 361,
+      "sha256": "2a7a78d8746c153574bf05ae933747d9f7a8764f1cb7cccebf83709a1eef5a0e",
+      "git_blob_sha1": "c093a94306fc8c7c04e9c67aa80be59f6f07d111"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_2/history.json",
+      "chars": 13248,
+      "sha256": "6a57f80bd44ba8c7f264b3b966e97d6d54e805789dc85b8164ed8057ea25773d",
+      "git_blob_sha1": "c6699e68d0e9efdaec6beb2d0eb7dc789c1c4765"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_2/train_predictions.csv",
+      "chars": 27193,
+      "sha256": "ec9dafc056e2f0afaef5ae808498c310f57a598e80abd237daa7793e92ba4e8c",
+      "git_blob_sha1": "80cf2303a40842d037b149fd37eb962ece8823f0"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_2/valid_predictions.csv",
+      "chars": 3529,
+      "sha256": "ad7caeac2a27d8e72f6647659af0be49167bef3cffa82b00b13d1a7d73f1b433",
+      "git_blob_sha1": "a7d5161019eb5bb0b43f599652e88d712d2be40e"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_0/completion.json",
+      "chars": 523,
+      "sha256": "fd2d674b65d23b7c91eb27aa13b9186b2dc82dbc71c4dd62d64b76e48cdb410a",
+      "git_blob_sha1": "06d8d8d3742f5dc5ec0e8967602609a3adb1536e"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_0/config.json",
+      "chars": 366,
+      "sha256": "3aa46250a2ee5a41b97f8f666b0ef07d8864ba500c45e5dab9e2affe5a5fa5ce",
+      "git_blob_sha1": "6ac034aa9ee4526313ed0393f837a31419d6268f"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_0/history.json",
+      "chars": 13159,
+      "sha256": "c971b01dc8cbd4a1e99779532d29c9cb7e7e163b95b29bc2bd0f3a18a5f3bf5c",
+      "git_blob_sha1": "d33a22ac49eeca1c6911617ea214b636a91ba75c"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_0/train_predictions.csv",
+      "chars": 14857,
+      "sha256": "a50aa3e6bc71952c641828378759bb6bef667dcbbe2ddb1421887b2ada08c9cd",
+      "git_blob_sha1": "6380a6f3ac15b53bc0fa4bafcae95cf80b0cf026"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_0/valid_predictions.csv",
+      "chars": 1868,
+      "sha256": "79c4048c14a0bf2f39e3b0940187dd025115b6012f313d23c4f419a78d7ade1e",
+      "git_blob_sha1": "b20bfef01f91eb80cf6caf8e9c7fa5d3bdf349d7"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_1/completion.json",
+      "chars": 524,
+      "sha256": "f40553cc1a7ac6c939bd025355d40a5768f01e1b08f4a67220824ed311952002",
+      "git_blob_sha1": "63fe6757930db8e409fc937412dce6bed5f57d60"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_1/config.json",
+      "chars": 366,
+      "sha256": "c9af6b4a16179f3636aa93fcbf86109720a29052b6c6c3dc8af8434643fa1142",
+      "git_blob_sha1": "9804da2435b789c1276d319ec06bfe90549c28d8"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_1/history.json",
+      "chars": 13221,
+      "sha256": "a1f09dacc8ceff146d1134431e6a81695a82e69fea2ff5245632055f49acfbe2",
+      "git_blob_sha1": "9dde85b28c9d1c5d2848349c2d0a5555f1db0993"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_1/train_predictions.csv",
+      "chars": 14832,
+      "sha256": "2a32f0122534b7495863dc7421d4ffcc4dd7d2cb498fa593ee2cd8afb9c3d058",
+      "git_blob_sha1": "ed9ee5448cd2d2937fd817152a5801a28f431a4b"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_1/valid_predictions.csv",
+      "chars": 1884,
+      "sha256": "42ef621c0eb3032665cdcf5f4481dcacc415b4bb31151336b6af163c9555c16a",
+      "git_blob_sha1": "c87890cc140d3f94993eca92a820e7b08a610b86"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_2/completion.json",
+      "chars": 523,
+      "sha256": "d371170bbf561ed737f9b40ffe4a8fa4360dfa7a28bf4b9cf0462b087927b695",
+      "git_blob_sha1": "9cf862f9c445ec0643feb7074e8bbf46d7a997bc"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_2/config.json",
+      "chars": 366,
+      "sha256": "db75d54338bb668670c15bffac8bb3695e9048407f3ff5ef2b940589e7933b6f",
+      "git_blob_sha1": "277d73d7176a545ae79bc70ccac7d169b3772730"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_2/history.json",
+      "chars": 13188,
+      "sha256": "c21fbe4f05f416e3174d36e90002f8476abd149868b9643cda96db92915880d3",
+      "git_blob_sha1": "03e389b4fe79fd9b7b7cb1defc614052a2b7ad9d"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_2/train_predictions.csv",
+      "chars": 14825,
+      "sha256": "d4341bd5141fdf62ce7c61f2af0a9497b1f39912dfcf11252818a09e1253da2a",
+      "git_blob_sha1": "86d44d441584bd0dc63dcffe2e0b763867ae8fff"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_2/valid_predictions.csv",
+      "chars": 1874,
+      "sha256": "7620a7d187051592b0e3d0fd7f00c60f3fae8694aa19a9faf7af36666d19a85f",
+      "git_blob_sha1": "3f265ac621d2e9019af1ff51677393d481c5e936"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/esol/completion.json",
+      "chars": 895,
+      "sha256": "bd1d1a644e048e47cfae12a7d21e3fbea6132c3a6d31fcb2258a433abb3772eb",
+      "git_blob_sha1": "143f32779dd2f689e0bf101469c77a7206f5f844"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/esol/train_predictions.csv",
+      "chars": 27216,
+      "sha256": "a3c2dea525fee87c2628034b05597163f12635ab5fe2685c7287432affbf1e9e",
+      "git_blob_sha1": "c6f477164c8a793e1339e97cf01d6cb5f24822a1"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/esol/valid_predictions.csv",
+      "chars": 3541,
+      "sha256": "edddf0837c6171081c33d82b123d534855dfd576a66ff09432e77f95fc9e0703",
+      "git_blob_sha1": "18a0e8f3542efd4bd0747a0b78e5f4b02e4da35a"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/freesolv/completion.json",
+      "chars": 895,
+      "sha256": "5fde77e51310ab966892cf9a6f5b5fe987b97a35b983ca063d9e48bcafa06dce",
+      "git_blob_sha1": "1ed9fcfb73e2694fad1d9e142e87537cedda5cd6"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/freesolv/train_predictions.csv",
+      "chars": 14879,
+      "sha256": "3b73c27d7d08a7dd4de2b547250f19d85b5d481f449c8efe47c920608a6edff5",
+      "git_blob_sha1": "7d010976e091623331a6456ed1e308ff287e6cdb"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/freesolv/valid_predictions.csv",
+      "chars": 1892,
+      "sha256": "3f749cffc4e020809c7fb666477486273162401078f2148c5807b74a08951525",
+      "git_blob_sha1": "4bfe43492c1f8fed3a3a3107452c4d9657dd11a6"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/results.json",
+      "chars": 2579,
+      "sha256": "d20114c9ef4ab93d8dc9fc82cca7a15c51c533d67dca99595b9e904e9bb5a480",
+      "git_blob_sha1": "09ad63ef6b413ca235168e1975d5a49c6099445a"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge_float64/esol/train_predictions.csv",
+      "chars": 27257,
+      "sha256": "38881a37ba92825b803d30416f983652990a84a82908e7eb2683a2e920ec55ef",
+      "git_blob_sha1": "028f7e0bb10423f25df7bd3d106ba8f42b01cedc"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge_float64/esol/valid_predictions.csv",
+      "chars": 3532,
+      "sha256": "c981aae012ee3930d59f0e79dab034fd697c5babc27707f8976f46b92d1a2faa",
+      "git_blob_sha1": "d7de8af2bce5f6d4d24f0e9d29040600ca4a4499"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge_float64/freesolv/train_predictions.csv",
+      "chars": 14845,
+      "sha256": "d2674703e27b965ca204bd7769906533bc304a87ec68c71606a97eeca144b2a6",
+      "git_blob_sha1": "e82ca85b4ef8e60b72499fea2b1b4bc8930f69b8"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge_float64/freesolv/valid_predictions.csv",
+      "chars": 1890,
+      "sha256": "9b7c89b17013e52cdd1fe99531e76f100b959729be329179faba86c68cf1636c",
+      "git_blob_sha1": "193e5c501a7065ba000ed614674e81469d4a176f"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge_float64/results.json",
+      "chars": 1672,
+      "sha256": "673527713a5ed5a658814db298a91bcad75e74c907fba37c6d2ba61c72199902",
+      "git_blob_sha1": "dd4f360ab40bcf2347cdcd838d7de77f933a9d92"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/plan.json",
+      "chars": 26887,
+      "sha256": "250fcbe54a41a2ca30d20e9cfe745812c758587d2fb8951458b7a5f7a79a1adc",
+      "git_blob_sha1": "56984e5697594a06f1459150336eeb47f9a9da7e"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/provenance.json",
+      "chars": 1838,
+      "sha256": "329b328fc2baae128f5181003d52df701918516ed3b50120657cb484f79874b8",
+      "git_blob_sha1": "312684d7987f00e0f254ee5ea6c20034db41d9c5"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/results.json",
+      "chars": 3943,
+      "sha256": "e72fc4c3bdb223b1c35f534432f5b6f826d98a59df1bebdc625c4368f6bb7191",
+      "git_blob_sha1": "4b9747e23f912761eab537dce72a6e2b341b4a0e"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/status.json",
+      "chars": 165,
+      "sha256": "4a18d841847d35037ae7b5e3a5d0b295bc4a0f74ab94d2def3b4893ba090a869",
+      "git_blob_sha1": "32a98c57447ea7b3f7fe410c801a19040d31a23f"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/data/esol_train.csv",
+      "chars": 503,
+      "sha256": "5f3e4267e6d81072d4a7e9b91efea999d8143c1d7a92fef83ce1f7d29bb3d169",
+      "git_blob_sha1": "eba2a8e67ea7b2e45f78c1a18efc5743720b4c54"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/data/esol_valid.csv",
+      "chars": 666,
+      "sha256": "b0e46d80374d05d1bfd46aa426bf1fdf305d4347d932be4ba94eab84daa21e35",
+      "git_blob_sha1": "e3895a714bd55ab0e22c3dd7fabc005bc54fcdc1"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/data/freesolv_train.csv",
+      "chars": 371,
+      "sha256": "7e3126e8db0c279281d5831db2848379b28aa4975e8365e2a0d39f57ff94def7",
+      "git_blob_sha1": "89e71acbfba0f595f814de0adda3ea08f12091de"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/data/freesolv_valid.csv",
+      "chars": 609,
+      "sha256": "356c0c2e7fa39e0a8de58051d9964460f0227fb1ad190c4f71f02dbf08e667af",
+      "git_blob_sha1": "8985c1fdc8709c9101dbf2861576286d12baa883"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/esol/seed_0/completion.json",
+      "chars": 519,
+      "sha256": "b7a7b7de5fa70dda955b5e99eb09db885125026c44932899b2e4d5f87db9f46d",
+      "git_blob_sha1": "552ee60f904c6fa8eab2ba0186d9918e9efd00b7"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/esol/seed_0/config.json",
+      "chars": 352,
+      "sha256": "a8f980da5eab1b391f56f606bc20bb3863696681d4a84dca442337e292cc79f7",
+      "git_blob_sha1": "8d5d7292c2a8b337797f1450591cbdbaa553293e"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/esol/seed_0/history.json",
+      "chars": 467,
+      "sha256": "daf14ef2ca9abba3af473db83d63445f26fde091c4d34c94d546973151fa3ad3",
+      "git_blob_sha1": "f4f9def64779a557b36e4bdd67b570548acae660"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/esol/seed_0/train_predictions.csv",
+      "chars": 478,
+      "sha256": "4ee4ab585c335a7678fb0a84ab4a6f6eb6c9c57d084c652df72b7f2be7c748da",
+      "git_blob_sha1": "b8770e43b1af408299444a95fcc3c2746818b78e"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/esol/seed_0/valid_predictions.csv",
+      "chars": 508,
+      "sha256": "aaa1d31c38709f9b35d38bb80849f9ab0c18f982e90e185ad05263e700140a04",
+      "git_blob_sha1": "2e878dd1c358ebe52a11b17f0c8243547752549d"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/freesolv/seed_0/completion.json",
+      "chars": 522,
+      "sha256": "c749482f1253e9d737a83dea3b394aa85653872e221c41fe4a0c67eed5ad42ca",
+      "git_blob_sha1": "e4f0d6ab0a058df9d32a4c6e79b983a1edfdab97"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/freesolv/seed_0/config.json",
+      "chars": 356,
+      "sha256": "8eafd844ba28272157b959719b98d58e653f4320784d759d99b36870e664c2dd",
+      "git_blob_sha1": "5fb925b9be8dff3e3f596544e98518bfe1a616fb"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/freesolv/seed_0/history.json",
+      "chars": 467,
+      "sha256": "a9cb83218b88162801f47dd4c5ca5a0500d6ac4185189965531d7c7293545155",
+      "git_blob_sha1": "3a60bd1050d76da6f575b5b5f7a23c1aeac69342"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/freesolv/seed_0/train_predictions.csv",
+      "chars": 472,
+      "sha256": "f8fd7f51730f940d8b0b95a092f638b919c6d5269d0695cce1186b839884325b",
+      "git_blob_sha1": "94bb528ad42d0bcb548369221e08b3271bcecdc7"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/freesolv/seed_0/valid_predictions.csv",
+      "chars": 490,
+      "sha256": "8d566ae1e373e6945022c9def7dbd72890dcfb47ac4e10351f7abe66bacddd5a",
+      "git_blob_sha1": "cf3302b5333f70d304caa3fe8a179ad56ee708df"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/plan.json",
+      "chars": 3529,
+      "sha256": "a295cdcda880ea5100d87e2d45dce8b40f8b43cdc6b27731ceb8f3fc616572cd",
+      "git_blob_sha1": "9bbe7d215b2146b76255a9685a2d56857a77480e"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/provenance.json",
+      "chars": 1838,
+      "sha256": "329b328fc2baae128f5181003d52df701918516ed3b50120657cb484f79874b8",
+      "git_blob_sha1": "312684d7987f00e0f254ee5ea6c20034db41d9c5"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/results.json",
+      "chars": 1485,
+      "sha256": "7937430a338b10319a7e366ab6f620c13ee6ec1b6b0ea92654e73c2361d8e53a",
+      "git_blob_sha1": "028a9062f41f7dc8b29ba173b846bf20f09555df"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/status.json",
+      "chars": 163,
+      "sha256": "b21b09f8b2ac297908ba6a57b22cf441ab880e13ad46f1ab950a18511e913e9c",
+      "git_blob_sha1": "c802c60422d9b04f11275438c77c2e15f4248335"
+    },
+    {
+      "path": "motif/official_chemprop_rich/METHOD_20261030.md",
+      "chars": 2485,
+      "sha256": "0afb85a4c31ff33018bc1e626280c64aab081d99659e7071e2b06c4fc7a6355a",
+      "git_blob_sha1": "95dbb6f3dfaeeba7b65cea3af51a9ff05f81cb8d"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/data/esol_train.csv",
+      "chars": 28663,
+      "sha256": "4384741e39046f79b70f7f527b5cc2ac6bb5ae07f5efe202dfda430691a7dbff",
+      "git_blob_sha1": "0eb3ca9cd59afe60e8334f87a6611e09c84fc844"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/data/esol_valid.csv",
+      "chars": 5030,
+      "sha256": "3db5696d4dc05f453121fd297499e67a4a5b2141b9ecb68c43ec181fec512078",
+      "git_blob_sha1": "eca05c0e4dda312628d8a677b9e1be00c41154b7"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/data/freesolv_train.csv",
+      "chars": 12415,
+      "sha256": "d778580829b95ecc37fc6b31fa7e54a29969425f296b7f770d72e1ddb5a8fa1b",
+      "git_blob_sha1": "a2f6e504e83983b99dec4a506ae848c8f234d9ba"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/data/freesolv_valid.csv",
+      "chars": 2198,
+      "sha256": "25167af45052420ff0f7a3bf91af1dcf91330b83370b3f71f641685ec3e775c0",
+      "git_blob_sha1": "f70f52803eb2724403a9bd04d70497afe1d997f9"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/selection.json",
+      "chars": 1704,
+      "sha256": "6b18fc5cf416ded726df75e19ad97372e803d94c12ccff6fb0866b77b47318a7",
+      "git_blob_sha1": "396b3a3f5a09f594c833d69bd95483ff5ad12782"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/train_seed_0_predictions.csv",
+      "chars": 27191,
+      "sha256": "fa13f94245412a4c87de2198519ec801705950b32129e1202be74b236564f014",
+      "git_blob_sha1": "95b510af9919547d27af7b3ecdfcdc9651db4990"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/train_seed_1_predictions.csv",
+      "chars": 27205,
+      "sha256": "53206c1e5a20bea90dfc6fd3ae5f097e939bcdb812e0c4d66cbca6f0c58b97f8",
+      "git_blob_sha1": "4cc23d49b43ebc4204f1eaad84be287a3b7de130"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/train_seed_2_predictions.csv",
+      "chars": 27204,
+      "sha256": "72bec97fbb33b3774c8c17c8bd6492cbd87dd43d884f82c49d922e1eac92a63b",
+      "git_blob_sha1": "478d7e3c1dcdbc1188e2150f0cc11dfc533ec00a"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/valid_seed_0_predictions.csv",
+      "chars": 3539,
+      "sha256": "44ac763e0cc9e1a92ec4f648ba1e11ce1ef29f53b678503e3f7d2e584bf43d15",
+      "git_blob_sha1": "9db1f6b0293d9a94778c9f93f7bd07675dff3f1b"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/valid_seed_1_predictions.csv",
+      "chars": 3548,
+      "sha256": "5fa3703fdcc374f4c1e093f4fa3303967e9eed07ba96a3335e808298c700db28",
+      "git_blob_sha1": "b4051ae180a6b983b7938e27edfafb4fdf85e569"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/valid_seed_2_predictions.csv",
+      "chars": 3539,
+      "sha256": "944c7077808a46176f3f9ed4182eb033673eefbee21b8403a1f0028a5e3d2913",
+      "git_blob_sha1": "8090954221d73af604cd4f85d623e05f4fed6bac"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/selection.json",
+      "chars": 1688,
+      "sha256": "50b517ee380a9c5bf6323458bc3b7ff1353e6ce3070000d54ea1aee912338250",
+      "git_blob_sha1": "d878aa1f72af25352d15a455511073d70fdf8c06"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/train_seed_0_predictions.csv",
+      "chars": 14874,
+      "sha256": "693750ca210e452bbccd813e93e9fe9185d6d92a3462dc99ad09a98ba0be7894",
+      "git_blob_sha1": "8705d326f793fb8827775db10e5c3ec09e58eec4"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/train_seed_1_predictions.csv",
+      "chars": 14847,
+      "sha256": "4a77dd55b692d1878db407ebeba55863dd81393fc11fc56b28b65e166e17b173",
+      "git_blob_sha1": "78f686d9052eca16812fb6620fce34ca5971f749"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/train_seed_2_predictions.csv",
+      "chars": 14857,
+      "sha256": "c3300f2c4b2d28e6404c71c9dd3882c418b788b07878fc656e00f4d70bd97c38",
+      "git_blob_sha1": "912f444de07a4f3188e14ab16ae9b4f1c2984811"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/valid_seed_0_predictions.csv",
+      "chars": 1879,
+      "sha256": "f2d884b5e7caa75b4e23e27bdfc1cf5bfffd5b213ee1599e2e11057dcd913d0d",
+      "git_blob_sha1": "185b174bad47e22dcb5696a083cadb7f39d7c324"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/valid_seed_1_predictions.csv",
+      "chars": 1883,
+      "sha256": "458c2a43c5ae465c7ff0fae859a859a0d77364398f1e359dbc72beb40f104d9b",
+      "git_blob_sha1": "b2dcaeeb1e40991dc62e27feb522ec882a0e3a6e"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/valid_seed_2_predictions.csv",
+      "chars": 1879,
+      "sha256": "8b5968d65279d2f7d847bf2177acdc0e7d5f466f97e16f7921d84860976f6070",
+      "git_blob_sha1": "ddcc6d2e7be594cd78ec9b03078fba9cbf34d3fe"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/plan.json",
+      "chars": 1359,
+      "sha256": "c725c0684b2ee29d2a85cd446ab24cb877a339568f7b695b3f82e1245c587778",
+      "git_blob_sha1": "6c66667cda4072883a3f40dc19c7d6e2c950f41d"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/results.json",
+      "chars": 2995,
+      "sha256": "7c44ba31e7809c52386dd98d1668b89de263cb0e0ca63d9383c552785b61e816",
+      "git_blob_sha1": "df97feca00507944ecf058dd3e0ee177c03cc1a8"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/source_before_io_fix.py",
+      "chars": 3891,
+      "sha256": "6cd95694fa2fec71342fc0fc04d0532e7563640ab74af69b53f3e5a2f152cb10",
+      "git_blob_sha1": "0102c96814debf49a078b5f44dda11622ed463eb"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_0/completion.json",
+      "chars": 475,
+      "sha256": "5c7d96700c5012001f446e6fda177f590746e95ca2b1d192b08215594ccf6447",
+      "git_blob_sha1": "63780a402bfa896ee468239182028dc3366f9b92"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_0/config.json",
+      "chars": 336,
+      "sha256": "1d2723096aa74d2a906bc1a035543994366b882bfd478526add3c438329f8667",
+      "git_blob_sha1": "1cd5616e39b8ac1450bdb90e7d89b3775eae671e"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_0/history.json",
+      "chars": 13052,
+      "sha256": "3a72df1f79ca0c23a805e376d2018f9cf23a62764720b6c353da4ce4509fdde6",
+      "git_blob_sha1": "a230dfd59a5e350ec72f8a8d6b76773fcc0f8df4"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_0/train_predictions.csv",
+      "chars": 27208,
+      "sha256": "74338f64748f2d59fcac3cd3f056000f257c13911805d0ef1d75239e1bb3b77f",
+      "git_blob_sha1": "2a41d60e8b6be371e4265349172d7c5aa16144d7"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_0/valid_predictions.csv",
+      "chars": 3528,
+      "sha256": "73e26eeac3b53414bfa835ce01968a8f40c70f42605cd79da8e5d80c4e86aa4e",
+      "git_blob_sha1": "3785e51e545ec53d4f3b72b7add6461d0bfa2332"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_1/completion.json",
+      "chars": 475,
+      "sha256": "45ad04230707a49ea9f0c406a95e5942895af4f10b3d5c6fbacc0dc48b178ba4",
+      "git_blob_sha1": "9f4abcd0843a9a9f93a5ad84d2eb780a725215be"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_1/config.json",
+      "chars": 336,
+      "sha256": "01f23d991694c4a7991b7adf8ffaac77b94d3d92a7f7954ae19b222e9d370503",
+      "git_blob_sha1": "f78b3ba4775f3e82ffc1ef3e2abec0740f22744f"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_1/history.json",
+      "chars": 13061,
+      "sha256": "08b5bb613d0d223b5a6a35e7dab5b67736caee5d2b5452d31b2234df8455f610",
+      "git_blob_sha1": "b2e76cd53a93ae08b0a356c7013364192918197b"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_1/train_predictions.csv",
+      "chars": 27192,
+      "sha256": "73163b1bcea68a3835a6346d1087cc6285d397ba35ac6401de9a7c5572d1e992",
+      "git_blob_sha1": "32e45e2897b495c32f9d5661ea5280955bd2773e"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_1/valid_predictions.csv",
+      "chars": 3540,
+      "sha256": "d261838ea5dfc07e9aa3275f8ecde367597c85416d1db6e77e16a2d870cb4f35",
+      "git_blob_sha1": "43103032f75dfb87ebb634b63974437aa5369ff2"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_2/completion.json",
+      "chars": 476,
+      "sha256": "b9d7657e86360567f74c4454f841beae24ee80555d5cb20e7031ce2939690e7f",
+      "git_blob_sha1": "b3fa3f9f123b98ef1962db81feb3cb4ce216f0d3"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_2/config.json",
+      "chars": 336,
+      "sha256": "5c63760d65029b679e0f82d4e5146c4c30a959411dc2c06f8e508f536b6c75fb",
+      "git_blob_sha1": "debfdeab1223584c0c3c9b201862e0ad8c5dad92"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_2/history.json",
+      "chars": 13055,
+      "sha256": "391a64a0f0e9cc92c9caab527e6512bd839942316e427b3cd65f693ded4c4923",
+      "git_blob_sha1": "9902ff2ec0eafcd29ff9b5cb09cbe72ff3763052"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_2/train_predictions.csv",
+      "chars": 27202,
+      "sha256": "98e205bf2904051c17837f6e2e72f30ba37227800cb381758f804a430e59750a",
+      "git_blob_sha1": "26261feb208b415d1ff5e99b15501b3e727e7a66"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_2/valid_predictions.csv",
+      "chars": 3533,
+      "sha256": "58b1cd95c17ec824f32842b919c5404c83b46c77ed69df2cf5a4242187d625a6",
+      "git_blob_sha1": "e053dab3b7794cc149e00d35277d2ce34ff5e0f5"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/svr/completion.json",
+      "chars": 570,
+      "sha256": "3875e80d9af0836bb9c7b9ac1f3ba4a10fd5f59f6ab4cfb1c90e4d095032a1ef",
+      "git_blob_sha1": "84010ca5f3371d0d4485a6262271ac30b5572e13"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/svr/train_predictions.csv",
+      "chars": 27206,
+      "sha256": "f9cd21dc50682b600b5026e5235adb7df78736d5f91fe26011cd0bf394b4466b",
+      "git_blob_sha1": "ab142cf3e8bee1fbec12cdb34f37b6c4c5f82f36"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/svr/valid_predictions.csv",
+      "chars": 3537,
+      "sha256": "92d75857e231abaad984a3f5315392409e3ecf808d25f92180ea215cc7cc8e34",
+      "git_blob_sha1": "d19e08f94204a1ffa759d37f302dc80d138a655a"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/svr/verification.json",
+      "chars": 560,
+      "sha256": "7f2fcea844e728a837c9997e3a98c925e40355153eebac50a402d025a50ab891",
+      "git_blob_sha1": "c2ff495af615ecdb93df1b0b2a93fe11687a2aa0"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol_normalized_descriptors.json",
+      "chars": 228,
+      "sha256": "3823254346de7443808aa758ab4af34566ed17013f8f25df5af8936810642c35",
+      "git_blob_sha1": "1614c810a5223e993ccbd80640f71f62319a2d87"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol_train_features.json",
+      "chars": 77,
+      "sha256": "a17efa290f172b04b09bfc69ea01946fc403b507587343a59c14ea0ac805f574",
+      "git_blob_sha1": "641833faec987d68bbb61801fdb834a7e4241907"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol_valid_features.json",
+      "chars": 77,
+      "sha256": "a17efa290f172b04b09bfc69ea01946fc403b507587343a59c14ea0ac805f574",
+      "git_blob_sha1": "641833faec987d68bbb61801fdb834a7e4241907"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_0/completion.json",
+      "chars": 479,
+      "sha256": "145b06d235191c52b04c884683d64cfc3f88ca7c04811f2a1dca8e07ede3c0bf",
+      "git_blob_sha1": "68704ac23b2ebbf066fd14d377227c1e13a89170"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_0/config.json",
+      "chars": 341,
+      "sha256": "ca5ded2e63ed54df7651b3c394c96adcff9e560829875f45bc13a3336b832e03",
+      "git_blob_sha1": "65ecdb2122bb6f5d9baf9ba66b1349a3da5ca4a1"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_0/history.json",
+      "chars": 13013,
+      "sha256": "d37db1e63a8e9d3fc56ac6f5514c9d8d29e214d919bb15bfb693c0da9cb13695",
+      "git_blob_sha1": "4b63eb1e77df9026f1fbb723a53849ee3de7b02e"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_0/train_predictions.csv",
+      "chars": 14859,
+      "sha256": "b3f4fe3f3d07d38fd8d24596e114638755cccf5f06054f796711c8d32e43dd98",
+      "git_blob_sha1": "f47fd5fc6255a706349c7d6668986bd613cf711d"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_0/valid_predictions.csv",
+      "chars": 1888,
+      "sha256": "1ed6670491e553982adb7d180fffd4a08a1234cc5eb0d241cb14eb84d83dd411",
+      "git_blob_sha1": "667cfa162cc699d1ce309f678e6278fb201aa331"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_1/completion.json",
+      "chars": 478,
+      "sha256": "7417fc7c2486bb4e66c7d009f63c2fe8591ec9e23db5e15c53af5e918edbf0c2",
+      "git_blob_sha1": "0ea40c23cfbed5ae27a31d0d5c0e360e07e69468"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_1/config.json",
+      "chars": 341,
+      "sha256": "5ef448fa38f1229389f5cdf4c8f3c56b395d9ea582ab57cd1f633bdff0e01a86",
+      "git_blob_sha1": "8f89e05b0b24f8d9e7de512068187dc12f09cf19"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_1/history.json",
+      "chars": 13027,
+      "sha256": "0c4ef611d8efa58bfd02cb80614618285968fcee08209344f9197e96df8a3ac0",
+      "git_blob_sha1": "0132a5f793ec27b7c60148b9628f95d4468b7c9f"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_1/train_predictions.csv",
+      "chars": 14848,
+      "sha256": "c630db537f281dba8bd8751706c5a4f1a49b59f8ef3a47e256e47ff4cda9015a",
+      "git_blob_sha1": "ca5e0dfeebeeb37440889599aa8929e45fc6b55c"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_1/valid_predictions.csv",
+      "chars": 1898,
+      "sha256": "42b6aa55c78a14e79a8eeed9f07e5e07afe6da483e15e95f592ac9f307202e04",
+      "git_blob_sha1": "0efb5e96d378b0eff010fc384ccb464d22e2baa5"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_2/completion.json",
+      "chars": 479,
+      "sha256": "65ea379a42a189c20a89485c479f5dcee390ba4596a5f843211d5b5df1c3bdca",
+      "git_blob_sha1": "4c57bb7b2340493fc1dcc1e9d7279e2e6f086302"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_2/config.json",
+      "chars": 341,
+      "sha256": "5742bec37485ed6df42554b051b5b4f13795900d20813c2ba3eca294ba5a781a",
+      "git_blob_sha1": "a68098947019ec587df6dbdb57da223ebd9110bd"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_2/history.json",
+      "chars": 13005,
+      "sha256": "0ac03f477077f8e0eb9f732c57db049da878d2d308ebe6892d6a84a679b17e0c",
+      "git_blob_sha1": "7da8ce73c0c6875e12221fdfeeb747d19711f7ab"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_2/train_predictions.csv",
+      "chars": 14864,
+      "sha256": "03bb080272277d7b40ea30e6306ce1c5c13b26f3105487415d62ace0d1109099",
+      "git_blob_sha1": "9fd2a0c36dc137eea13c0ad08873093ada245a99"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_2/valid_predictions.csv",
+      "chars": 1886,
+      "sha256": "66d2f80cd0a20bd226f500ceac277a134e2a8845e487007b0470aadbf28276d0",
+      "git_blob_sha1": "ccec9061822ce8ebf1c7ae641d84fc97fa7b35d9"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/svr/completion.json",
+      "chars": 569,
+      "sha256": "11b7a2c55ea8b5350d813327ad4816cdc398ca7e69872b6da7f8b21061ccb95a",
+      "git_blob_sha1": "50b41b2249913e6263001fca1b6e6c85474b1c7d"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/svr/train_predictions.csv",
+      "chars": 14862,
+      "sha256": "66309d7a86e1d13f2ee8ce57a1468eb235bf834edfd5e1dfd786af08f9513103",
+      "git_blob_sha1": "d958241b6b0df55f7f96c445c36910f7459b8270"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/svr/valid_predictions.csv",
+      "chars": 1887,
+      "sha256": "45776965e09102572b465f35916abaab089f8e1e1cb8fd74c2bf7f76ddb6376a",
+      "git_blob_sha1": "6c2cb206cdcbf2a65de1d49abd535edd3b8c642e"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/svr/verification.json",
+      "chars": 405,
+      "sha256": "4401a050e9ec4c4a0c1a3abad58debcfd8688c1df0359d28435e16d100263502",
+      "git_blob_sha1": "185294a74083dca293757d6358334897422d4183"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv_normalized_descriptors.json",
+      "chars": 228,
+      "sha256": "b009db9dc4ae5773fba2b3938e74a641bfb989602e1e6e8636b66b2db6336b92",
+      "git_blob_sha1": "8b9af66cf4bb5a02665992ad81e11b4bb4760903"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv_train_features.json",
+      "chars": 77,
+      "sha256": "a17efa290f172b04b09bfc69ea01946fc403b507587343a59c14ea0ac805f574",
+      "git_blob_sha1": "641833faec987d68bbb61801fdb834a7e4241907"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv_valid_features.json",
+      "chars": 77,
+      "sha256": "a17efa290f172b04b09bfc69ea01946fc403b507587343a59c14ea0ac805f574",
+      "git_blob_sha1": "641833faec987d68bbb61801fdb834a7e4241907"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/plan.json",
+      "chars": 26709,
+      "sha256": "992b60a3b0e501c2cd2bb83636c5433ee6ca0fa3a79cb836552ebfecea301a80",
+      "git_blob_sha1": "0db09dd4701b31d620311b6509b358074cfb4a30"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/provenance.json",
+      "chars": 6683,
+      "sha256": "370bbddcf921c9e636087f0515fa19a931c5a896ab144a7ebdc9c3725bab397e",
+      "git_blob_sha1": "76f7508dc3ca4f5508d02a018848af03ab47cbe1"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/results.json",
+      "chars": 3620,
+      "sha256": "174c3245e33a2e365602b0656ac15d0e4fe65b3be4f1471170a8fe5049708376",
+      "git_blob_sha1": "233fd14b55b1fa186953b114e68b9ee0b0b353c8"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/status.json",
+      "chars": 134,
+      "sha256": "293c5a07d68eee1adaa1c870ebb3bcc4f93f0168241e05e05aee10542d4e6d18",
+      "git_blob_sha1": "3b37f01a3ac720868e67a1a58377a92944e937ce"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/svr_results.json",
+      "chars": 1411,
+      "sha256": "f29f600411caae76d87ebe091e75220f6481084ec8c07e06d89c3837a56fc011",
+      "git_blob_sha1": "579248aa953f5ebc6f4c6c5d7ea8cdc68a8f973b"
+    },
+    {
+      "path": "motif/official_method_search/__init__.py",
+      "chars": 77,
+      "sha256": "e38d509f84e1311d6269e17297f09ea166e89f9d425824083c2fdec68fd5a355",
+      "git_blob_sha1": "9750791f68b2ea527947b7a240f562c325d2b08b"
+    },
+    {
+      "path": "motif/official_method_search/acceptance_20261030.json",
+      "chars": 1428,
+      "sha256": "5fd6dd6545ac9c988d434d12672c25336b68204eb34a62508129c56247b7c076",
+      "git_blob_sha1": "d93825b32653a0b294789d8994ab1d836e74ae8a"
+    },
+    {
+      "path": "motif/official_method_search/data_verification.json",
+      "chars": 588,
+      "sha256": "52eff9c5d667eaebe44236a1e0eff82b53eed9c4cae606a92808e2a8d1344599",
+      "git_blob_sha1": "820d5e534cbeacc56f38f05b5bb4f0e649c2ee08"
+    },
+    {
+      "path": "motif/official_method_search/esol_svr_archive.json",
+      "chars": 344,
+      "sha256": "a488d3048cb3f943a9c5fca9e7b175acc2ccd38e387d0e8d0a700b048925eeb2",
+      "git_blob_sha1": "4fa48f6d18db75dabe7596b7bc21509ef1b3e170"
+    },
+    {
+      "path": "motif/official_method_search/predict_svr.py",
+      "chars": 1795,
+      "sha256": "1cd8314ebcdca6e571f550da12818a4de57365dd6668bef1c9b0203f0e40185e",
+      "git_blob_sha1": "362e13a35c697ddba89a50a308857e46d6833bc0"
+    },
+    {
+      "path": "motif/official_method_search/README.md",
+      "chars": 2851,
+      "sha256": "53dfe1b8a234499e8c427ce5d0e3b7c4fecb1e7d5dbf45385bcbcaacc1fefd06",
+      "git_blob_sha1": "7ce200949ec7e6a413ac59d1811a2419c93b3244"
+    },
+    {
+      "path": "motif/official_method_search/results_20261030.json",
+      "chars": 2075,
+      "sha256": "e22efdb4f965799cf9d307b28fe2a733e5e624c6fecc3da0204df59d755365bd",
+      "git_blob_sha1": "6797cf6901bd6855b6003a32620bae4ff0195216"
+    }
+  ],
+  "binary_files": [
+    {
+      "path": "motif/official_method_search/frozen_sources_20261030.tar.xz",
+      "bytes": 29896,
+      "sha256": "4c496b9c1072af0c57531378a63a7a08b6d3406df5282bc3ff75f7433f742613",
+      "base64_chars": 39864,
+      "git_blob_sha1": "64ea8fd6f53b6012135829c0a357cf3ba2c06d94"
+    },
+    {
+      "path": "motif/official_method_search/esol_svr_20261030.tar.xz",
+      "bytes": 210652,
+      "sha256": "3efa0cd051c2d8649a602679f0ecf2366db0330d5c86f560d5829ebca02839a8",
+      "base64_chars": 280872,
+      "git_blob_sha1": "c71530e05976e89c8f7dfea8e1c2e15e4e920d45"
+    }
+  ],
+  "model_files": [
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/esol/seed_0/checkpoints/best.ckpt",
+      "bytes": 111972310,
+      "sha256": "db9e3d951417d5f6289f7999425dc4bb1da18180cd757deaaffd1391b6b857dc"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/esol/seed_0/checkpoints/last.ckpt",
+      "bytes": 111972310,
+      "sha256": "db9e3d951417d5f6289f7999425dc4bb1da18180cd757deaaffd1391b6b857dc"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/freesolv/seed_0/checkpoints/best.ckpt",
+      "bytes": 111972310,
+      "sha256": "4cb1b1b7522bd52ebc887e0732e9c84d377c8ba1a08d138efc221110a7f236fd"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/smoke_20261030/freesolv/seed_0/checkpoints/last.ckpt",
+      "bytes": 111972310,
+      "sha256": "4cb1b1b7522bd52ebc887e0732e9c84d377c8ba1a08d138efc221110a7f236fd"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_0/checkpoints/best.ckpt",
+      "bytes": 111972374,
+      "sha256": "1dc5fd885ca0d559c27906d39acf75766237ca9525b0bb26bd3b9ed2b54e7bd3"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_0/checkpoints/last.ckpt",
+      "bytes": 111972374,
+      "sha256": "1dc5fd885ca0d559c27906d39acf75766237ca9525b0bb26bd3b9ed2b54e7bd3"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_1/checkpoints/best.ckpt",
+      "bytes": 111972374,
+      "sha256": "cd538e3cb4b205e56aa3a6b1912cd2e1dc1f8c6eb1ee92b63d830a73d121d817"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_1/checkpoints/last.ckpt",
+      "bytes": 111972374,
+      "sha256": "cd538e3cb4b205e56aa3a6b1912cd2e1dc1f8c6eb1ee92b63d830a73d121d817"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_2/checkpoints/best.ckpt",
+      "bytes": 111972374,
+      "sha256": "67495cdd2b6084d4dd3455b0c440c77b71623a8700f65b483f2513251917a280"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/esol/seed_2/checkpoints/last.ckpt",
+      "bytes": 111972374,
+      "sha256": "67495cdd2b6084d4dd3455b0c440c77b71623a8700f65b483f2513251917a280"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_0/checkpoints/best.ckpt",
+      "bytes": 111972374,
+      "sha256": "6a720e1802698a466228c6ae9db3ee9dd33cdbf6bdd030b991a989a2ec8db0a8"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_0/checkpoints/last.ckpt",
+      "bytes": 111972374,
+      "sha256": "6a720e1802698a466228c6ae9db3ee9dd33cdbf6bdd030b991a989a2ec8db0a8"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_1/checkpoints/best.ckpt",
+      "bytes": 111972374,
+      "sha256": "dfb1ce9f385eab393d6c3b882647ecab8e88f2be33863d528022f8c8daa31dba"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_1/checkpoints/last.ckpt",
+      "bytes": 111972374,
+      "sha256": "dfb1ce9f385eab393d6c3b882647ecab8e88f2be33863d528022f8c8daa31dba"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_2/checkpoints/best.ckpt",
+      "bytes": 111972374,
+      "sha256": "b44bbd9ab4023023caf32aa54c9a9ee864628338bb33c7a0b2c482c2b37cfc48"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/freesolv/seed_2/checkpoints/last.ckpt",
+      "bytes": 111972374,
+      "sha256": "b44bbd9ab4023023caf32aa54c9a9ee864628338bb33c7a0b2c482c2b37cfc48"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/esol/ridge.joblib",
+      "bytes": 58372,
+      "sha256": "b2043238eb8fcdbee4e4d43abc50fad26a7b4d0c5ba3a62b49281d86e272dbcb"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/freesolv/ridge.joblib",
+      "bytes": 58372,
+      "sha256": "b6abc75637a37e28f1bb5d6b47b6e2e443925d959df001a46c1945083a2126df"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge_float64/esol/ridge.joblib",
+      "bytes": 66536,
+      "sha256": "f6948fa5e03e665da17b7fee63764a8dd440c56c9e9519930054ef5d8fe43fe8"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge_float64/freesolv/ridge.joblib",
+      "bytes": 66536,
+      "sha256": "08fd584b373d1fda11af61c638c187bc1fd2c92bcf9c3082075a38b96ed40d29"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/model_seed_0.json",
+      "bytes": 907588,
+      "sha256": "4aa6ffab3a93734ad6e9e85053e2a837f8a99390ee976946012fb821057b9cd9"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/model_seed_1.json",
+      "bytes": 900438,
+      "sha256": "f06d73924b554be61291e6837c15735a7614e45b7131e40cef6b32edd784f81c"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/esol/model_seed_2.json",
+      "bytes": 887204,
+      "sha256": "4169d7e58d99a3d6314ddc4b1919521517afa768c3cfd8aac5e88f1faede9fe8"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/model_seed_0.json",
+      "bytes": 831173,
+      "sha256": "56f7b9921c3dbc72e72678720f91ed73d7e41ba17e45a98f2c02b081f202ac53"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/model_seed_1.json",
+      "bytes": 823662,
+      "sha256": "04fcb497e6ba31edb842e7550a7ec490127b5ab996fb1a68c2ea8712af709506"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/descriptor_xgboost/freesolv/model_seed_2.json",
+      "bytes": 829744,
+      "sha256": "396ea9fd0c3af791137ad20210c240f5801200d564a8ec9aa39cc8761760af1b"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_0/checkpoints/best.ckpt",
+      "bytes": 5000214,
+      "sha256": "862df9d36170574f41e674be5b98183533b90df3923f60775456539867316479"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_0/checkpoints/last.ckpt",
+      "bytes": 5000214,
+      "sha256": "862df9d36170574f41e674be5b98183533b90df3923f60775456539867316479"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_1/checkpoints/best.ckpt",
+      "bytes": 5000214,
+      "sha256": "b82ffcb3b884e917eb8d051585e14f5dc5496eed5464ed06e534bf0ad2aea6d7"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_1/checkpoints/last.ckpt",
+      "bytes": 5000214,
+      "sha256": "b82ffcb3b884e917eb8d051585e14f5dc5496eed5464ed06e534bf0ad2aea6d7"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_2/checkpoints/best.ckpt",
+      "bytes": 5000214,
+      "sha256": "64fe23a687e567f6344eca7528289689ca17f47db523ae764f23c3c802b0ea21"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/seed_2/checkpoints/last.ckpt",
+      "bytes": 5000214,
+      "sha256": "64fe23a687e567f6344eca7528289689ca17f47db523ae764f23c3c802b0ea21"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol/svr/model.joblib",
+      "bytes": 1086804,
+      "sha256": "90e851ee91c63a8b789b4f30f1f2d88dce5c8b09c1265f64aee8e0a6f996ee48"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_0/checkpoints/best.ckpt",
+      "bytes": 5000214,
+      "sha256": "fe73f7bb1604cde2db81dd32707a459ce6a05bd2de295697bcdff06c5ff868b3"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_0/checkpoints/last.ckpt",
+      "bytes": 5000214,
+      "sha256": "fe73f7bb1604cde2db81dd32707a459ce6a05bd2de295697bcdff06c5ff868b3"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_1/checkpoints/best.ckpt",
+      "bytes": 5000214,
+      "sha256": "eb15575e46ea6a7c878695bc3ad79c0433473f7152831356e11e506a63db457e"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_1/checkpoints/last.ckpt",
+      "bytes": 5000214,
+      "sha256": "eb15575e46ea6a7c878695bc3ad79c0433473f7152831356e11e506a63db457e"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_2/checkpoints/best.ckpt",
+      "bytes": 5000214,
+      "sha256": "38d5b08fed8f841e098996415026c5c9cb51a5e2cab63b880de02f2a60120532"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/seed_2/checkpoints/last.ckpt",
+      "bytes": 5000214,
+      "sha256": "38d5b08fed8f841e098996415026c5c9cb51a5e2cab63b880de02f2a60120532"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv/svr/model.joblib",
+      "bytes": 634828,
+      "sha256": "d8f7a43eed8e56f95207539cf87d4f10af7128e48723de96918b273d06586c2d"
+    }
+  ],
+  "local_only_features": [
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/esol/features.npz",
+      "bytes": 2737770,
+      "sha256": "5b31b039c5d56994ba00bd680d405142fa78562eed011791d56782da902cc920"
+    },
+    {
+      "path": "motif/official_chemeleon/runs/comparison_20261030/frozen_ridge/freesolv/features.npz",
+      "bytes": 1299971,
+      "sha256": "e34d08a660f45da9b28dfd134c86885986465c8978c996afe534e5d5979ee7e5"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/esol_normalized_descriptors.npz",
+      "bytes": 499774,
+      "sha256": "f78d0576a005d45f22bf1c21fd72ec75a541b23a83501626f1ad345ec0241939"
+    },
+    {
+      "path": "motif/official_chemprop_rich/runs/comparison_20261030/freesolv_normalized_descriptors.npz",
+      "bytes": 247902,
+      "sha256": "ad1e45a0951213d55f21fac913a8b2684787013b45f1fa0dfbaad0402207387e"
+    }
+  ],
+  "published_model": "ESOL descriptor-SVR included in esol_svr_20261030.tar.xz; other models local",
+  "external_foundation": {
+    "path": "model/pretrained/chemeleon_mp.pt",
+    "sha256": "c376624d3407204e780a0ed13a9ac097cc9bb1c13ef89cdbc633c1715c183651",
+    "source": "https://zenodo.org/records/15460715"
+  }
+}

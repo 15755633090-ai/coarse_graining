@@ -1,0 +1,20 @@
+{
+  "dataset": "freesolv",
+  "seed": 0,
+  "train": {
+    "rmse": 2.797006832730066,
+    "mae": 1.9979002290964125
+  },
+  "valid": {
+    "rmse": 5.992448293871726,
+    "mae": 3.989857202768326
+  },
+  "best_epoch": 2,
+  "epochs_run": 2,
+  "elapsed_seconds": 2.2734072000021115,
+  "best_checkpoint_sha256": "4cb1b1b7522bd52ebc887e0732e9c84d377c8ba1a08d138efc221110a7f236fd",
+  "active_parameters": 9329241,
+  "inverse_scale_and_val_selection_verified": true,
+  "prediction_replay_verified": true,
+  "test_evaluated": false
+}

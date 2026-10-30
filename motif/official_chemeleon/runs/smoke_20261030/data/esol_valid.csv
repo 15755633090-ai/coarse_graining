@@ -1,0 +1,17 @@
+sample_id,smiles,target
+32,COC(=O)Nc1cccc(OC(=O)Nc2cccc(C)c2)c1,-4.805
+34,Cc1cccc2c1Cc3ccccc32,-5.22
+72,CC1(C)C2CCC1(C)C(=O)C2,-1.96
+88,CC(C)C1CCC(C)CC1=O,-2.35
+91,CCCC(C)C1(CC=C)C(=O)NC(=S)NC1=O ,-3.46
+156,Oc2ccc1CCCCc1c2 ,-1.99
+164,O2c1cc(C)ccc1N(C)C(=O)c3cc(N)cnc23 ,-3.043
+186,c1ccnnc1,1.1
+195,CC(C)Oc1cc(c(Cl)cc1Cl)n2nc(oc2=O)C(C)(C)C,-5.6960000000000015
+200,Nc1ccc(cc1)S(=O)(=O)c2ccc(N)cc2,-3.094
+213,CC12CCC(CC1)C(C)(C)O2 ,-1.64
+226,CCOP(=S)(OCC)Oc1nc(Cl)n(n1)C(C)C,-3.658
+232,CC34CCC1C(CCC2CC(O)CCC12C)C3CCC4=O,-4.16
+240,O=C1CCCCC1,-0.6
+254,CC(=O)OC3(CCC4C2C=C(C)C1=CC(=O)CCC1(C)C2CCC34C)C(C)=O ,-5.35
+262,Fc1cccc(F)c1C(=O)NC(=O)Nc2cc(Cl)c(F)c(Cl)c2F ,-7.28

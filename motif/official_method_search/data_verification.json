@@ -1,0 +1,26 @@
+{
+  "results": {
+    "esol": {
+      "train": {
+        "rows": 902,
+        "identical_smiles_labels_and_indices": true
+      },
+      "valid": {
+        "rows": 113,
+        "identical_smiles_labels_and_indices": true
+      }
+    },
+    "freesolv": {
+      "train": {
+        "rows": 513,
+        "identical_smiles_labels_and_indices": true
+      },
+      "valid": {
+        "rows": 64,
+        "identical_smiles_labels_and_indices": true
+      }
+    }
+  },
+  "test_evaluated": false,
+  "verification_script_sha256": "2175af1e03cc3adb15605e7d5a5f99ad0dca831db6954faa2106db1d0f60189e"
+}

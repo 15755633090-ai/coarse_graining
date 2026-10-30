@@ -1,0 +1,20 @@
+{
+  "model_sha256": "90e851ee91c63a8b789b4f30f1f2d88dce5c8b09c1265f64aee8e0a6f996ee48",
+  "metrics": {
+    "train": {
+      "rmse": 0.20309774047981444,
+      "mae": 0.12961563818450691
+    },
+    "valid": {
+      "rmse": 0.7729214819044478,
+      "mae": 0.5924310247276114
+    }
+  },
+  "replay_passed": true,
+  "chemprop": "2.2.3",
+  "sklearn": "1.9.1",
+  "rdkit": "2026.09.1",
+  "test_evaluated": false,
+  "standalone_predictor_source_sha256": "1cd8314ebcdca6e571f550da12818a4de57365dd6668bef1c9b0203f0e40185e",
+  "standalone_inference_verified_rows": 113
+}

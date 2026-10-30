@@ -1,0 +1,8 @@
+{
+  "path": "esol_svr_20261030.tar.xz",
+  "sha256": "3efa0cd051c2d8649a602679f0ecf2366db0330d5c86f560d5829ebca02839a8",
+  "bytes": 210652,
+  "raw_model_sha256": "90e851ee91c63a8b789b4f30f1f2d88dce5c8b09c1265f64aee8e0a6f996ee48",
+  "extract_at": "project root",
+  "scope": "candidate ESOL predictor; repeated validation search, no test claim"
+}

@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "auditor_sha256": "94ff8922983df3facd4dd3b1f44881fe0e6ee877fe4679085ac17c4fead71439",
+  "neural_runs": [
+    {
+      "run": "chemeleon_smoke",
+      "source_data_histories_checkpoints_and_prediction_csvs_passed": true,
+      "models": 2
+    },
+    {
+      "run": "chemeleon_formal",
+      "source_data_histories_checkpoints_and_prediction_csvs_passed": true,
+      "models": 6
+    },
+    {
+      "run": "rich_formal",
+      "source_data_histories_checkpoints_and_prediction_csvs_passed": true,
+      "models": 6
+    }
+  ],
+  "all_prediction_csv_metrics_recomputed": true,
+  "source_archive_sha256": "4c496b9c1072af0c57531378a63a7a08b6d3406df5282bc3ff75f7433f742613",
+  "svr_standalone_inference_replayed_rows": 113,
+  "test_evaluated": false,
+  "data_verification": {
+    "results": {
+      "esol": {
+        "train": {
+          "rows": 902,
+          "identical_smiles_labels_and_indices": true
+        },
+        "valid": {
+          "rows": 113,
+          "identical_smiles_labels_and_indices": true
+        }
+      },
+      "freesolv": {
+        "train": {
+          "rows": 513,
+          "identical_smiles_labels_and_indices": true
+        },
+        "valid": {
+          "rows": 64,
+          "identical_smiles_labels_and_indices": true
+        }
+      }
+    },
+    "test_evaluated": false,
+    "verification_script_sha256": "2175af1e03cc3adb15605e7d5a5f99ad0dca831db6954faa2106db1d0f60189e"
+  }
+}

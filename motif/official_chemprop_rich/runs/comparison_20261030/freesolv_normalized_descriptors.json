@@ -1,0 +1,6 @@
+{
+  "chemprop": "2.2.3",
+  "rdkit": "2026.09.1",
+  "sha256": "ad1e45a0951213d55f21fac913a8b2684787013b45f1fa0dfbaad0402207387e",
+  "descriptor": "official V1RDKit2DNormalizedFeaturizer, same NaN-zero token; no fitted scaling"
+}

@@ -1,0 +1,16 @@
+{
+  "dataset": "esol",
+  "seed": 1,
+  "atom_dim": 133,
+  "bond_dim": 14,
+  "descriptor_dim": 200,
+  "active_parameters": 414901,
+  "target_center": [
+    -2.8668758314855878
+  ],
+  "target_scale": [
+    2.066724108076815
+  ],
+  "plan_sha256": "cc63cbfb99228f7c25d3ca1d694c51845e3e28c7018d3f3a9228639a140b134c",
+  "pretraining": false
+}

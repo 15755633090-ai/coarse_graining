@@ -1,0 +1,120 @@
+{
+  "method": "published CheMeleon checkpoint + unmodified Chemprop 2.2.3 components and Lightning trainer",
+  "datasets": {
+    "esol": {
+      "split": {
+        "train": [
+          2,
+          5,
+          6,
+          7,
+          11,
+          12,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          22,
+          23,
+          24
+        ],
+        "valid": [
+          32,
+          34,
+          72,
+          88,
+          91,
+          156,
+          164,
+          186,
+          195,
+          200,
+          213,
+          226,
+          232,
+          240,
+          254,
+          262
+        ]
+      },
+      "train_n": 16,
+      "valid_n": 16,
+      "raw_mapping_sha256": "9d35028b2adf47376c1a74d89bb1f21aa584605d17eca8193b37b0c88ef2515d",
+      "raw_labels_sha256": "049ab083983327bd4e2d0bcdb019d6ae4c0316ae676e6add0403a5a7e94c5cad"
+    },
+    "freesolv": {
+      "split": {
+        "train": [
+          0,
+          1,
+          2,
+          4,
+          5,
+          6,
+          7,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          17,
+          18
+        ],
+        "valid": [
+          8,
+          42,
+          59,
+          71,
+          83,
+          90,
+          91,
+          139,
+          154,
+          156,
+          160,
+          169,
+          183,
+          192,
+          203,
+          206
+        ]
+      },
+      "train_n": 16,
+      "valid_n": 16,
+      "raw_mapping_sha256": "81d2ed64f4366ba1459e4cdb697c080b14e220b73074380ee968b35ed65e175d",
+      "raw_labels_sha256": "70f2a5492e15e12efd8232e77de4bcc424a8592ebb59512df511c80047aa5dff"
+    }
+  },
+  "data_sha256": {
+    "data\\esol_train.csv": "31dc9d4345de5777ccb719212eb0fc094e459ecd1e2bd673a6a2d52efef26808",
+    "data\\esol_valid.csv": "326d47fea0229020e64ee7bfc43b7dafc906aaf8059186703b0327b3cb5ab9e3",
+    "data\\freesolv_train.csv": "a4047202a98fb0d4aa086c28eff1f6ad1cc5838a1ae5940b3d603f631e250f50",
+    "data\\freesolv_valid.csv": "3f86b6326dc8d797e85d1e13431bb979d1802e764ac14b5a47741856a1b3736d"
+  },
+  "seeds": [
+    0
+  ],
+  "epochs": 2,
+  "smoke": true,
+  "batch_size": 64,
+  "ffn_hidden_dim": 300,
+  "optimizer": "official MPNN Adam + NoamLikeLR defaults: warmup2, init1e-4 max1e-3 final1e-4",
+  "model": "checkpoint-defined BondMessagePassing; official MeanAggregation; fresh RegressionFFN; batch_normFalse",
+  "weight_path": "C:\\Users\\12775\\Desktop\\GNN\u8bfe\u98981\\model\\pretrained\\chemeleon_mp.pt",
+  "weight_url": "https://zenodo.org/records/15460715/files/chemeleon_mp.pt",
+  "expected_md5": "6a80b54fdb7de37ef0374d302f01e8ce",
+  "reference": "Chemprop official CheMeleon foundation finetuning notebook; no custom motif/attention/readout/recovery layer",
+  "model_selection": "all seeds, fixed epochs, best val_loss checkpoint; no tuning or validation-dependent recipe change",
+  "pretrain_overlap": "unknown exact overlap of published PubChem pretraining corpus with these task structures; no claim of disjoint pretraining",
+  "capacity_and_budget": "external million-molecule pretrained encoder2048 vs original custom64; method comparison, not attribution to pretraining or our motifs",
+  "heldout": "only existing scaffold train/valid data exported; no test predictions, labels or metrics exported/evaluated",
+  "source_sha256": {
+    "_github_sync\\run_official_chemeleon_20261030.py": "ff31eb1da89d1347c2e8fa77da8ea886116688254afd77c3c70603b85b2524d5"
+  },
+  "test_evaluated": false
+}

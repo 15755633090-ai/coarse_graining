@@ -1,0 +1,55 @@
+{
+  "runs": [
+    {
+      "dataset": "esol",
+      "train": {
+        "rmse": 0.3603968766867811,
+        "mae": 0.2679902744326258
+      },
+      "valid": {
+        "rmse": 12.931889286347545,
+        "mae": 4.113335732827941
+      },
+      "selected_alpha": 1000.0,
+      "max_abs_standardized_validation_feature": 8616.075290022975,
+      "training_cv_mean_mse": [
+        1.6586790720820457,
+        1.658239929043048,
+        1.6417336552439032,
+        1.5207711143586535,
+        1.2956750137260091,
+        1.0204218615919984,
+        0.5709111222577535,
+        0.6756721895688614
+      ],
+      "cached_features_sha256": "5b31b039c5d56994ba00bd680d405142fa78562eed011791d56782da902cc920"
+    },
+    {
+      "dataset": "freesolv",
+      "train": {
+        "rmse": 0.5959331981603505,
+        "mae": 0.4464913718782654
+      },
+      "valid": {
+        "rmse": 4.274924557914341,
+        "mae": 2.6630853555913823
+      },
+      "selected_alpha": 1000.0,
+      "max_abs_standardized_validation_feature": 1882.2937643622897,
+      "training_cv_mean_mse": [
+        127.64281868684577,
+        127.63532959916378,
+        127.55747448085819,
+        126.4998161868826,
+        109.86235940601458,
+        48.15983812312013,
+        3.6111236613639335,
+        6.236053906981053
+      ],
+      "cached_features_sha256": "e34d08a660f45da9b28dfd134c86885986465c8978c996afe534e5d5979ee7e5"
+    }
+  ],
+  "revision": "float64 for numerical stability after float32 warnings; identical features, folds, regularization grid; original results retained",
+  "source_script_sha256": "192fced87df3c654184424537a8bfe450a0eb6a8dbcb02e78dd2516c5f8c6e58",
+  "test_evaluated": false
+}

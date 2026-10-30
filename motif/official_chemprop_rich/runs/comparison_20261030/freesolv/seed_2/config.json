@@ -1,0 +1,16 @@
+{
+  "dataset": "freesolv",
+  "seed": 2,
+  "atom_dim": 133,
+  "bond_dim": 14,
+  "descriptor_dim": 200,
+  "active_parameters": 414901,
+  "target_center": [
+    -3.2594736842105263
+  ],
+  "target_scale": [
+    3.2775297233608893
+  ],
+  "plan_sha256": "cc63cbfb99228f7c25d3ca1d694c51845e3e28c7018d3f3a9228639a140b134c",
+  "pretraining": false
+}

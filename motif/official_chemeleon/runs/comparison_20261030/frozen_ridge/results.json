@@ -1,0 +1,86 @@
+{
+  "runs": [
+    {
+      "dataset": "esol",
+      "train": {
+        "rmse": 0.36039684435273905,
+        "mae": 0.2679902751810535
+      },
+      "valid": {
+        "rmse": 12.931874357136333,
+        "mae": 4.113331964273368
+      },
+      "selected_alpha": 1000.0,
+      "training_cv_mean_mse": [
+        1.4792101057238085,
+        1.6562096744326928,
+        1.637734878664046,
+        1.5206562390849487,
+        1.2956553782599172,
+        1.0204137880168118,
+        0.5709100049735395,
+        0.6756722310218789
+      ],
+      "alphas": [
+        0.001,
+        0.01,
+        0.1,
+        1.0,
+        10.0,
+        100.0,
+        1000.0,
+        10000.0
+      ],
+      "selection": "5-fold training-only canonical-molecule GroupKFold CV, StandardScaler inside each fold; no task validation used",
+      "model_sha256": "b2043238eb8fcdbee4e4d43abc50fad26a7b4d0c5ba3a62b49281d86e272dbcb",
+      "features_sha256": "5b31b039c5d56994ba00bd680d405142fa78562eed011791d56782da902cc920",
+      "replay_passed": true,
+      "test_evaluated": false
+    },
+    {
+      "dataset": "freesolv",
+      "train": {
+        "rmse": 0.5959331616665682,
+        "mae": 0.44649133301153054
+      },
+      "valid": {
+        "rmse": 4.274927148990335,
+        "mae": 2.6630864164233206
+      },
+      "selected_alpha": 1000.0,
+      "training_cv_mean_mse": [
+        127.639875273353,
+        127.63634020868449,
+        127.55857654516687,
+        126.50024080848202,
+        109.86365347612778,
+        48.15971517709026,
+        3.611134780073402,
+        6.236056225361239
+      ],
+      "alphas": [
+        0.001,
+        0.01,
+        0.1,
+        1.0,
+        10.0,
+        100.0,
+        1000.0,
+        10000.0
+      ],
+      "selection": "5-fold training-only canonical-molecule GroupKFold CV, StandardScaler inside each fold; no task validation used",
+      "model_sha256": "b6abc75637a37e28f1bb5d6b47b6e2e443925d959df001a46c1945083a2126df",
+      "features_sha256": "e34d08a660f45da9b28dfd134c86885986465c8978c996afe534e5d5979ee7e5",
+      "replay_passed": true,
+      "test_evaluated": false
+    }
+  ],
+  "method": "frozen official CheMeleon encoder and standard ridge adaptation; not a new combined neural architecture",
+  "independent_models_per_task": 1,
+  "deterministic_not_three_seed_replicates": true,
+  "source_script_sha256": "199ff7854debd833361f4980515758686fbfae62bef9d78947b081d21d95fc8c",
+  "weight_sha256": "c376624d3407204e780a0ed13a9ac097cc9bb1c13ef89cdbc633c1715c183651",
+  "chemprop": "2.2.3",
+  "wall_seconds": 6.1614526999183,
+  "test_evaluated": false
+}

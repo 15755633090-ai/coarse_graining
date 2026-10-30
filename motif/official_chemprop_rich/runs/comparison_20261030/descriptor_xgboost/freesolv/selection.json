@@ -1,0 +1,76 @@
+{
+  "scores": [
+    {
+      "config": {
+        "max_depth": 4,
+        "learning_rate": 0.03,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8
+      },
+      "fold_mse": [
+        0.485678298587909,
+        0.652978431893148,
+        0.9040129256520129,
+        2.4102204848458726,
+        0.6675830188045065
+      ],
+      "mean_mse": 1.0240946319566897
+    },
+    {
+      "config": {
+        "max_depth": 6,
+        "learning_rate": 0.03,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8
+      },
+      "fold_mse": [
+        0.635851819165053,
+        0.8343597345781701,
+        0.9350206495798631,
+        2.582357043121553,
+        0.7640500867438268
+      ],
+      "mean_mse": 1.1503278666376933
+    },
+    {
+      "config": {
+        "max_depth": 4,
+        "learning_rate": 0.05,
+        "subsample": 1.0,
+        "colsample_bytree": 0.8
+      },
+      "fold_mse": [
+        0.4791328707426581,
+        0.8057127319032963,
+        1.0145387914840092,
+        2.325287270941015,
+        0.719076955061154
+      ],
+      "mean_mse": 1.0687497240264265
+    },
+    {
+      "config": {
+        "max_depth": 6,
+        "learning_rate": 0.05,
+        "subsample": 0.8,
+        "colsample_bytree": 1.0
+      },
+      "fold_mse": [
+        0.7326614267537649,
+        0.924121394870747,
+        0.9708728125891924,
+        2.4835203917915543,
+        0.8968590707432561
+      ],
+      "mean_mse": 1.2016070193497028
+    }
+  ],
+  "selected": {
+    "max_depth": 4,
+    "learning_rate": 0.03,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8
+  },
+  "features_sha256": "ad1e45a0951213d55f21fac913a8b2684787013b45f1fa0dfbaad0402207387e",
+  "selection": "training-only CV"
+}

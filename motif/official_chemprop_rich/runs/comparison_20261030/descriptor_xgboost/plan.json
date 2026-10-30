@@ -1,0 +1,48 @@
+{
+  "method": "XGBoost on official normalized200 descriptors, no graph model or feature concatenation",
+  "candidates_from": "model/search_spaces.json/morgan_xgboost",
+  "candidate_space_sha256": "ec4cefeeb81e52b778e11748b2a4329fe0d6f571a786fd6f8c6226123773281b",
+  "candidates": [
+    {
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8
+    },
+    {
+      "max_depth": 6,
+      "learning_rate": 0.03,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8
+    },
+    {
+      "max_depth": 4,
+      "learning_rate": 0.05,
+      "subsample": 1.0,
+      "colsample_bytree": 0.8
+    },
+    {
+      "max_depth": 6,
+      "learning_rate": 0.05,
+      "subsample": 0.8,
+      "colsample_bytree": 1.0
+    }
+  ],
+  "trees": 500,
+  "reg_lambda": 1.0,
+  "cv": "canonical-molecule GroupKFold5 within training only; no task validation or early stopping",
+  "selection_seed": 42,
+  "refit_seeds": [
+    0,
+    1,
+    2
+  ],
+  "xgboost": "2.1.4",
+  "sklearn": "1.6.1",
+  "source_script_sha256": "f1d0688ce5deeb8a2588cef3d5d97882591382c6b5082024f9c9d41db75ee8e8",
+  "test_evaluated": false,
+  "io_revision": {
+    "original_source_sha256": "6cd95694fa2fec71342fc0fc04d0532e7563640ab74af69b53f3e5a2f152cb10",
+    "reason": "Windows non-ASCII checkpoint path; use XGBoost raw byte buffer API; model and CV unchanged"
+  }
+}

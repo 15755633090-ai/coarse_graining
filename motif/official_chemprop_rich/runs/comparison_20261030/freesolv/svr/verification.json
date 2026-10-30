@@ -1,0 +1,18 @@
+{
+  "model_sha256": "d8f7a43eed8e56f95207539cf87d4f10af7128e48723de96918b273d06586c2d",
+  "metrics": {
+    "train": {
+      "rmse": 0.10286520470869819,
+      "mae": 0.09191307297351459
+    },
+    "valid": {
+      "rmse": 3.203784501434874,
+      "mae": 1.752542938709293
+    }
+  },
+  "replay_passed": true,
+  "chemprop": "2.2.3",
+  "sklearn": "1.9.1",
+  "rdkit": "2026.09.1",
+  "test_evaluated": false
+}

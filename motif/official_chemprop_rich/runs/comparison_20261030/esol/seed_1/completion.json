@@ -1,0 +1,19 @@
+{
+  "dataset": "esol",
+  "seed": 1,
+  "train": {
+    "rmse": 0.38353868908550265,
+    "mae": 0.282728240168544
+  },
+  "valid": {
+    "rmse": 0.9141392322395452,
+    "mae": 0.6782782083190648
+  },
+  "best_epoch": 38,
+  "epochs_run": 50,
+  "active_parameters": 414901,
+  "elapsed_seconds": 19.319838600000367,
+  "best_checkpoint_sha256": "b82ffcb3b884e917eb8d051585e14f5dc5496eed5464ed06e534bf0ad2aea6d7",
+  "replay_and_inverse_scale_passed": true,
+  "test_evaluated": false
+}

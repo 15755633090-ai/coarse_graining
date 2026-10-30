@@ -1,0 +1,15 @@
+{
+  "dataset": "esol",
+  "seed": 0,
+  "active_parameters": 9329241,
+  "encoder_output_dim": 2048,
+  "target_center": [
+    -3.719375
+  ],
+  "target_scale": [
+    2.2962346046027178
+  ],
+  "initial_encoder_matches_published_weights": true,
+  "plan_sha256": "e50579401bd4c33c3a193f385ea72fa02587f92299a699889eacb7be8c92a77c",
+  "test_evaluated": false
+}
