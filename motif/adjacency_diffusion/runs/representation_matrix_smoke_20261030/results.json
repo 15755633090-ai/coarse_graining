@@ -1,0 +1,93 @@
+{
+  "runs": [
+    {
+      "best_epoch": 1,
+      "best_score": 2.0713599668144553,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.12010910000000052,
+      "corpus": "small",
+      "objective": "edge",
+      "seed": 7,
+      "task_seed": 0,
+      "validation": {
+        "rmse": 2.0713599668144553,
+        "mae": 1.6603420972824097,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 1,
+      "best_score": 2.0666737951135237,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.08071810000000035,
+      "corpus": "small",
+      "objective": "representation",
+      "seed": 7,
+      "task_seed": 0,
+      "validation": {
+        "rmse": 2.0666737951135237,
+        "mae": 1.6531825065612793,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 1,
+      "best_score": 2.071228976099829,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.08113509999999913,
+      "corpus": "expanded",
+      "objective": "edge",
+      "seed": 7,
+      "task_seed": 0,
+      "validation": {
+        "rmse": 2.071228976099829,
+        "mae": 1.6600711345672607,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 1,
+      "best_score": 2.066654529330801,
+      "epochs_run": 2,
+      "elapsed_seconds": 0.0856425999999999,
+      "corpus": "expanded",
+      "objective": "representation",
+      "seed": 7,
+      "task_seed": 0,
+      "validation": {
+        "rmse": 2.066654529330801,
+        "mae": 1.6531530618667603,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    }
+  ],
+  "aggregate": {
+    "small_edge": {
+      "n": 1,
+      "mean_rmse": 2.0713599668144553,
+      "sample_sd": null
+    },
+    "small_representation": {
+      "n": 1,
+      "mean_rmse": 2.0666737951135237,
+      "sample_sd": null
+    },
+    "expanded_edge": {
+      "n": 1,
+      "mean_rmse": 2.071228976099829,
+      "sample_sd": null
+    },
+    "expanded_representation": {
+      "n": 1,
+      "mean_rmse": 2.066654529330801,
+      "sample_sd": null
+    }
+  },
+  "scratch_reference": null,
+  "budget_note": "same graph draws and optimizer updates within corpus; representation uses two differentiable encoder passes versus one; not compute matched",
+  "test_evaluated": false
+}

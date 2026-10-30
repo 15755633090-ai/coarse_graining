@@ -1,0 +1,79 @@
+{
+  "corpus": "small",
+  "objective": "edge",
+  "seed": 7,
+  "task_seed": 0,
+  "source": {
+    "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\representation_matrix_smoke_20261030\\pretraining\\small_edge_7\\encoder.pt",
+    "checkpoint_sha256": "b7bfc1b1bc0b711dc7590ec25649c34b452661dd3fd502091996177d853810a8",
+    "initial_state_hash": "2444d657a15a5916214be09293fc495c5aebdce2c1e5f24c1378e8c60b4ea812",
+    "diagnostics": {
+      "n": 8,
+      "clean": {
+        "mean_dimension_std": 0.011615734547376633,
+        "effective_rank": 1.8090085983276367,
+        "mean_norm": 0.723183274269104,
+        "sigreg": 3.569763660430908,
+        "catastrophic_collapse_flag": true
+      },
+      "corrupted_t200": {
+        "mean_dimension_std": 0.011502140201628208,
+        "effective_rank": 1.8255243301391602,
+        "mean_norm": 0.7251938581466675,
+        "sigreg": 3.5774312019348145,
+        "catastrophic_collapse_flag": true
+      },
+      "view_mse": 0.0010261525167152286,
+      "scope": "unlabeled reused heldout molecules; collapse thresholds are diagnostics, not guarantees or selection criteria"
+    },
+    "checkpoint_replay_passed": true,
+    "unique_molecules_seen": 8,
+    "graph_draws": 16,
+    "encoder_graph_passes": 16,
+    "gpu_compute_ms": 0.0,
+    "wall_seconds": 0.12069240000000114,
+    "masked_candidate_positions": 1151,
+    "masked_true_bonds": 131
+  },
+  "splits": {
+    "train": [
+      2,
+      5,
+      6,
+      7,
+      11,
+      12,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      22,
+      23,
+      24
+    ],
+    "valid": [
+      32,
+      34,
+      72,
+      88,
+      91,
+      156,
+      164,
+      186,
+      195,
+      200,
+      213,
+      226,
+      232,
+      240,
+      254,
+      262
+    ]
+  },
+  "head_initial_hash": "41bdbb8c907628cca7007ce726f2e92adea12b7ab8ac3dc0f92cc679f0136a42",
+  "plan_sha256": "cf54c94be7fb95fc3f7af913100c4fd989c635e07936cee9358521889c9192a9",
+  "test_evaluated": false
+}

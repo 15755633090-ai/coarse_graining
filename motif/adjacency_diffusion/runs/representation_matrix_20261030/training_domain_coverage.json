@@ -1,0 +1,10 @@
+{
+  "captured_posthoc": true,
+  "property_labels_used": false,
+  "split": "ESOL train only",
+  "n": 902,
+  "mean_atoms": 12.0509977827051,
+  "mean_fragments": 2.1818181818181817,
+  "multi_fragment_fraction": 0.48558758314855877,
+  "mean_cross_bonds": 1.1818181818181819
+}

@@ -1,0 +1,16 @@
+{
+  "best_epoch": 52,
+  "best_score": 0.8167042530583843,
+  "epochs_run": 60,
+  "elapsed_seconds": 98.48253980000004,
+  "corpus": "small",
+  "objective": "representation",
+  "seed": 2,
+  "task_seed": 2,
+  "validation": {
+    "rmse": 0.8167042530583843,
+    "mae": 0.6423277854919434,
+    "evaluated_tasks": 1.0
+  },
+  "checkpoint_replay_passed": true
+}

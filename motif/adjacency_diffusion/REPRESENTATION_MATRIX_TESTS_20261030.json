@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-30",
+  "related_regression_cases": 54,
+  "related_regression_passed": true,
+  "duration_seconds": 2.596,
+  "new_representation_interface_cases": 4,
+  "dedicated_runner_guard_recheck_passed": true,
+  "guard_recheck_cases": 4,
+  "guard_recheck_duration_seconds": 2.468,
+  "smoke": {
+    "cells": 4,
+    "pretrain_steps_each": 2,
+    "property_epochs_each": 2,
+    "all_initializations_paired": true,
+    "all_checkpoint_replays_passed": true,
+    "performance_evidence": false
+  },
+  "scope": "CF formula, gradients through both views, collapsed-distribution penalty, unchanged clean predictor, unused-head freezing, schema/loader roundtrip and pretrain-evaluator guard; not proof against all collapse"
+}

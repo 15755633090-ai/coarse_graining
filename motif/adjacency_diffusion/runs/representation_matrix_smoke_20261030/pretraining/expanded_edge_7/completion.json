@@ -1,0 +1,32 @@
+{
+  "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\representation_matrix_smoke_20261030\\pretraining\\expanded_edge_7\\encoder.pt",
+  "checkpoint_sha256": "e4bb74ee45487252a3c29b71970287e5bdbcaedc6fbe6190e7f04ac4826157e4",
+  "initial_state_hash": "3fb74efd9b292c4acbd88c3963dbb62cd9f60ea9cd6399d4f3c5c00b01f4a5c2",
+  "diagnostics": {
+    "n": 8,
+    "clean": {
+      "mean_dimension_std": 0.011547684669494629,
+      "effective_rank": 1.8305128812789917,
+      "mean_norm": 0.7295413613319397,
+      "sigreg": 3.575885772705078,
+      "catastrophic_collapse_flag": true
+    },
+    "corrupted_t200": {
+      "mean_dimension_std": 0.011351551860570908,
+      "effective_rank": 1.8500897884368896,
+      "mean_norm": 0.7322937250137329,
+      "sigreg": 3.5844860076904297,
+      "catastrophic_collapse_flag": true
+    },
+    "view_mse": 0.0010395362041890621,
+    "scope": "unlabeled reused heldout molecules; collapse thresholds are diagnostics, not guarantees or selection criteria"
+  },
+  "checkpoint_replay_passed": true,
+  "unique_molecules_seen": 8,
+  "graph_draws": 16,
+  "encoder_graph_passes": 16,
+  "gpu_compute_ms": 0.0,
+  "wall_seconds": 0.09483969999999964,
+  "masked_candidate_positions": 1045,
+  "masked_true_bonds": 127
+}

@@ -1,0 +1,27 @@
+{
+  "reused_original": true,
+  "path": "C:\\Users\\12775\\Desktop\\GNN课题1\\motif\\adjacency_diffusion\\runs\\masked_property_comparison_20261029\\pretraining\\masked_seed_2\\encoder.pt",
+  "checkpoint_sha256": "7d90691b538d908a65ba6e56b61b4ea268444d6ff1df561a6b33118f36c69519",
+  "initial_state_hash": "3b722bd92df3f043def5737539a21e98a6d555712c07fbe12642c235db9b3934",
+  "diagnostics": {
+    "n": 128,
+    "clean": {
+      "mean_dimension_std": 0.49798521399497986,
+      "effective_rank": 3.7400145530700684,
+      "mean_norm": 6.2037458419799805,
+      "sigreg": 51.5830192565918,
+      "near_constant_flag": false,
+      "low_effective_rank_flag": false
+    },
+    "corrupted_t200": {
+      "mean_dimension_std": 0.5102351307868958,
+      "effective_rank": 4.053524494171143,
+      "mean_norm": 6.221971035003662,
+      "sigreg": 48.1258430480957,
+      "near_constant_flag": false,
+      "low_effective_rank_flag": false
+    },
+    "view_mse": 0.06745418161153793,
+    "scope": "unlabeled reused heldout molecules; collapse thresholds are diagnostics, not guarantees or selection criteria"
+  }
+}

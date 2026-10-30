@@ -1,0 +1,11 @@
+{
+  "state": "complete",
+  "source_hashes_match": true,
+  "all_checkpoint_replays_passed": true,
+  "initializations_paired": true,
+  "all_new_tasks_60_epochs": true,
+  "identical_downstream_architecture_capacity": true,
+  "matched_corruption_positions_across_objectives": true,
+  "strict_compute_match": false,
+  "test_evaluated": false
+}

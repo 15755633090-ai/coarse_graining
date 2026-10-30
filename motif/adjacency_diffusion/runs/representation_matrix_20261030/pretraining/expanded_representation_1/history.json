@@ -1,0 +1,122 @@
+[
+  {
+    "step": 100,
+    "loss": 0.09527011960744858,
+    "parts": {
+      "consistency": 7.468968397006392e-05,
+      "sigreg": 1.9039833545684814
+    },
+    "pre_clip_norm": 0.13798387348651886,
+    "unique_molecules_seen": 731
+  },
+  {
+    "step": 200,
+    "loss": 0.09179188311100006,
+    "parts": {
+      "consistency": 2.354176831431687e-05,
+      "sigreg": 1.835390329360962
+    },
+    "pre_clip_norm": 0.1469191461801529,
+    "unique_molecules_seen": 1314
+  },
+  {
+    "step": 300,
+    "loss": 0.08512108772993088,
+    "parts": {
+      "consistency": 6.365476292558014e-05,
+      "sigreg": 1.7012124061584473
+    },
+    "pre_clip_norm": 0.06319806724786758,
+    "unique_molecules_seen": 1806
+  },
+  {
+    "step": 400,
+    "loss": 0.07686711102724075,
+    "parts": {
+      "consistency": 1.4813311281614006e-05,
+      "sigreg": 1.5370607376098633
+    },
+    "pre_clip_norm": 0.1204727366566658,
+    "unique_molecules_seen": 2201
+  },
+  {
+    "step": 500,
+    "loss": 0.11893787980079651,
+    "parts": {
+      "consistency": 2.9869715945096686e-05,
+      "sigreg": 2.378190040588379
+    },
+    "pre_clip_norm": 0.29590144753456116,
+    "unique_molecules_seen": 2551
+  },
+  {
+    "step": 600,
+    "loss": 0.1070309653878212,
+    "parts": {
+      "consistency": 0.00022170619922690094,
+      "sigreg": 2.136406898498535
+    },
+    "pre_clip_norm": 0.12707379460334778,
+    "unique_molecules_seen": 2822
+  },
+  {
+    "step": 700,
+    "loss": 0.0823497325181961,
+    "parts": {
+      "consistency": 3.06856077258999e-06,
+      "sigreg": 1.6469364166259766
+    },
+    "pre_clip_norm": 0.07658474892377853,
+    "unique_molecules_seen": 3048
+  },
+  {
+    "step": 800,
+    "loss": 0.13485224545001984,
+    "parts": {
+      "consistency": 3.644162916316418e-06,
+      "sigreg": 2.6969757080078125
+    },
+    "pre_clip_norm": 0.2994310259819031,
+    "unique_molecules_seen": 3252
+  },
+  {
+    "step": 900,
+    "loss": 0.13233374059200287,
+    "parts": {
+      "consistency": 8.781644282862544e-06,
+      "sigreg": 2.646507978439331
+    },
+    "pre_clip_norm": 0.30429986119270325,
+    "unique_molecules_seen": 3409
+  },
+  {
+    "step": 1000,
+    "loss": 0.07180773466825485,
+    "parts": {
+      "consistency": 3.345107188579277e-06,
+      "sigreg": 1.4360910654067993
+    },
+    "pre_clip_norm": 0.07897596061229706,
+    "unique_molecules_seen": 3532
+  },
+  {
+    "step": 1100,
+    "loss": 0.10609625279903412,
+    "parts": {
+      "consistency": 2.9991920200700406e-06,
+      "sigreg": 2.121868133544922
+    },
+    "pre_clip_norm": 0.25089842081069946,
+    "unique_molecules_seen": 3631
+  },
+  {
+    "step": 1200,
+    "loss": 0.09340543299913406,
+    "parts": {
+      "consistency": 3.00746114589856e-06,
+      "sigreg": 1.868051528930664
+    },
+    "pre_clip_norm": 0.13016889989376068,
+    "unique_molecules_seen": 3711
+  }
+]

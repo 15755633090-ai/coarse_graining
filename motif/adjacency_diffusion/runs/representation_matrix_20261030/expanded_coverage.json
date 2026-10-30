@@ -1,0 +1,8 @@
+{
+  "unique_molecules": 4096,
+  "mean_atoms": 21.911865234375,
+  "mean_fragments": 5.980224609375,
+  "multi_fragment_fraction": 0.99853515625,
+  "mean_cross_bonds": 4.980224609375,
+  "scope": "coarse structural coverage only; not evidence of covering every motif/environment type"
+}

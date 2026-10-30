@@ -15,6 +15,12 @@ from motif.brics_atom_diffusion.pretrain import read_smiles
 
 
 def training_checkpoint(path,model):
+    if hasattr(model,'regularizer_weight'):
+        from .representation_pretrain import load_model
+        _,saved=load_model(path)
+        if saved['regularizer_weight']!=model.regularizer_weight or saved['directions']!=model.directions:
+            raise ValueError('Representation objective mismatch')
+        return saved
     if hasattr(model,'readout_norm'):
         from .task_readout import load_model
         _,saved=load_model(path)
@@ -123,6 +129,8 @@ def initialize_encoder_transfer(model,state,reset_output_projection=False):
 
 
 def fit(model,train,valid,args,metadata,spec=None,scaler=None,weight=None):
+    if args.stage=='pretrain' and hasattr(model,'regularizer_weight'):
+        raise ValueError('Representation pretraining requires its dedicated runner; edge recovery evaluation is incompatible')
     model.set_stage(args.stage)
     parameters=[p for p in model.parameters() if p.requires_grad]
     optimizer=make_optimizer(model,args)

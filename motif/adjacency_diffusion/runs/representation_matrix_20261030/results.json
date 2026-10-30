@@ -1,0 +1,269 @@
+{
+  "runs": [
+    {
+      "best_epoch": 12,
+      "best_score": 0.8704874982511301,
+      "epochs_run": 60,
+      "elapsed_seconds": 103.80704519999995,
+      "arm": "masked",
+      "task_seed": 0,
+      "pretrain_seed": 7,
+      "validation": {
+        "rmse": 0.8704874982511301,
+        "mae": 0.6766722798347473,
+        "evaluated_tasks": 1.0
+      },
+      "head_initial_hash": "67769114a6d45c2e6136b23616b3a21d6add09093ba501c70e017be7656eea9b",
+      "encoder_initial_hash": "d93179d4af179fad59e32e80eddf332d63454c9797b22d680af13a463b8d66a4",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true,
+      "corpus": "small",
+      "objective": "edge",
+      "seed": 7,
+      "reused_original": true
+    },
+    {
+      "best_epoch": 18,
+      "best_score": 0.8752556835993547,
+      "epochs_run": 60,
+      "elapsed_seconds": 100.40094500000004,
+      "corpus": "small",
+      "objective": "representation",
+      "seed": 7,
+      "task_seed": 0,
+      "validation": {
+        "rmse": 0.8752556835993547,
+        "mae": 0.6720937490463257,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 28,
+      "best_score": 0.770295591342893,
+      "epochs_run": 60,
+      "elapsed_seconds": 107.28071260000002,
+      "arm": "masked",
+      "task_seed": 1,
+      "pretrain_seed": 1,
+      "validation": {
+        "rmse": 0.770295591342893,
+        "mae": 0.6378213167190552,
+        "evaluated_tasks": 1.0
+      },
+      "head_initial_hash": "331743ae36d337bab57044c37641869b3d82b95cfe74a6bea3452ef907ed0d8a",
+      "encoder_initial_hash": "cb08249be4784a70efd2aa8888d9b71dca8831cd8166c34e62bddf5b00111b7f",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true,
+      "corpus": "small",
+      "objective": "edge",
+      "seed": 1,
+      "reused_original": true
+    },
+    {
+      "best_epoch": 34,
+      "best_score": 0.8115014395733355,
+      "epochs_run": 60,
+      "elapsed_seconds": 102.78049379999993,
+      "corpus": "small",
+      "objective": "representation",
+      "seed": 1,
+      "task_seed": 1,
+      "validation": {
+        "rmse": 0.8115014395733355,
+        "mae": 0.641005277633667,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 12,
+      "best_score": 0.802586154294165,
+      "epochs_run": 60,
+      "elapsed_seconds": 97.29588489999992,
+      "arm": "masked",
+      "task_seed": 2,
+      "pretrain_seed": 2,
+      "validation": {
+        "rmse": 0.802586154294165,
+        "mae": 0.6576504111289978,
+        "evaluated_tasks": 1.0
+      },
+      "head_initial_hash": "da49d1de941d2e89ebc38d7081ea794c3c7f374c4810a2c8b158cf8652869de5",
+      "encoder_initial_hash": "49bb247783c58fbe1a6282becc2d5c5435a2f4307d246d50363c263e7aedec1f",
+      "test_evaluated": false,
+      "checkpoint_replay_passed": true,
+      "corpus": "small",
+      "objective": "edge",
+      "seed": 2,
+      "reused_original": true
+    },
+    {
+      "best_epoch": 52,
+      "best_score": 0.8167042530583843,
+      "epochs_run": 60,
+      "elapsed_seconds": 98.48253980000004,
+      "corpus": "small",
+      "objective": "representation",
+      "seed": 2,
+      "task_seed": 2,
+      "validation": {
+        "rmse": 0.8167042530583843,
+        "mae": 0.6423277854919434,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 58,
+      "best_score": 0.8599574802666211,
+      "epochs_run": 60,
+      "elapsed_seconds": 99.68308420000005,
+      "corpus": "expanded",
+      "objective": "edge",
+      "seed": 7,
+      "task_seed": 0,
+      "validation": {
+        "rmse": 0.8599574802666211,
+        "mae": 0.6715073585510254,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 28,
+      "best_score": 0.8336191561401559,
+      "epochs_run": 60,
+      "elapsed_seconds": 97.16864599999997,
+      "corpus": "expanded",
+      "objective": "representation",
+      "seed": 7,
+      "task_seed": 0,
+      "validation": {
+        "rmse": 0.8336191561401559,
+        "mae": 0.6701192259788513,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 28,
+      "best_score": 0.8262834045305891,
+      "epochs_run": 60,
+      "elapsed_seconds": 99.70611980000001,
+      "corpus": "expanded",
+      "objective": "edge",
+      "seed": 1,
+      "task_seed": 1,
+      "validation": {
+        "rmse": 0.8262834045305891,
+        "mae": 0.6807429790496826,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 42,
+      "best_score": 0.8065978770901803,
+      "epochs_run": 60,
+      "elapsed_seconds": 99.24828409999986,
+      "corpus": "expanded",
+      "objective": "representation",
+      "seed": 1,
+      "task_seed": 1,
+      "validation": {
+        "rmse": 0.8065978770901803,
+        "mae": 0.632041335105896,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 28,
+      "best_score": 0.8423900947990134,
+      "epochs_run": 60,
+      "elapsed_seconds": 98.61990220000007,
+      "corpus": "expanded",
+      "objective": "edge",
+      "seed": 2,
+      "task_seed": 2,
+      "validation": {
+        "rmse": 0.8423900947990134,
+        "mae": 0.6542161703109741,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    },
+    {
+      "best_epoch": 48,
+      "best_score": 0.8299439804291822,
+      "epochs_run": 60,
+      "elapsed_seconds": 99.4829473000002,
+      "corpus": "expanded",
+      "objective": "representation",
+      "seed": 2,
+      "task_seed": 2,
+      "validation": {
+        "rmse": 0.8299439804291822,
+        "mae": 0.6499348282814026,
+        "evaluated_tasks": 1.0
+      },
+      "checkpoint_replay_passed": true
+    }
+  ],
+  "aggregate": {
+    "small_edge": {
+      "n": 3,
+      "mean_rmse": 0.8144564146293961,
+      "sample_sd": 0.051139826581606936
+    },
+    "small_representation": {
+      "n": 3,
+      "mean_rmse": 0.8344871254103582,
+      "sample_sd": 0.03540231376121124
+    },
+    "expanded_edge": {
+      "n": 3,
+      "mean_rmse": 0.8428769931987412,
+      "sample_sd": 0.016842317141882456
+    },
+    "expanded_representation": {
+      "n": 3,
+      "mean_rmse": 0.8233870045531728,
+      "sample_sd": 0.014655470987078166
+    }
+  },
+  "scratch_reference": {
+    "n": 3,
+    "mean_rmse": 0.7871093541578864,
+    "sample_sd": 0.02804412413028663
+  },
+  "budget_note": "same graph draws and optimizer updates within corpus; representation uses two differentiable encoder passes versus one; not compute matched",
+  "test_evaluated": false,
+  "paired_factor_effects": [
+    {
+      "seed": 7,
+      "representation_minus_edge_small": 0.004768185348224541,
+      "representation_minus_edge_expanded": -0.026338324126465196,
+      "expanded_minus_small_edge": -0.010530017984509032,
+      "expanded_minus_small_representation": -0.04163652745919877,
+      "interaction": -0.031106509474689736
+    },
+    {
+      "seed": 1,
+      "representation_minus_edge_small": 0.04120584823044249,
+      "representation_minus_edge_expanded": -0.019685527440408856,
+      "expanded_minus_small_edge": 0.05598781318769608,
+      "expanded_minus_small_representation": -0.004903562483155266,
+      "interaction": -0.060891375670851344
+    },
+    {
+      "seed": 2,
+      "representation_minus_edge_small": 0.014118098764219322,
+      "representation_minus_edge_expanded": -0.01244611436983123,
+      "expanded_minus_small_edge": 0.03980394050484837,
+      "expanded_minus_small_representation": 0.013239727370797816,
+      "interaction": -0.02656421313405055
+    }
+  ]
+}

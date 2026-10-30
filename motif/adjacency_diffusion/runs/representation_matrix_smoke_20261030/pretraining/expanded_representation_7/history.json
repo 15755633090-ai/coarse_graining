@@ -1,0 +1,12 @@
+[
+  {
+    "step": 2,
+    "loss": 0.17391100525856018,
+    "parts": {
+      "consistency": 0.003041381947696209,
+      "sigreg": 3.420433521270752
+    },
+    "pre_clip_norm": 0.09545326977968216,
+    "unique_molecules_seen": 8
+  }
+]

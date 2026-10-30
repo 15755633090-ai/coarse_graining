@@ -1,0 +1,17 @@
+{
+  "state": "complete",
+  "best_epoch": 1,
+  "best_score": 2.0666737951135237,
+  "epochs_run": 2,
+  "elapsed_seconds": 0.08071810000000035,
+  "corpus": "small",
+  "objective": "representation",
+  "seed": 7,
+  "task_seed": 0,
+  "validation": {
+    "rmse": 2.0666737951135237,
+    "mae": 1.6531825065612793,
+    "evaluated_tasks": 1.0
+  },
+  "checkpoint_replay_passed": true
+}

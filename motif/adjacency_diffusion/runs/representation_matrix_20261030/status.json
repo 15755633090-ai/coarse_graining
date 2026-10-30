@@ -1,0 +1,10 @@
+{
+  "state": "complete",
+  "sources": 12,
+  "properties": 12,
+  "new_property_runs": 9,
+  "all_replays_passed": true,
+  "initialization_pairing_passed": true,
+  "test_evaluated": false,
+  "wall_seconds": 1329.6944465000001
+}
